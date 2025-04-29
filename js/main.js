@@ -8,35 +8,45 @@ const ruedas = [
 ];
 
 function drawWheel(canvasId, llenados, meta, rotation = 0) {
-  const canvas = document.getElementById(canvasId);
-  const ctx = canvas.getContext("2d");
-
-  if (!ctx) return;
-
-  const centerX = canvas.width / 2;
-  const centerY = canvas.height / 2;
-  const radius = Math.min(centerX, centerY) - 10;
-  const sliceAngle = (2 * Math.PI) / meta;
-
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  ctx.save();
-  ctx.translate(centerX, centerY);
-  ctx.rotate(rotation);
-
-  for (let i = 0; i < meta; i++) {
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.arc(0, 0, radius, i * sliceAngle, (i + 1) * sliceAngle);
-    ctx.closePath();
-    ctx.fillStyle = i < llenados ? "#4caf50" : "#333";
-    ctx.fill();
-    ctx.strokeStyle = "#555";
-    ctx.stroke();
+    const canvas = document.getElementById(canvasId);
+    const ctx = canvas.getContext("2d");
+  
+    if (!ctx) return;
+  
+    // Soporte HiDPI
+    const scale = window.devicePixelRatio || 1;
+    canvas.width = 400 * scale;
+    canvas.height = 400 * scale;
+    canvas.style.width = '200px';
+    canvas.style.height = '200px';
+    ctx.setTransform(scale, 0, 0, scale, 0, 0); // escalamos
+  
+    const centerX = canvas.width / (2 * scale);
+    const centerY = canvas.height / (2 * scale);
+    const radius = Math.min(centerX, centerY) - 10;
+    const sliceAngle = (2 * Math.PI) / meta;
+  
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+    ctx.save();
+    ctx.translate(centerX, centerY);
+    ctx.rotate(rotation);
+  
+    for (let i = 0; i < meta; i++) {
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.arc(0, 0, radius, i * sliceAngle, (i + 1) * sliceAngle);
+      ctx.closePath();
+      ctx.fillStyle = i < llenados ? getRandomColor(i) : "#333";
+      ctx.fill();
+      ctx.strokeStyle = "#222";
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+    }
+  
+    ctx.restore();
   }
-
-  ctx.restore();
-}
+  
 
 function actualizarUI() {
   ruedas.forEach(rueda => {
