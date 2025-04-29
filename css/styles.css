@@ -3,57 +3,91 @@ body {
     font-family: Arial, sans-serif;
     background-color: #111;
     color: white;
+    height: 100%;
+    overflow-x: hidden;
   }
   
+  /* -------- TOP BAR -------- */
   .top-bar {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
-    padding: 10px 20px;
+    padding: 10px 15px;
     background-color: #222;
+    gap: 10px;
+  }
+  
+  .social-icons {
+    display: flex;
+    justify-content: center;
   }
   
   .social-icons img {
-    width: 30px;
-    margin-right: 10px;
+    width: 28px;
+    margin: 0 5px;
   }
   
   .logo {
-    font-size: 2em;
+    font-size: 1.8em;
     font-weight: bold;
   }
   
   .terms {
     color: white;
-    font-size: 1.5em;
+    font-size: 1.3em;
     text-decoration: none;
+    align-self: flex-end;
+    margin-top: -25px;
   }
   
+  /* -------- BOLSA -------- */
   .animated-bag {
     text-align: center;
-    margin: 20px 0;
+    margin: 15px 0;
   }
   
   .animated-bag img {
-    width: 120px;
+    width: 100px;
   }
   
+  /* -------- REWARDS / VAULTS -------- */
   .rewards {
     display: flex;
-    justify-content: space-around;
-    padding: 20px;
-    gap: 20px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: stretch;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 15px;
+    padding: 10px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
   }
   
   .vault {
-    width: 30%;
-    text-align: center;
+    flex: 0 0 auto;
+    width: 90vw; /* ocupa el 90% del ancho visible */
+    max-width: 300px; /* no se estira ridículamente en pantallas grandes */
+    min-width: 250px; /* no se encoge demasiado en pantallas pequeñas */
     background: #222;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px #444;
+    padding: 20px 15px;
+    border-radius: 15px;
+    box-shadow: 0 0 12px #444;
+    text-align: center;
+    scroll-snap-align: center;
   }
   
+  
+  
+  /* Canvas (ruleta) */
+  canvas {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+  }
+  
+  /* -------- PROGRESS BAR -------- */
   .progress-container {
     width: 100%;
     height: 25px;
@@ -71,8 +105,27 @@ body {
     transition: width 0.8s ease;
   }
   
+  /* -------- BUTTONS -------- */
+  button {
+    width: 100%;
+    padding: 12px;
+    font-size: 1.1rem;
+    border-radius: 10px;
+    border: none;
+    background-color: #4caf50;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  button:hover {
+    background-color: #66bb6a;
+  }
+  
+  /* -------- META Y GANADORES -------- */
   .meta, .ganadores {
-    padding: 20px;
+    padding: 20px 15px;
+    font-size: 1rem;
   }
   
   .meta ul {
@@ -81,12 +134,19 @@ body {
     margin: 0;
   }
   
+  .galeria {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+  
   .galeria img {
-    width: 100px;
-    margin-right: 10px;
+    width: 80px;
     border-radius: 5px;
   }
-
+  
+  /* -------- MODAL -------- */
   .custom-modal {
     position: fixed;
     top: 50%;
@@ -100,11 +160,13 @@ body {
     z-index: 1000;
     box-shadow: 0 0 15px #4caf50;
     font-family: Arial, sans-serif;
+    width: 80%;
+    max-width: 300px;
   }
   
   .custom-modal h2 {
     margin: 0 0 10px 0;
-    font-size: 22px;
+    font-size: 1.3rem;
   }
   
   .custom-modal button {
@@ -113,10 +175,11 @@ body {
     border: none;
     padding: 10px 20px;
     margin-top: 10px;
-    font-size: 16px;
+    font-size: 1rem;
     border-radius: 10px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    width: 100%;
   }
   
   .custom-modal button:hover {
