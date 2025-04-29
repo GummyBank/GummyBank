@@ -7,6 +7,12 @@ const ruedas = [
   { id: "canvas-dorada", meta: 500, rotation: 0 }
 ];
 
+function getRandomColor(seed = 0) {
+    const hue = (seed * 137.5) % 360; // ángulo base variado para colores distintos
+    return `hsl(${hue}, 85%, 60%)`;
+  }
+  
+
 function drawWheel(canvasId, llenados, meta, rotation = 0) {
     const canvas = document.getElementById(canvasId);
     const ctx = canvas.getContext("2d");
