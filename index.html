@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sorteo de Gomitas</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header>
+    <div class="top-bar">
+      <div class="social-icons">
+        <a href="#"><img src="icons/instagram.svg" alt="Instagram"></a>
+        <a href="#"><img src="icons/whatsapp.svg" alt="WhatsApp"></a>
+      </div>
+      <div class="logo">LOGO</div>
+      <a href="#" class="terms">?</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="animated-bag">
+      <img src="img/bolsa-girando.gif" alt="Bolsa de gomitas">
+    </div>
+
+    <section class="rewards">
+      <div class="vault">
+        <h3>CRISTAL</h3>
+        <canvas id="canvas-cristal" width="200" height="200"></canvas>
+        <div class="progress-container">
+          <div class="progress-bar" style="--percent: 0%"></div>
+        </div>
+        <p><span class="count" data-meta="100">0</span> / 100</p>
+        <button onclick="registrarCodigo()">Registrar Código</button>
+      </div>
+
+      <div class="vault">
+        <h3>PLATEADA</h3>
+        <canvas id="canvas-plateada" width="200" height="200"></canvas>
+        <div class="progress-container">
+          <div class="progress-bar" style="--percent: 0%"></div>
+        </div>
+        <p><span class="count" data-meta="250">0</span> / 250</p>
+        <button onclick="registrarCodigo()">Registrar Código</button>
+      </div>
+
+      <div class="vault">
+        <h3>DORADA</h3>
+        <canvas id="canvas-dorada" width="200" height="200"></canvas>
+        <div class="progress-container">
+          <div class="progress-bar" style="--percent: 0%"></div>
+        </div>
+        <p><span class="count" data-meta="500">0</span> / 500</p>
+        <button onclick="registrarCodigo()">Registrar Código</button>
+      </div>
+    </section>
+
+    <section class="meta">
+      <h4>Meta para desbloquear</h4>
+      <p>Lista de códigos anotados</p>
+      <ul id="lista-codigos"></ul>
+    </section>
+
+    <section class="ganadores">
+      <h4>Ganadores</h4>
+      <div class="galeria">
+        <img src="img/ganador1.jpg" alt="Ganador 1">
+        <img src="img/ganador2.jpg" alt="Ganador 2">
+      </div>
+    </section>
+  </main>
+
+  <div id="overlay" style="display: none;"></div>
+<div id="customModal" class="custom-modal" style="display: none;">
+  <h2>Registro con éxito</h2>
+  <p>¡Mucha suerte!</p>
+  <button onclick="closeModal()">OK</button>
+</div>
+
+
+  <script src="js/main.js"></script>
+</body>
+</html>
