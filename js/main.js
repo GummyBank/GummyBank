@@ -24,7 +24,7 @@ function getRandomColor(seed = 0) {
     canvas.width = 400 * scale;
     canvas.height = 200 * scale;
     canvas.style.width = '100%';
-    canvas.style.height = 'auto';
+    canvas.style.height = '150px'; // aseguras visibilidad mínima
     ctx.setTransform(scale, 0, 0, scale, 0, 0);
   
     const width = canvas.width / scale;
@@ -68,44 +68,27 @@ function getRandomColor(seed = 0) {
     ctx.fillText(Math.round(progress * 100) + "%", width / 2, liquidHeight - 8);  
   }
   
-function actualizarUI() {
-  ruedas.forEach(rueda => {
-    const meta = rueda.meta;
-    const llenados = Math.min(totalRegistrados, meta);
-    const canvas = document.getElementById(rueda.id);
-    const span = canvas.closest(".vault").querySelector(".count");
-    const barra = canvas.closest(".vault").querySelector(".progress-bar");
-
-    drawLiquid(rueda.id, llenados, meta);
-
-    span.textContent = llenados;
-    barra.style.setProperty("--percent", (llenados / meta * 100) + "%");
-  });
-
-  const lista = document.getElementById("lista-codigos");
-  lista.innerHTML = codigosRegistrados.map(c => `<li>${c}</li>`).join('');
-}
-
-function easeOutCubic(t) {
-  return 1 - Math.pow(1 - t, 3);
-}
-
-function registrarCodigo() {
-    const nuevoCodigo = prompt("Ingresa tu código:");
-    
-    if (nuevoCodigo && !codigosRegistrados.includes(nuevoCodigo)) {
-      codigosRegistrados.push(nuevoCodigo);
-      totalRegistrados++;
+  function actualizarUI() {
+    ruedas.forEach(rueda => {
+      const meta = rueda.meta;
+      const llenados = Math.min(totalRegistrados, meta);
+      const canvas = document.getElementById(rueda.id);
   
-      // Mostrar ventana personalizada de éxito
-      showModal();
+      if (!canvas) return; // Evita errores si falta el canvas
   
-      // Actualizar progreso
-      actualizarUI();
-    } else {
-      alert("Código inválido o ya registrado.");
-    }
-  }
+      drawLiquid(rueda.id, llenados, meta);
+  
+      const vault = canvas.closest(".vault");
+      const span = vault?.querySelector(".count");
+      const barra = vault?.querySelector(".progress-bar");
+  
+      if (span) span.textContent = llenados;
+      if (barra) barra.style.setProperty("--percent", (llenados / meta * 100) + "%");
+    });
+  
+    const lista = document.getElementById("lista-codigos");
+    lista.innerHTML = codigosRegistrados.map(c => `<li>${c}</li>`).join('');
+  }   
   
 
 function showModal() {
@@ -123,10 +106,26 @@ function showModal() {
     requestAnimationFrame(loopAnimacion);
   }
   
-
-// Inicializar ruletas
-window.onload = function() {
-  actualizarUI();
-  loopAnimacion(); // iniciar animación LED
-};
-
+  function registrarCodigo() {
+    const nuevoCodigo = prompt("Ingresa tu código:");
+  
+    if (nuevoCodigo && !codigosRegistrados.includes(nuevoCodigo)) {
+      codigosRegistrados.push(nuevoCodigo);
+      totalRegistrados++;
+  
+      showModal();
+      actualizarUI();
+    } else {
+      alert("Código inválido o ya registrado.");
+    }
+  }
+  
+  // Inicializar ruletas
+  window.onload = function() {
+    actualizarUI();
+    loopAnimacion(); // iniciar animación LED
+  };
+  
+  window.registrarCodigo = registrarCodigo;
+  window.closeModal = closeModal;
+  
