@@ -76,7 +76,7 @@ body {
 
   @media (max-width: 768px) {
     .vault {
-      width: 33%%;
+      width: 33%;
       aspect-ratio: 1 / 1;
     }
   }
