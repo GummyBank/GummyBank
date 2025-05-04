@@ -1,264 +1,236 @@
 body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #111;
-    color: white;
-    height: 100%;
-    overflow-x: hidden;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #111;
+  color: white;
+  height: 100%;
+  overflow-x: hidden;
+}
+
+/* -------- TOP BAR -------- */
+.top-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 15px;
+  background-color: #222;
+  gap: 10px;
+}
+
+.social-icons {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.social-icons img {
+  width: 28px;
+  margin: 0 5px;
+}
+
+.logo {
+  font-size: 1.8em;
+  font-weight: bold;
+  text-align: center;
+}
+
+.terms {
+  color: white;
+  font-size: 1.3em;
+  text-decoration: none;
+  margin-top: -15px;
+  align-self: flex-end;
+}
+
+/* -------- BOLSA -------- */
+.animated-bag {
+  text-align: center;
+  margin: 15px 0;
+}
+
+.animated-bag img {
+  width: 100px;
+}
+
+/* -------- REWARDS / VAULTS -------- */
+.rewards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  padding: 10px;
+}
+
+.vault {
+  flex: 0 1 calc(33.333% - 20px);
+  aspect-ratio: 1 / 1;
+  box-sizing: border-box;
+  background: #222;
+  padding: 15px;
+  border-radius: 15px;
+  box-shadow: 0 0 12px #444;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s ease;
+}
+
+.vault:hover {
+  transform: scale(1.03);
+}
+
+/* Canvas (ruleta) */
+canvas {
+  width: 100%;
+  height: 100px;
+  display: block;
+  margin: 0 auto 10px;
+  object-fit: contain;
+}
+
+/* -------- PROGRESS BAR -------- */
+.progress-container {
+  width: 100%;
+  height: 25px;
+  background: #333;
+  border: 2px solid #555;
+  margin: 10px 0;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(to right, #4caf50, #8bc34a);
+  width: var(--percent);
+  transition: width 0.8s ease;
+}
+
+/* -------- BUTTONS -------- */
+button {
+  width: 100%;
+  padding: 12px;
+  font-size: 1.1rem;
+  border-radius: 10px;
+  border: none;
+  background-color: #4caf50;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #66bb6a;
+}
+
+/* -------- META Y GANADORES -------- */
+.meta, .ganadores {
+  padding: 20px 15px;
+  font-size: 1rem;
+}
+
+.meta ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.galeria {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.galeria img {
+  width: 80px;
+  border-radius: 5px;
+}
+
+/* -------- MODAL -------- */
+.custom-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #222;
+  color: #fff;
+  padding: 20px 30px;
+  border-radius: 15px;
+  text-align: center;
+  z-index: 1000;
+  box-shadow: 0 0 15px #4caf50;
+  font-family: Arial, sans-serif;
+  width: 80%;
+  max-width: 300px;
+}
+
+.custom-modal h2 {
+  margin: 0 0 10px 0;
+  font-size: 1.3rem;
+}
+
+.custom-modal button {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin-top: 10px;
+  font-size: 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 100%;
+}
+
+.custom-modal button:hover {
+  background-color: #66bb6a;
+}
+
+#overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: rgba(0,0,0,0.6);
+  z-index: 999;
+}
+
+/* -------- MEDIA QUERIES -------- */
+@media (max-width: 550px) {
+  .vault {
+    flex: 0 1 80%;
+    width: 100%;
+    max-width: 320px;
   }
-  
-  /* -------- TOP BAR -------- */
-  .top-bar {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 10px 15px;
-    background-color: #222;
-    gap: 10px;
-  }
-  
-  .social-icons {
-    display: flex;
-    justify-content: center;
-  }
-  
-  .social-icons img {
-    width: 28px;
-    margin: 0 5px;
-  }
-  
+
   .logo {
-    font-size: 1.8em;
-    font-weight: bold;
+    font-size: 1.4em;
   }
-  
+
   .terms {
-    color: white;
-    font-size: 1.3em;
-    text-decoration: none;
-    align-self: flex-end;
-    margin-top: -25px;
+    font-size: 1em;
+    align-self: center;
+    margin-top: 0;
   }
-  
-  /* -------- BOLSA -------- */
-  .animated-bag {
-    text-align: center;
-    margin: 15px 0;
+
+  .social-icons img {
+    width: 24px;
   }
-  
-  .animated-bag img {
-    width: 100px;
-  }
-  
-  /* -------- REWARDS / VAULTS -------- */
-  .rewards {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 15px;
+
+  button {
+    font-size: 1rem;
     padding: 10px;
   }
-   
-  
-  .vault {
-    width: 30%;
-    aspect-ratio: 1 / 1; /* Mantiene proporción cuadrada */
-    box-sizing: border-box;
-    background: #222;
-    padding: 15px;
-    border-radius: 15px;
-    box-shadow: 0 0 12px #444;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
 
-  @media (max-width: 768px) {
-    .vault {
-      width: 33%;
-      aspect-ratio: 1 / 1;
-    }
-  }
-  
-  
-  
-  /* Canvas (ruleta) */
-  canvas {
-    width: 100%;
-    height: 100px; /* 🔥 más estilizado */
-    display: block;
-    margin: 0 auto 10px;
-    object-fit: contain;
-  }
-  
-  
-  /* -------- PROGRESS BAR -------- */
-  .progress-container {
-    width: 100%;
-    height: 25px;
-    background: #333;
-    border: 2px solid #555;
-    margin: 10px 0;
-    border-radius: 5px;
-    overflow: hidden;
-  }
-  
-  .progress-bar {
-    height: 100%;
-    background: linear-gradient(to right, #4caf50, #8bc34a);
-    width: var(--percent);
-    transition: width 0.8s ease;
-  }
-  
-  /* -------- BUTTONS -------- */
-  button {
-    width: 100%;
-    padding: 12px;
-    font-size: 1.1rem;
-    border-radius: 10px;
-    border: none;
-    background-color: #4caf50;
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  button:hover {
-    background-color: #66bb6a;
-  }
-  
-  /* -------- META Y GANADORES -------- */
-  .meta, .ganadores {
-    padding: 20px 15px;
-    font-size: 1rem;
-  }
-  
-  .meta ul {
-    list-style: none;
-    padding-left: 0;
-    margin: 0;
-  }
-  
-  .galeria {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
-  }
-  
-  .galeria img {
-    width: 80px;
-    border-radius: 5px;
-  }
-  
-  /* -------- MODAL -------- */
-  .custom-modal {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #222;
-    color: #fff;
-    padding: 20px 30px;
-    border-radius: 15px;
-    text-align: center;
-    z-index: 1000;
-    box-shadow: 0 0 15px #4caf50;
-    font-family: Arial, sans-serif;
-    width: 80%;
-    max-width: 300px;
-  }
-  
   .custom-modal h2 {
-    margin: 0 0 10px 0;
-    font-size: 1.3rem;
+    font-size: 1.1rem;
   }
-  
-  .custom-modal button {
-    background-color: #4caf50;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    margin-top: 10px;
-    font-size: 1rem;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    width: 100%;
-  }
-  
-  .custom-modal button:hover {
-    background-color: #66bb6a;
-  }
-  
-  #overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    background: rgba(0,0,0,0.6);
-    z-index: 999;
-  }
-  
-  @media (max-width: 600px) {
 
-    .top-bar {
-      flex-direction: column;
-      align-items: center;
-      gap: 5px;
-      padding: 8px;
-    }
-  
-    .social-icons img {
-      width: 24px;
-      margin: 0 3px;
-    }
-  
-    .logo {
-      font-size: 1.4em;
-      text-align: center;
-    }
-  
-    .terms {
-      font-size: 1em;
-      margin-top: 0;
-      align-self: center;
-    }
-  
-    .animated-bag img {
-      width: 80px;
-    }
-  
-    .vault {
-      width: 90%; /* Casi todo el ancho disponible */
-      margin-bottom: 15px;
-    }
-  
-    .rewards {
-      flex-direction: column;
-      align-items: center;
-    }
-  
-    .meta, .ganadores {
-      font-size: 0.95rem;
-      padding: 10px;
-    }
-  
-    .custom-modal {
-      width: 90%;
-      font-size: 0.9rem;
-    }
-  
-    .custom-modal h2 {
-      font-size: 1.1rem;
-    }
-  
-    button {
-      font-size: 1rem;
-      padding: 10px;
-    }
-  
+  .meta, .ganadores {
+    padding: 10px;
+    font-size: 0.95rem;
   }
-  
+}
