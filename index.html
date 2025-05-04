@@ -26,30 +26,21 @@
     <section class="rewards">
       <div class="vault">
         <h3>CRISTAL</h3>
-        <canvas id="canvas-cristal" width="200" height="200"></canvas>
-        <div class="progress-container">
-          <div class="progress-bar" style="--percent: 0%"></div>
-        </div>
+        <canvas id="canvas-cristal" class="liquid-canvas"></canvas>
         <p><span class="count" data-meta="100">0</span> / 100</p>
         <button onclick="registrarCodigo()">Registrar Código</button>
       </div>
 
       <div class="vault">
         <h3>PLATEADA</h3>
-        <canvas id="canvas-plateada" width="200" height="200"></canvas>
-        <div class="progress-container">
-          <div class="progress-bar" style="--percent: 0%"></div>
-        </div>
+        <canvas id="canvas-plateada" class="liquid-canvas"></canvas>
         <p><span class="count" data-meta="250">0</span> / 250</p>
         <button onclick="registrarCodigo()">Registrar Código</button>
       </div>
 
       <div class="vault">
         <h3>DORADA</h3>
-        <canvas id="canvas-dorada" width="200" height="200"></canvas>
-        <div class="progress-container">
-          <div class="progress-bar" style="--percent: 0%"></div>
-        </div>
+        <canvas id="canvas-dorada" class="liquid-canvas"></canvas>
         <p><span class="count" data-meta="500">0</span> / 500</p>
         <button onclick="registrarCodigo()">Registrar Código</button>
       </div>
@@ -71,12 +62,11 @@
   </main>
 
   <div id="overlay" style="display: none;"></div>
-<div id="customModal" class="custom-modal" style="display: none;">
-  <h2>Registro con éxito</h2>
-  <p>¡Mucha suerte!</p>
-  <button onclick="closeModal()">OK</button>
-</div>
-
+  <div id="customModal" class="custom-modal" style="display: none;">
+    <h2>Registro con éxito</h2>
+    <p>¡Mucha suerte!</p>
+    <button onclick="closeModal()">OK</button>
+  </div>
 
   <script src="js/main.js"></script>
 </body>

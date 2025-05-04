@@ -80,8 +80,7 @@ body {
   transform: scale(1.03);
 }
 
-/* Canvas (ruleta) */
-canvas {
+canvas:not(.liquid-canvas) {
   width: 100%;
   height: 100px;
   display: block;
@@ -198,13 +197,39 @@ button:hover {
   z-index: 999;
 }
 
+.liquid-canvas {
+  width: 100%;
+  height: auto;
+  min-height: 120px;
+  aspect-ratio: 2 / 1;
+  background-color: #111;
+  border-radius: 10px;
+  display: block;
+}
+
+.vault canvas {
+  box-shadow: 0 0 10px rgba(0, 255, 180, 0.3);
+  transition: box-shadow 0.4s ease;
+}
+
 /* -------- MEDIA QUERIES -------- */
-@media (max-width: 550px) {
-  .vault {
-    flex: 0 1 80%;
-    width: 100%;
-    max-width: 320px;
+@media (max-width: 500px) {
+  .rewards {
+    flex-direction: column;
+    align-items: center;
   }
+
+  .vault {
+    width: 70%;
+    max-width: 360px;
+    aspect-ratio: auto;
+  }
+
+  .vault {
+    margin-bottom: 20px;
+  }
+  
+}
 
   .logo {
     font-size: 1.4em;
@@ -233,4 +258,4 @@ button:hover {
     padding: 10px;
     font-size: 0.95rem;
   }
-}
+
