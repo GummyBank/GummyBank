@@ -5,41 +5,52 @@ body {
   color: white;
   height: 100%;
   overflow-x: hidden;
+  background-color: black !important;
 }
 
 /* -------- TOP BAR -------- */
 .top-bar {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
-  padding: 10px 15px;
+  padding: 10px 20px;
   background-color: #222;
-  gap: 10px;
 }
 
-.social-icons {
+.left-group {
   display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
 }
 
-.social-icons img {
-  width: 28px;
-  margin: 0 5px;
-}
-
-.logo {
-  font-size: 1.8em;
+.header-title {
+  font-size: 1.4em;
   font-weight: bold;
-  text-align: center;
+  color: white;
 }
 
-.terms {
-  color: white;
-  font-size: 1.3em;
-  text-decoration: none;
-  margin-top: -15px;
-  align-self: flex-end;
+.left-group i {
+  font-size: 1.5em;
+  color: #ffeb3b;
+  text-shadow: 0 0 5px #ffd700, 0 0 10px #ffd700;
+  animation: glowPulse 2s infinite alternate;
+}
+
+.icon-question i {
+  font-size: 1.6em;
+  color: red;
+  animation: blinkRed 1s infinite;
+}
+
+/* -------- ANIMACIONES ICONOS -------- */
+@keyframes glowPulse {
+  0% { text-shadow: 0 0 5px #53c706; }
+  100% { text-shadow: 0 0 15px #66ff00; }
+}
+
+@keyframes blinkRed {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
 }
 
 /* -------- BOLSA -------- */
@@ -80,12 +91,28 @@ body {
   transform: scale(1.03);
 }
 
+.vault canvas {
+  box-shadow: 0 0 10px rgba(0, 255, 180, 0.3);
+  transition: box-shadow 0.4s ease;
+}
+
+/* -------- CANVAS GENERAL -------- */
 canvas:not(.liquid-canvas) {
   width: 100%;
   height: 100px;
   display: block;
   margin: 0 auto 10px;
   object-fit: contain;
+}
+
+.liquid-canvas {
+  width: 100%;
+  height: auto;
+  min-height: 120px;
+  aspect-ratio: 2 / 1;
+  background-color: #111;
+  border-radius: 10px;
+  display: block;
 }
 
 /* -------- PROGRESS BAR -------- */
@@ -113,14 +140,22 @@ button {
   font-size: 1.1rem;
   border-radius: 10px;
   border: none;
-  background-color: #4caf50;
+  background: linear-gradient(90deg, #4caf50, #d4af37);
+  background-size: 200% 100%;
+  background-position: left;
   color: white;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-position 1.2s ease-in-out;
+  animation: buttonPulse 2s infinite alternate;
 }
 
 button:hover {
-  background-color: #66bb6a;
+  background-position: right;
+}
+
+@keyframes buttonPulse {
+  0% { box-shadow: 0 0 6px #4caf50; }
+  100% { box-shadow: 0 0 16px #d4af37; }
 }
 
 /* -------- META Y GANADORES -------- */
@@ -197,19 +232,28 @@ button:hover {
   z-index: 999;
 }
 
-.liquid-canvas {
+/* -------- LLUVIA EFECTO -------- */
+#lluvia-container {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: auto;
-  min-height: 120px;
-  aspect-ratio: 2 / 1;
-  background-color: #111;
-  border-radius: 10px;
-  display: block;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
 }
 
-.vault canvas {
-  box-shadow: 0 0 10px rgba(0, 255, 180, 0.3);
-  transition: box-shadow 0.4s ease;
+.gomita {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  animation: caer 4s linear forwards;
+  opacity: 0.95;
+}
+
+@keyframes caer {
+  0% { transform: translateY(-60px) rotate(0deg); }
+  100% { transform: translateY(100vh) rotate(360deg); }
 }
 
 /* -------- MEDIA QUERIES -------- */
@@ -223,26 +267,12 @@ button:hover {
     width: 90%;
     max-width: 360px;
     aspect-ratio: auto;
-  }
-
-  .vault {
     margin-bottom: 20px;
   }
-  
-}
 
-  .logo {
-    font-size: 1.4em;
-  }
-
-  .terms {
-    font-size: 1em;
-    align-self: center;
-    margin-top: 0;
-  }
-
-  .social-icons img {
-    width: 24px;
+  .meta, .ganadores {
+    padding: 10px;
+    font-size: 0.95rem;
   }
 
   button {
@@ -254,8 +284,7 @@ button:hover {
     font-size: 1.1rem;
   }
 
-  .meta, .ganadores {
-    padding: 10px;
-    font-size: 0.95rem;
+  .social-icons img {
+    width: 24px;
   }
-
+}

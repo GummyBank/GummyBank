@@ -5,20 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sorteo de Gomitas</title>
   <link rel="stylesheet" href="css/styles.css">
+  <!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
 </head>
 <body>
   <header>
     <div class="top-bar">
-      <div class="social-icons">
-        <a href="#"><img src="icons/instagram.svg" alt="Instagram"></a>
-        <a href="#"><img src="icons/whatsapp.svg" alt="WhatsApp"></a>
+      <div class="left-group">
+        <span class="header-title">Redes</span>
+        <i class="bi bi-instagram"></i>
+        <i class="bi bi-whatsapp"></i>
       </div>
-      <div class="logo">LOGO</div>
-      <a href="#" class="terms">?</a>
+      <div class="icon-question">
+        <i class="bi bi-question-circle-fill"></i>
+      </div>
     </div>
+    
   </header>
-
+  
+  
+  
   <main>
+    <div id="lluvia-container"></div>
+
     <div class="animated-bag">
       <img src="img/bolsa-girando.gif" alt="Bolsa de gomitas">
     </div>
@@ -27,21 +37,21 @@
       <div class="vault">
         <h3>CRISTAL</h3>
         <canvas id="canvas-cristal" class="liquid-canvas"></canvas>
-        <p> META 100 EMPAQUES REGISTRADOS</p>
+        <p> Meta de Empaques <span class="count" data-meta="250">0</span> / 100</p>
         <button onclick="registrarCodigo()">Registrar Código</button>
       </div>
 
       <div class="vault">
         <h3>PLATEADA</h3>
         <canvas id="canvas-plateada" class="liquid-canvas"></canvas>
-        <p><span class="count" data-meta="250">0</span> / 250</p>
+        <p> Meta de Empaques <span class="count" data-meta="250">0</span> / 250</p>
         <button onclick="registrarCodigo()">Registrar Código</button>
       </div>
 
       <div class="vault">
         <h3>DORADA</h3>
         <canvas id="canvas-dorada" class="liquid-canvas"></canvas>
-        <p><span class="count" data-meta="500">0</span> / 500</p>
+        <p> Meta de Empaques <span class="count" data-meta="500">0</span> / 500</p>
         <button onclick="registrarCodigo()">Registrar Código</button>
       </div>
     </section>
