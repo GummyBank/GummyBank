@@ -33,16 +33,24 @@ function getRandomColor(seed = 0) {
   
     ctx.clearRect(0, 0, width, height);
   
-    // Glow exterior (bóveda brillante)
+    // --- Glow exterior
     ctx.save();
-    const glowPulse = 0.3 + 0.2 * Math.sin(Date.now() / 500); // cambia cada segundo
-    ctx.shadowColor = `rgba(255, 215, 0, ${glowPulse})`;
+    const glowPulse = 0.3 + 0.2 * Math.sin(Date.now() / 500);
+  
+    if (canvasId.includes("cristal")) {
+      ctx.shadowColor = `rgba(0, 255, 255, ${glowPulse})`;
+    } else if (canvasId.includes("plateada")) {
+      ctx.shadowColor = `rgba(200, 200, 200, ${glowPulse})`;
+    } else {
+      ctx.shadowColor = `rgba(255, 215, 0, ${glowPulse})`;
+    }
+  
     ctx.shadowBlur = 40;
     ctx.fillStyle = "#222";
     ctx.fillRect(0, 0, width, height);
     ctx.restore();
   
-    // Nivel del líquido
+    // --- Nivel del líquido
     const liquidHeight = height * (1 - progress);
     const waveAmplitude = 6;
     const waveLength = 50;
@@ -58,18 +66,30 @@ function getRandomColor(seed = 0) {
     ctx.lineTo(0, height);
     ctx.closePath();
   
-    // Gradiente dorado con brillo pulsante
+    // --- Gradiente personalizado por bóveda
     const t = Date.now() / 1000;
-    const goldShift = Math.sin(t * 2) * 0.1;
+    const shift = Math.sin(t * 2) * 0.1;
+    let gradient = ctx.createLinearGradient(0, liquidHeight, 0, height);
   
-    const gradient = ctx.createLinearGradient(0, liquidHeight, 0, height);
-    gradient.addColorStop(0, `hsl(45, 100%, ${60 + goldShift * 20}%)`);
-    gradient.addColorStop(0.5, `hsl(43, 95%, ${55 + goldShift * 15}%)`);
-    gradient.addColorStop(1, `hsl(39, 90%, ${45 + goldShift * 10}%)`);
+    if (canvasId.includes("cristal")) {
+      gradient.addColorStop(0, `hsl(190, 100%, ${60 + shift * 20}%)`);
+      gradient.addColorStop(0.5, `hsl(185, 95%, ${55 + shift * 15}%)`);
+      gradient.addColorStop(1, `hsl(180, 90%, ${50 + shift * 10}%)`);
+    } else if (canvasId.includes("plateada")) {
+      gradient.addColorStop(0, `hsl(0, 0%, ${75 + shift * 10}%)`);
+      gradient.addColorStop(0.5, `hsl(0, 0%, ${65 + shift * 10}%)`);
+      gradient.addColorStop(1, `hsl(0, 0%, ${55 + shift * 10}%)`);
+    } else {
+      // Dorada
+      gradient.addColorStop(0, `hsl(45, 100%, ${60 + shift * 20}%)`);
+      gradient.addColorStop(0.5, `hsl(43, 95%, ${55 + shift * 15}%)`);
+      gradient.addColorStop(1, `hsl(39, 90%, ${45 + shift * 10}%)`);
+    }
+  
     ctx.fillStyle = gradient;
     ctx.fill();
   
-    // Burbujas animadas que suben
+    // --- Burbujas
     const bubbleCount = 10;
     const bubbleTime = Date.now() / 800;
     for (let i = 0; i < bubbleCount; i++) {
@@ -85,14 +105,14 @@ function getRandomColor(seed = 0) {
       ctx.fill();
     }
   
-    // Porcentaje flotante
+    // --- Porcentaje
     ctx.shadowBlur = 0;
     ctx.font = `${Math.max(14, height * 0.12)}px Arial`;
     ctx.fillStyle = "white";
     ctx.textAlign = "center";
     ctx.fillText((progress * 100).toFixed(1) + "%", width / 2, liquidHeight - 10);
-
   }
+  
   
   
   function actualizarUI() {
