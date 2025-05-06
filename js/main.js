@@ -159,7 +159,7 @@ function showModal() {
 
   function crearLluviaImagen() {
     const img = document.createElement("img");
-    img.src = "../img/gomita.png"; // ← pon el nombre exacto aquí
+    img.src = "./img/gomita.png"; // ← pon el nombre exacto aquí
     img.className = "gomita";
     img.style.left = Math.random() * window.innerWidth + "px";
     img.style.animationDuration = (2 + Math.random() * 3) + "s";
