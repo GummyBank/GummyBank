@@ -30,6 +30,20 @@
         display: block;            /* elimina espacio adicional */
         margin: 20px auto;         /* centra horizontalmente */
       }
+      .imagen-recompensa {
+        width: 90vw;               /* 90% del ancho visible del viewport */
+        max-width: 1000px;         /* límite para pantallas muy grandes */
+        height: auto;              /* mantiene la proporción */
+        display: block;            /* elimina espacio adicional */
+        margin: 20px auto;         /* centra horizontalmente */
+        margin-left: -5px;
+      }
+      
+      
+      
+      
+      
+      
       
     </style>
 
@@ -51,7 +65,7 @@
 
     <section class="rewards">
       <div class="vault">
-        <h3>CRISTAL</h3>
+        <img class="imagen-recompensa" src="./img/Cristal.png"  alt="Premio Cristal">    
         <canvas id="canvas-cristal" class="liquid-canvas"></canvas>
         <p> Meta de Empaques <span class="count" data-meta="250">0</span> / 100</p>
         <button onclick="registrarCodigo()">Registrar Código</button>
