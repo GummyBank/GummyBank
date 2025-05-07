@@ -288,3 +288,21 @@ button:hover {
     width: 24px;
   }
 }
+/* Estilos visuales específicos para cada canvas */
+#canvas-cristal {
+  background: radial-gradient(circle, #d0f8ff, #a0e9ff);
+  border: 2px solid #00eaff;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+}
+
+#canvas-plateada {
+  background: linear-gradient(135deg, #f0f0f0, #aaa);
+  border: 2px solid #ccc;
+  box-shadow: 0 0 15px rgba(180, 180, 180, 0.6);
+}
+
+#canvas-dorada {
+  background: linear-gradient(135deg, #fff4b5, #ffc107);
+  border: 2px solid #ffcc00;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+}

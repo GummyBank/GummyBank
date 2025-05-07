@@ -56,6 +56,19 @@
     .vault.dorada button {
       background: linear-gradient(90deg, #ffd700, #ff9900);
     }
+    .vault.dorada {
+      position: relative;
+    }
+    
+    .vault.dorada .regalo-icono {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 50px;
+      height: auto;
+      z-index: 3;
+    }
+    
   </style>
 </head>
 
@@ -96,11 +109,13 @@
       </div>
 
       <div class="vault dorada">
+        <img class="regalo-icono" src="./img/regalo-oro.png" alt="Regalo Oro">
         <img class="imagen-recompensa" src="./img/oro.png" alt="Premio Oro">
         <canvas id="canvas-dorada" class="liquid-canvas"></canvas>
         <p> Meta de Empaques <span class="count" data-meta="500">0</span> / 500</p>
         <button onclick="registrarCodigo()">Registrar Código</button>
       </div>
+      
     </section>
 
     <section class="meta">
