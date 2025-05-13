@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Actualizar Ranking de Escuelas</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #111;
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 30px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    input[type="number"] {
+      width: 80px;
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: none;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      background-color: #0d6efd;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #084298;
+    }
+  </style>
+</head>
+<body>
+  <h1>📊 Actualizar Ranking de Escuelas</h1>
+
+  <div class="form-group">
+    <label>Tecnológico de Pachuca:</label>
+    <input type="number" id="tec" min="0">
+  </div>
+
+  <div class="form-group">
+    <label>Preparatoria No. 1:</label>
+    <input type="number" id="prepa1" min="0">
+  </div>
+
+  <div class="form-group">
+    <label>CEHUM:</label>
+    <input type="number" id="cehum" min="0">
+  </div>
+
+  <div class="form-group">
+    <label>UPEFIM:</label>
+    <input type="number" id="upefim" min="0">
+  </div>
+
+  <button onclick="guardarRanking()">Guardar Ranking</button>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import {
+      getFirestore,
+      doc,
+      setDoc
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAJJgDg5SUPvvHgPtDNhIy1f1fiGpBHBw",
+      authDomain: "registro-gomitas.firebaseapp.com",
+      projectId: "registro-gomitas",
+      storageBucket: "registro-gomitas.appspot.com",
+      messagingSenderId: "435485731864",
+      appId: "1:435485731864:web:43dff09753a4c9d507e76d"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.guardarRanking = async function () {
+      const data = {
+        tec: Number(document.getElementById("tec").value || 0),
+        prepa1: Number(document.getElementById("prepa1").value || 0),
+        cehum: Number(document.getElementById("cehum").value || 0),
+        upefim: Number(document.getElementById("upefim").value || 0)
+      };
+
+      await setDoc(doc(db, "ranking", "actual"), data);
+      alert("Ranking actualizado correctamente ✅");
+    }
+  </script>
+</body>
+</html>

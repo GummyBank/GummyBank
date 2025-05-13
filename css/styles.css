@@ -31,21 +31,25 @@ body {
 
 .left-group i {
   font-size: 1.5em;
-  color: #ffeb3b;
+  color: whitesmoke;
   text-shadow: 0 0 5px #ffd700, 0 0 10px #ffd700;
   animation: glowPulse 2s infinite alternate;
 }
 
+.left-group span{
+  font-size: 17px;
+}
+
 .icon-question i {
   font-size: 1.6em;
-  color: red;
+  color: whitesmoke;
   animation: blinkRed 1s infinite;
 }
 
 /* -------- ANIMACIONES ICONOS -------- */
 @keyframes glowPulse {
-  0% { text-shadow: 0 0 5px #53c706; }
-  100% { text-shadow: 0 0 15px #66ff00; }
+  0% { text-shadow: 0 0 5px whitesmoke; }
+  100% { text-shadow: 0 0 15px whitesmoke; }
 }
 
 @keyframes blinkRed {
@@ -288,21 +292,123 @@ button:hover {
     width: 24px;
   }
 }
-/* Estilos visuales específicos para cada canvas */
-#canvas-cristal {
-  background: radial-gradient(circle, #d0f8ff, #a0e9ff);
-  border: 2px solid #00eaff;
-  box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+
+.card-codigo {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 10px 15px;
+  margin: 8px 0;
+  font-size: 0.9rem;
+  color: white;
+  box-shadow: 0 0 8px rgba(255,255,255,0.1);
+}
+.vault.cristal .card-codigo {
+  border-left: 4px solid #00eaff;
+}
+.vault.plateada .card-codigo {
+  border-left: 4px solid #bbb;
+}
+.vault.dorada .card-codigo {
+  border-left: 4px solid gold;
 }
 
-#canvas-plateada {
-  background: linear-gradient(135deg, #f0f0f0, #aaa);
-  border: 2px solid #ccc;
-  box-shadow: 0 0 15px rgba(180, 180, 180, 0.6);
+#ranking-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-top: 20px;
+}
+.ranking-card {
+  background-color: #1e1e1e;
+  padding: 15px 20px;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 500px;
+  font-size: 1rem;
+  color: white;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.05);
+  text-align: center;
+  font-weight: 500;
+  margin: 10px auto;
+}
+.escuela-tec { border-left: 5px solid #00eaff; }
+.escuela-prepa1 { border-left: 5px solid #aaa; }
+.escuela-cehum { border-left: 5px solid #ff7f00; }
+.escuela-upefim { border-left: 5px solid gold; }
+
+.modal-info {
+  position: fixed;
+  z-index: 1001;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #1e1e1e;
+  color: white;
+  padding: 30px;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 600px;
+  box-shadow: 0 0 15px #000;
+  overflow-y: auto;
+  max-height: 80vh;
 }
 
-#canvas-dorada {
-  background: linear-gradient(135deg, #fff4b5, #ffc107);
-  border: 2px solid #ffcc00;
-  box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+.modal-info ul {
+  padding-left: 20px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+}
+
+.modal-info h2 {
+  margin-top: 0;
+  font-size: 1.5rem;
+  border-bottom: 1px solid #444;
+  padding-bottom: 10px;
+}
+
+.modal-info button {
+  background-color: crimson;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin-top: 20px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.modal-info button:hover {
+  background-color: darkred;
+}
+
+.modal-overlay {
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.7);
+}
+
+#infoModal {
+  background-color: #222;
+  padding: 30px;
+  border-radius: 10px;
+  max-width: 400px;
+  max-height: 80vh; /* límite vertical */
+  overflow-y: auto;  /* activa scroll vertical */
+  text-align: left;
+}
+
+#overlay-info {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
 }
