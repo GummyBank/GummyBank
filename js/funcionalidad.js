@@ -1,4 +1,3 @@
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
 import {
   getFirestore,
@@ -6,10 +5,11 @@ import {
   getDoc,
   setDoc,
   updateDoc,
-  collection
+  collection,
+  getDocs
 } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-// Configuración de Firebase
+// === CONFIGURACIÓN FIREBASE ===
 const firebaseConfig = {
   apiKey: "AIzaSyAJJgDg5SUPvvHgPtDNhIy1f1fiGpBHBw",
   authDomain: "registro-gomitas.firebaseapp.com",
@@ -23,6 +23,27 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// === METAS DE BÓVEDAS ===
+const metas = {
+  madera: 25,
+  cristal: 100,
+  plateada: 250,
+  dorada: 500
+};
+
+// === CONTADOR DE CÓDIGOS EN CADA BÓVEDA ===
+async function cargarContadores() {
+  for (const boveda in metas) {
+    const ref = collection(db, boveda);
+    const snap = await getDocs(ref);
+    const cantidad = snap.size;
+
+    const contador = document.querySelector(`.vault.${boveda} .count`);
+    if (contador) contador.textContent = cantidad;
+  }
+}
+cargarContadores();
+
 // === REGISTRO DE CÓDIGOS ===
 window.registrarCodigo = async function (boveda) {
   const codigo = prompt("Ingresa tu código (8 caracteres):")?.trim().toUpperCase();
@@ -31,7 +52,7 @@ window.registrarCodigo = async function (boveda) {
   const telefono = prompt("Ingresa tu número de teléfono:")?.trim();
   if (!telefono || telefono.length < 8) return alert("Teléfono inválido.");
 
-  if (!["cristal", "plateada", "dorada"].includes(boveda)) {
+  if (!["madera", "cristal", "plateada", "dorada"].includes(boveda)) {
     return alert("Bóveda inválida.");
   }
 
@@ -55,6 +76,7 @@ window.registrarCodigo = async function (boveda) {
   });
 
   agregarTarjeta(boveda, codigo, telefono);
+  cargarContadores(); // Refrescar el contador visual
   document.getElementById("customModal").style.display = "block";
   document.getElementById("overlay").style.display = "block";
 };
@@ -96,9 +118,9 @@ async function cargarRanking() {
     contenedor.appendChild(div);
   });
 }
-
 cargarRanking();
 
+// === MOSTRAR TARJETAS DE CÓDIGOS ===
 function agregarTarjeta(boveda, codigo, telefono) {
   const contenedor = document.getElementById(`tarjetas-${boveda}`);
   if (!contenedor) return;
@@ -111,7 +133,9 @@ function agregarTarjeta(boveda, codigo, telefono) {
   `;
   contenedor.prepend(tarjeta);
 }
+window.agregarTarjeta = agregarTarjeta;
 
+// === INICIO DE SESIÓN ADMIN ===
 document.getElementById("lock-icon").addEventListener("click", () => {
   const usuario = prompt("Usuario:");
   const contrasena = prompt("Contraseña:");
@@ -124,6 +148,7 @@ document.getElementById("lock-icon").addEventListener("click", () => {
   }
 });
 
+// === INSTRUCCIONES ===
 document.querySelector(".bi-info-circle").addEventListener("click", () => {
   document.getElementById("infoModal").style.display = "block";
   document.getElementById("overlay-info").style.display = "block";
@@ -133,5 +158,3 @@ window.cerrarInfoModal = function () {
   document.getElementById("infoModal").style.display = "none";
   document.getElementById("overlay-info").style.display = "none";
 };
-
-window.agregarTarjeta = agregarTarjeta;

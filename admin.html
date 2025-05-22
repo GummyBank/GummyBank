@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -21,6 +20,10 @@
       background-color: #1e1e1e;
       border: 1px solid #333;
       border-radius: 8px;
+    }
+    .boveda#madera {
+      border-color: #8b5a2b;
+      background-color: #2e1a0b;
     }
     ul {
       list-style: none;
@@ -77,17 +80,26 @@
 <body>
   <script>
     const auth = sessionStorage.getItem("auth");
-  
-    // Evita acceso si no hay sesión o si expiró
     if (auth !== "true") {
-      sessionStorage.clear(); // refuerzo por si hay basura
-      window.location.replace("index.html"); // 👈 reemplaza para que no se pueda regresar
+      sessionStorage.clear();
+      window.location.replace("index.html");
     }
   </script>  
+
   <header style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #111; color: white;">
     <h2 style="margin: 0;">Panel de Administración</h2>
     <button onclick="cerrarSesion()" style="background: crimson; color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer;">Cerrar sesión</button>
   </header>
+
+  <!-- 🪵 Bóveda Madera -->
+  <div class="boveda" id="madera">
+    <h2>Bóveda Madera</h2>
+    <ul id="lista-madera"></ul>
+    <div class="botones">
+      <button onclick="confirmarEliminacion('madera', 'ultimos')">Eliminar últimos 25</button>
+      <button onclick="confirmarEliminacion('madera', 'todos')">Eliminar todos</button>
+    </div>
+  </div>
 
   <div class="boveda" id="cristal">
     <h2>Bóveda Cristal</h2>
@@ -143,6 +155,7 @@
     const db = getFirestore(app);
 
     const LIMITE_POR_BOVEDA = {
+      madera: 25,
       cristal: 100,
       plateada: 250,
       dorada: 500
@@ -215,6 +228,8 @@
       cerrarModal();
     });
 
+    // Cargar registros de todas las bóvedas
+    cargarRegistros("madera");
     cargarRegistros("cristal");
     cargarRegistros("plateada");
     cargarRegistros("dorada");
@@ -223,10 +238,8 @@
   <script>
     function cerrarSesion() {
       sessionStorage.removeItem("auth");
-      window.location.replace("index.html"); // evita volver atrás
+      window.location.replace("index.html");
     }
   </script>
-  
-  
 </body>
 </html>

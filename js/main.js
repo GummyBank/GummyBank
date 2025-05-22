@@ -1,4 +1,3 @@
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
 import {
   getFirestore,
@@ -6,7 +5,7 @@ import {
   getDocs
 } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-// Configuración de Firebase (usa tu propia si es diferente)
+// Configuración de Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyAJJgDg5SUPvvHgPtDNhIy1f1fiGpBHBw",
   authDomain: "registro-gomitas.firebaseapp.com",
@@ -20,25 +19,19 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// NUEVO: Contadores por bóveda
 const registrosPorBoveda = {
+  madera: 0,
   cristal: 0,
   plateada: 0,
   dorada: 0
 };
 
 const ruedas = [
+  { id: "canvas-madera", meta: 25, clave: "madera" },
   { id: "canvas-cristal", meta: 100, clave: "cristal" },
   { id: "canvas-plateada", meta: 250, clave: "plateada" },
   { id: "canvas-dorada", meta: 500, clave: "dorada" }
 ];
-
-function getRandomColor(seed = 0) {
-  const hue = (seed * 137.5) % 360;
-  return `hsl(${hue}, 85%, 60%)`;
-}
-
-let bordeTime = 0;
 
 function drawLiquid(canvasId, llenados, meta) {
   const canvas = document.getElementById(canvasId);
@@ -64,8 +57,10 @@ function drawLiquid(canvasId, llenados, meta) {
     ctx.shadowColor = `rgba(0, 255, 255, ${glowPulse})`;
   } else if (canvasId.includes("plateada")) {
     ctx.shadowColor = `rgba(200, 200, 200, ${glowPulse})`;
-  } else {
+  } else if (canvasId.includes("dorada")) {
     ctx.shadowColor = `rgba(255, 215, 0, ${glowPulse})`;
+  } else {
+    ctx.shadowColor = `rgba(139, 69, 19, ${glowPulse})`; // madera
   }
 
   ctx.shadowBlur = 40;
@@ -100,10 +95,14 @@ function drawLiquid(canvasId, llenados, meta) {
     gradient.addColorStop(0, `hsl(0, 0%, ${75 + shift * 10}%)`);
     gradient.addColorStop(0.5, `hsl(0, 0%, ${65 + shift * 10}%)`);
     gradient.addColorStop(1, `hsl(0, 0%, ${55 + shift * 10}%)`);
-  } else {
+  } else if (canvasId.includes("dorada")) {
     gradient.addColorStop(0, `hsl(45, 100%, ${60 + shift * 20}%)`);
     gradient.addColorStop(0.5, `hsl(43, 95%, ${55 + shift * 15}%)`);
     gradient.addColorStop(1, `hsl(39, 90%, ${45 + shift * 10}%)`);
+  } else {
+    gradient.addColorStop(0, `hsl(30, 70%, ${55 + shift * 10}%)`);
+    gradient.addColorStop(0.5, `hsl(28, 60%, ${50 + shift * 10}%)`);
+    gradient.addColorStop(1, `hsl(26, 55%, ${45 + shift * 10}%)`);
   }
 
   ctx.fillStyle = gradient;
@@ -142,13 +141,9 @@ function actualizarUI() {
   ruedas.forEach(rueda => {
     const meta = rueda.meta;
     const llenados = Math.min(registrosPorBoveda[rueda.clave], meta);
-    const canvas = document.getElementById(rueda.id);
-
-    if (!canvas) return;
-
     drawLiquid(rueda.id, llenados, meta);
 
-    const vault = canvas.closest(".vault");
+    const vault = document.getElementById(rueda.id)?.closest(".vault");
     const span = vault?.querySelector(".count");
     const barra = vault?.querySelector(".progress-bar");
 
@@ -187,7 +182,6 @@ function crearLluviaImagen() {
   img.style.animationDuration = (2 + Math.random() * 3) + "s";
 
   document.getElementById("lluvia-container").appendChild(img);
-
   setTimeout(() => img.remove(), 6000);
 }
 
