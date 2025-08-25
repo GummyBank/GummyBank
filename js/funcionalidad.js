@@ -215,16 +215,16 @@ if (lockIcon) {
     const contrasena = prompt("Contraseña:");
     if (contrasena == null) return;
 
-    if (usuario === "admin" && contrasena === "1234") {
+    if (usuario === "admin" && contrasena === "123") {
       sessionStorage.setItem("auth", "true");
       window.location.href = "admin.html";
-    } else if (usuario === "panel" && contrasena === "12345") {
+    } else if (usuario === "panel" && contrasena === "123") {
       sessionStorage.setItem("ventas_auth", "true");
       window.location.href = "ventas.html";
-    } else if (usuario === "vendedor" && contrasena === "123456") {
+    } else if (usuario === "vende" && contrasena === "encvent") {
       sessionStorage.setItem("vendedor_auth", "true");
       window.location.href = "premios.html";
-    } else if (usuario === "registroven" && contrasena === "1234567") {
+    } else if (usuario === "registro" && contrasena === "123") {
       sessionStorage.setItem("registro_auth", "true");
       window.location.href = "registro-premios.html";
     } else {
