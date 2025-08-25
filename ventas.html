@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Panel de Producto (Firestore)</title>
+
+<!-- Bloqueo temprano: si no hay sesión, no cargues nada -->
+<script>
+  if (sessionStorage.getItem("ventas_auth") !== "true") {
+    window.location.replace("index.html");
+  }
+</script>
+
+<link rel="preconnect" href="https://cdn.jsdelivr.net" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root { --bg:#0f1115; --card:#151922; --ink:#e7ecf3; --muted:#97a0af; --line:#242b38; --ok:#38b000; --bad:#ef4444; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial}
+  .wrap{max-width:1100px;margin:32px auto;padding:0 16px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 16px;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+  h2{margin:0 0 12px;font-size:20px}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 14px}
+  .btn{background:#1f2633;border:1px solid var(--line);color:var(--ink);padding:8px 12px;border-radius:10px;cursor:pointer}
+  .btn:hover{filter:brightness(1.1)}
+  .grid{width:100%;border-collapse:collapse}
+  .grid th, .grid td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left}
+  .grid th{font-weight:600;color:#c9d2e0;background:#11151d;position:sticky;top:0;z-index:1}
+  .grid td[contenteditable="true"]{outline:0}
+  .grid td.num, .grid th.num { text-align:center; font-variant-numeric: tabular-nums; }
+  .tag{font-weight:700}
+  .tag.ok{color:var(--ok)}
+  .tag.bad{color:var(--bad)}
+  .sum{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:16px;margin-top:10px;color:#c9d2e0}
+  .cards{display:grid;grid-template-columns:1fr;gap:16px;margin-top:18px}
+  @media(min-width:900px){ .cards{grid-template-columns:1fr 1fr} }
+  .card{background:#101522;border:1px solid var(--line);border-radius:16px;padding:12px}
+  canvas{width:100%;height:360px}
+  .hint{color:#97a0af;font-size:13px}
+  .del{color:#ff6b6b;cursor:pointer}
+  .caret { caret-color:#e7ecf3; }
+
+  @media (max-width: 820px){
+    body{font-size:14px}
+    .grid, .grid thead, .grid tbody, .grid th, .grid td, .grid tr{display:block}
+    .grid thead tr{display:none}
+    .grid tbody tr{border:1px solid var(--line);border-radius:12px;margin:10px 0;background:#11151d;overflow:hidden}
+    .grid td{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid #0d1220}
+    .grid td:last-child{border-bottom:none}
+    .grid td::before{
+      content:attr(data-label);
+      color:#9fb0c9;
+      font-weight:600;
+      padding-right:12px;
+      text-align:left;
+      flex:1 1 50%;
+    }
+    .grid td.num{justify-content:space-between}
+    .grid td[contenteditable="true"]{min-height:22px}
+  }
+
+  /* Modal de confirmación / errores / aviso de sesión */
+  #confirmModal{display:none; position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:999; align-items:center; justify-content:center;}
+  #confirmBox{background:#1f2633; padding:22px; border-radius:12px; max-width:360px; width:92%; text-align:center; box-shadow:0 8px 25px rgba(0,0,0,.4);}
+  #confirmBox h3{margin:0 0 10px; font-size:18px}
+  #confirmBox p{margin:0 0 16px; color:#d1d5db}
+  #confirmBtns{display:flex; gap:12px; justify-content:center}
+  .btn-gray{padding:8px 14px; border:none; border-radius:8px; background:#374151; color:#fff; cursor:pointer}
+  .btn-red {padding:8px 14px; border:none; border-radius:8px; background:#ef4444; color:#fff; cursor:pointer}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="panel">
+    <h2>Panel de Administración de Producto · <span class="hint">tabla → cálculo → gráficas</span></h2>
+
+    <div class="toolbar">
+      <button class="btn" id="addRow">Agregar fila</button>
+      <button class="btn" id="logoutBtn">Cerrar sesión</button>
+    </div>
+
+    <div style="overflow:auto; max-height:55vh;">
+      <table class="grid" id="dataTable">
+        <thead>
+          <tr>
+            <th style="min-width:160px">Escuela / Vendedor</th>
+            <th class="num">Bolsas asignadas</th>
+            <th class="num">Bolsas vendidas</th>
+            <th class="num">Bolsas restantes</th>
+            <th class="num">Precio por bolsa</th>
+            <th class="num">Inversión</th>
+            <th class="num">Gastos variables</th>
+            <th class="num">Premios otorgados</th>
+            <th class="num">Ganancia total</th>
+            <th class="num">Ganancia neta</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+
+    <div class="sum" id="totals"></div>
+
+    <div class="cards">
+      <div class="card">
+        <h3 style="margin:0 0 6px">Ganancia Neta por escuela</h3>
+        <canvas id="netBar"></canvas>
+      </div>
+      <div class="card">
+        <h3 style="margin:0 0 6px">Composición promedio de costos</h3>
+        <canvas id="mixPie"></canvas>
+      </div>
+    </div>
+
+    <p class="hint" style="margin-top:12px">
+      Restantes = asignadas − vendidas. Total = vendidas × precio. Neta = total − inversión − gastos − premios.
+    </p>
+  </div>
+</div>
+
+<!-- Modal reutilizable -->
+<div id="confirmModal">
+  <div id="confirmBox">
+    <h3 id="confirmTitle">¿Eliminar registro?</h3>
+    <p id="confirmMsg"></p>
+    <div id="confirmBtns">
+      <button id="cancelDel" class="btn-gray">Cancelar</button>
+      <button id="okDel" class="btn-red">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  // ====== Sesión e inactividad ======
+  const INACTIVITY_MS = 15 * 60 * 1000; // 15 min
+  const WARN_BEFORE_MS = 60 * 1000;     // aviso 60 s antes
+
+  let idleTimer, warnTimer;
+
+  const $modal  = document.getElementById("confirmModal");
+  const $title  = document.getElementById("confirmTitle");
+  const $msg    = document.getElementById("confirmMsg");
+  const $okBtn  = document.getElementById("okDel");
+  const $canBtn = document.getElementById("cancelDel");
+
+  function doLogout(){
+    try {
+      sessionStorage.removeItem("ventas_auth");
+      sessionStorage.removeItem("auth");
+    } finally {
+      window.location.replace("index.html");
+    }
+  }
+
+  function resetIdle(){
+    clearTimeout(idleTimer);
+    clearTimeout(warnTimer);
+    warnTimer = setTimeout(openIdleWarn, Math.max(0, INACTIVITY_MS - WARN_BEFORE_MS));
+    idleTimer = setTimeout(doLogout, INACTIVITY_MS);
+  }
+
+  function openIdleWarn(){
+    // Modal en modo aviso de sesión
+    $title.textContent = "Sesión por expirar";
+    $msg.textContent   = "Se cerrará en 60 segundos por inactividad. ¿Deseas continuar?";
+    $okBtn.textContent = "Seguir en sesión";
+    $okBtn.className   = "btn-gray";
+    $canBtn.textContent= "Cerrar ahora";
+    $canBtn.className  = "btn-red";
+
+    $modal.style.display = "flex";
+
+    const cleanup = () => {
+      $modal.style.display = "none";
+      $okBtn.onclick = null;
+      $canBtn.onclick = null;
+    };
+
+    $okBtn.onclick = () => { cleanup(); resetIdle(); };
+    $canBtn.onclick = () => { cleanup(); doLogout(); };
+  }
+
+  // Sensores de actividad
+  ["click","keydown","mousemove","touchstart","scroll","wheel","visibilitychange"].forEach(evt=>{
+    window.addEventListener(evt, ()=> {
+      if (document.visibilityState === "visible") resetIdle();
+    }, { passive:true });
+  });
+  resetIdle();
+
+  // ====== App Firestore ======
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+  import {
+    getFirestore, collection, doc, getDocs, addDoc, updateDoc, deleteDoc,
+    onSnapshot, serverTimestamp, query, orderBy, enableIndexedDbPersistence
+  } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAJJgDg5SUPvvHgPtDNhIy1f1fiGpBHBw",
+    authDomain: "registro-gomitas.firebaseapp.com",
+    projectId: "registro-gomitas",
+    storageBucket: "registro-gomitas.appspot.com",
+    messagingSenderId: "435485731864",
+    appId: "1:435485731864:web:43dff09753a4c9d507e76d",
+    measurementId: "G-20KEW71X9G"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+  enableIndexedDbPersistence(db).catch(()=>{});
+
+  const COL = collection(db, "panelProducto");
+
+  const $rows   = document.getElementById("rows");
+  const $totals = document.getElementById("totals");
+
+  const num = v => Number(String(v).replace(/[^\d.\-]/g,"")) || 0;
+  const fmt = v => v.toLocaleString("es-MX", { style:"currency", currency:"MXN", maximumFractionDigits:0 });
+
+  function compute(r){
+    const restantes = Math.max(num(r.asignadas) - num(r.vendidas), 0);
+    const total = num(r.vendidas) * num(r.precio);
+    const neta  = total - num(r.inversion) - num(r.gastos) - num(r.premios);
+    return { restantes, total, neta };
+  }
+
+  function cell(label, html, cls=""){ return `<td class="${cls}" data-label="${label}">${html}</td>`; }
+
+  function rowTemplate(r, idx){
+    const { restantes, total, neta } = compute(r);
+    const tag = neta >= 0 ? "ok" : "bad";
+    return `
+      <tr data-idx="${idx}" data-id="${r.id||""}">
+        ${cell("Escuela / Vendedor", `<span class="caret" contenteditable="plaintext-only" data-k="nombre">${r.nombre}</span>`)}
+        ${cell("Bolsas asignadas", `<span class="num caret" contenteditable="plaintext-only" data-k="asignadas">${r.asignadas}</span>`, "num")}
+        ${cell("Bolsas vendidas", `<span class="num caret" contenteditable="plaintext-only" data-k="vendidas">${r.vendidas}</span>`, "num")}
+        ${cell("Bolsas restantes", `<span class="num">${restantes}</span>`, "num")}
+        ${cell("Precio por bolsa", `<span class="num caret" contenteditable="plaintext-only" data-k="precio">${r.precio}</span>`, "num")}
+        ${cell("Inversión", `<span class="num caret" contenteditable="plaintext-only" data-k="inversion">${r.inversion}</span>`, "num")}
+        ${cell("Gastos variables", `<span class="num caret" contenteditable="plaintext-only" data-k="gastos">${r.gastos}</span>`, "num")}
+        ${cell("Premios otorgados", `<span class="num caret" contenteditable="plaintext-only" data-k="premios">${r.premios}</span>`, "num")}
+        ${cell("Ganancia total", `<span class="tag">${fmt(total)}</span>`, "num")}
+        ${cell("Ganancia neta", `<span class="tag ${tag}">${fmt(neta)}</span>`, "num")}
+        ${cell("", `<span class="del" title="Eliminar fila">✕</span>`)}
+      </tr>
+    `;
+  }
+
+  // Estado único (sin duplicados ridículos)
+  const state = { rows: [], charts:{} };
+
+  function render(){
+    $rows.innerHTML = state.rows.map(rowTemplate).join("");
+    updateTotals();
+    bindTableEvents();
+    drawCharts();
+  }
+
+  function updateTotals(){
+    const acc = state.rows.reduce((a,r)=>{
+      const { total, neta } = compute(r);
+      a.total += total; a.neta += neta;
+      a.inv += num(r.inversion); a.gas += num(r.gastos); a.pre += num(r.premios);
+      return a;
+    },{total:0,neta:0,inv:0,gas:0,pre:0});
+
+    $totals.innerHTML = `
+      <div>Total ventas: <b>${fmt(acc.total)}</b></div>
+      <div>Inversión: <b>${fmt(acc.inv)}</b></div>
+      <div>Gastos: <b>${fmt(acc.gas)}</b></div>
+      <div>Premios: <b>${fmt(acc.pre)}</b></div>
+      <div>Ganancia neta: <b>${fmt(acc.neta)}</b></div>
+    `;
+  }
+
+  async function updateRowDB(row){
+    if(!row.id) return;
+    await updateDoc(doc(COL, row.id), {
+      nombre: row.nombre,
+      asignadas: num(row.asignadas),
+      vendidas: num(row.vendidas),
+      precio: num(row.precio),
+      inversion: num(row.inversion),
+      gastos: num(row.gastos),
+      premios: num(row.premios),
+      updatedAt: serverTimestamp()
+    });
+  }
+
+  // Modal confirmación para eliminar fila
+  function openConfirm(title, msg, onOk){
+    $title.textContent = title;
+    $msg.textContent   = msg;
+
+    // Botones en modo "eliminar"
+    $okBtn.textContent = "Eliminar";
+    $okBtn.className   = "btn-red";
+    $canBtn.textContent= "Cancelar";
+    $canBtn.className  = "btn-gray";
+
+    $modal.style.display = "flex";
+    const close = ()=>{ $modal.style.display = "none"; $okBtn.onclick = null; $canBtn.onclick = null; };
+    $canBtn.onclick = close;
+    $okBtn.onclick = async ()=>{ await onOk().catch(err=>{
+      // Mostrar error claro
+      $title.textContent = "No se pudo eliminar";
+      $msg.textContent = (err && err.message) ? err.message : "Error desconocido.";
+      console.error("Eliminar fila:", err);
+      return Promise.reject(err);
+    }); close(); };
+  }
+
+  function bindTableEvents(){
+    $rows.querySelectorAll("[contenteditable]").forEach(cell=>{
+      cell.addEventListener("keydown",(e)=>{
+        if(e.key === "Enter"){ e.preventDefault(); cell.blur(); }
+        if(e.key === "Escape"){ e.preventDefault(); document.execCommand("undo"); cell.blur(); }
+      });
+      cell.addEventListener("focus", ()=>{ /* marca edición para evitar parpadeos */ });
+      cell.addEventListener("blur", async ()=>{
+        const tr = cell.closest("tr");
+        const idx = Number(tr.dataset.idx);
+        const row = state.rows[idx];
+        await updateRowDB(row);
+      });
+
+      cell.addEventListener("input", ()=>{
+        const tr = cell.closest("tr");
+        const idx = Number(tr.dataset.idx);
+        const key = cell.dataset.k;
+        const val = key === "nombre" ? cell.textContent.trim() : num(cell.textContent);
+        state.rows[idx][key] = val;
+
+        const r = state.rows[idx];
+        const { restantes, total, neta } = compute(r);
+        tr.children[3].innerHTML = `<span class="num" data-label="Bolsas restantes">${restantes}</span>`;
+        tr.children[8].innerHTML = `<span class="tag">${fmt(total)}</span>`;
+        tr.children[9].innerHTML = `<span class="tag ${neta>=0?"ok":"bad"}">${fmt(neta)}</span>`;
+
+        updateTotals();
+
+        // Debounce de guardado
+        clearTimeout(tr._saveTimer);
+        tr._saveTimer = setTimeout(()=>{ updateRowDB(r); }, 500);
+        drawCharts();
+      });
+    });
+
+    // Eliminar fila con modal
+    $rows.querySelectorAll(".del").forEach(btn=>{
+      btn.addEventListener("click", (ev)=>{
+        ev.preventDefault();
+        ev.stopPropagation();
+
+        const tr  = btn.closest("tr");
+        const id  = tr.dataset.id;
+        const idx = Number(tr.dataset.idx);
+        const nombre = tr.querySelector('[data-k="nombre"]')?.textContent?.trim() || "esta fila";
+
+        openConfirm("¿Eliminar registro?", `Se eliminará "${nombre}". Esta acción no se puede deshacer.`, async ()=>{
+          tr.style.opacity = "0.5";
+          if (id) {
+            await deleteDoc(doc(COL, id));
+          } else {
+            state.rows.splice(idx,1);
+            render();
+          }
+        });
+      });
+    });
+  }
+
+  // Botón agregar fila
+  document.getElementById("addRow").addEventListener("click", async ()=>{
+    await addDoc(COL, {
+      nombre:"Nueva escuela",
+      asignadas:0, vendidas:0, precio:25, inversion:0, gastos:0, premios:0,
+      createdAt: serverTimestamp()
+    });
+  });
+
+  // Botón cerrar sesión
+  document.getElementById("logoutBtn").addEventListener("click", ()=>{
+    $title.textContent = "Cerrar sesión";
+    $msg.textContent   = "¿Seguro que quieres salir?";
+    $okBtn.textContent = "Cerrar sesión";
+    $okBtn.className   = "btn-red";
+    $canBtn.textContent= "Cancelar";
+    $canBtn.className  = "btn-gray";
+    $modal.style.display = "flex";
+    const close = ()=>{ $modal.style.display = "none"; $okBtn.onclick = null; $canBtn.onclick = null; };
+    $canBtn.onclick = close;
+    $okBtn.onclick = ()=>{ close(); doLogout(); };
+  });
+
+  // Gráficas
+  function drawCharts(){
+    const labels = state.rows.map(r=>r.nombre);
+    const netas  = state.rows.map(r=>compute(r).neta);
+
+    if(!state.charts.bar){
+      state.charts.bar = new Chart(document.getElementById("netBar"), {
+        type:"bar",
+        data:{ labels, datasets:[{ label:"Ganancia neta", data:netas }]},
+        options:{
+          responsive:true,
+          plugins:{ legend:{ display:false }},
+          scales:{ y:{ ticks:{ callback:v => v.toLocaleString("es-MX") + " MXN" }}}
+        }
+      });
+    }else{
+      state.charts.bar.data.labels = labels;
+      state.charts.bar.data.datasets[0].data = netas;
+      state.charts.bar.update();
+    }
+
+    const acc = state.rows.reduce((a,r)=>{
+      const { neta } = compute(r);
+      a.inv+=num(r.inversion); a.gas+=num(r.gastos); a.pre+=num(r.premios); a.ut+=Math.max(neta,0);
+      return a;
+    },{inv:0,gas:0,pre:0,ut:0});
+    const pieLabels = ["Inversión","Gastos variables","Premios","Utilidad"];
+    const pieData = [acc.inv, acc.gas, acc.pre, acc.ut];
+
+    if(!state.charts.pie){
+      state.charts.pie = new Chart(document.getElementById("mixPie"), {
+        type:"pie",
+        data:{ labels: pieLabels, datasets:[{ data: pieData }]},
+        options:{ responsive:true, plugins:{ legend:{ position:"bottom" }}}
+      });
+    }else{
+      state.charts.pie.data.labels = pieLabels;
+      state.charts.pie.data.datasets[0].data = pieData;
+      state.charts.pie.update();
+    }
+  }
+
+  // Snapshot en tiempo real
+  onSnapshot(
+    query(COL, orderBy("createdAt","asc")),
+    { includeMetadataChanges: true },
+    (snap)=>{
+      const rows = [];
+      snap.forEach(d=>{
+        const x = d.data();
+        rows.push({
+          id: d.id,
+          nombre: x.nombre || "Escuela",
+          asignadas: x.asignadas||0,
+          vendidas: x.vendidas||0,
+          precio: x.precio||0,
+          inversion: x.inversion||0,
+          gastos: x.gastos||0,
+          premios: x.premios||0
+        });
+      });
+      state.rows = rows;
+      render();
+    }
+  );
+</script>
+</body>
+</html>

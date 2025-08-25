@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Editor de Ventas · Gummy Bank</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <style>
+    :root{ --bg:#0f1115; --panel:#11151d; --card:#151a23; --line:#243041; --ink:#e7ecf3; --muted:#9fb0c9; --accent:#1f6feb; --bad:#ef4444; --ok:#22c55e; }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial}
+    .topbar{position:sticky;top:0;z-index:10;background:linear-gradient(180deg, rgba(17,21,29,.92), rgba(17,21,29,.75));border-bottom:1px solid var(--line);backdrop-filter:saturate(140%) blur(6px)}
+    .topbar-wrap{max-width:1100px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
+    .title{margin:0;font-size:18px}
+    .wrap{max-width:1100px;margin:18px auto;padding:0 16px;display:grid;gap:16px}
+    .card{background:linear-gradient(180deg, rgba(21,26,35,.9), rgba(21,26,35,.85));border:1px solid var(--line);border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.28);overflow:hidden}
+    .card h3{margin:0;padding:12px 14px;border-bottom:1px solid #192233;font-size:16px}
+    .inner{padding:12px 14px}
+    .form{display:grid;grid-template-columns:1fr 1fr 140px 140px;gap:10px}
+    .form input, .form select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:#0f141e;color:var(--ink);outline:none}
+    .form button{padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:#1b2330;color:var(--ink);cursor:pointer;font-weight:600}
+    .form button:hover{filter:brightness(1.08)}
+    .hint{color:var(--muted);font-size:13px;margin-top:6px}
+
+    .table-wrap{overflow:auto;max-height:65vh}
+    table{width:100%;border-collapse:collapse;min-width:720px}
+    thead th{position:sticky;top:0;background:#11151d;color:#cfe0ff;border-bottom:1px solid #1d2a3d;font-weight:700;font-size:13px}
+    th,td{padding:10px;border-bottom:1px solid #1a2435;text-align:left}
+    td.num, th.num{ text-align:center; font-variant-numeric: tabular-nums; }
+    tr:hover td{background:rgba(17,23,38,.45)}
+    [contenteditable="true"]{outline:0;border-bottom:1px dashed transparent}
+    [contenteditable="true"]:focus{border-bottom:1px dashed #3b82f6;background:#0c1220}
+    .actions{display:flex;gap:8px}
+    .btn{padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:#1b2330;color:var(--ink);cursor:pointer}
+    .btn:hover{filter:brightness(1.08)}
+    .del{background:linear-gradient(180deg, rgba(239,68,68,.18), rgba(239,68,68,.12));border-color:#3a1e23;color:#ffb4b4}
+    .ok{color:var(--ok)}
+    .err{color:#ffb4b4}
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+    @media (max-width:840px){
+      .form{grid-template-columns:1fr 1fr 1fr;gap:8px}
+      .form button{grid-column:1/-1}
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-wrap">
+      <h1 class="title">Editor de Ventas (ventasLogs)</h1>
+      <div class="toolbar">
+        <button class="btn" id="exportCSV">Exportar CSV del mes</button>
+        <button class="btn del" id="logoutBtn">Cerrar sesión</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <!-- Alta rápida -->
+    <section class="card">
+      <h3>Agregar registro</h3>
+      <div class="inner">
+        <form id="altaForm" class="form" autocomplete="off">
+          <input id="vendedor" placeholder="Vendedor" required>
+          <input id="escuela" placeholder="Escuela" required>
+          <input id="bolsas" type="number" min="1" step="1" placeholder="Bolsas" required>
+          <button type="submit">Guardar</button>
+        </form>
+        <div class="hint" id="altaMsg">Al guardar se crea: { vendedor, escuela, bolsas, createdAt }.</div>
+      </div>
+    </section>
+
+    <!-- Tabla editable -->
+    <section class="card">
+      <h3>Registros del mes actual</h3>
+      <div class="table-wrap">
+        <table id="tabla">
+          <thead>
+            <tr>
+              <th style="min-width:220px">Vendedor</th>
+              <th style="min-width:220px">Escuela</th>
+              <th class="num" style="min-width:140px">Bolsas</th>
+              <th style="min-width:160px">Fecha</th>
+              <th class="num" style="min-width:140px">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            <tr><td colspan="5" class="hint">Cargando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="inner">
+        <span class="hint">Tip: haz clic en una celda para editar. Enter guarda. Esc revierte.</span>
+        <div class="hint" id="totalesMes"></div>
+      </div>
+    </section>
+  </div>
+
+  <script type="module">
+    // ——— Protección simple opcional (mismo flag que tu admin): descomenta si quieres
+    // if (sessionStorage.getItem("auth") !== "true") { location.replace("index.html"); }
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import {
+      getFirestore, collection, addDoc, serverTimestamp, onSnapshot, query, where,
+      Timestamp, orderBy, doc, updateDoc, deleteDoc, enableIndexedDbPersistence, getDocs
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAJJgDg5SUPvvHgPtDNhIy1f1fiGpBHBw",
+      authDomain: "registro-gomitas.firebaseapp.com",
+      projectId: "registro-gomitas",
+      storageBucket: "registro-gomitas.appspot.com",
+      messagingSenderId: "435485731864",
+      appId: "1:435485731864:web:43dff09753a4c9d507e76d"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+    enableIndexedDbPersistence(db).catch(()=>{});
+
+    const COL = collection(db, "ventasLogs");
+
+    // Rango del mes actual (local)
+    const now = new Date();
+    const start = new Date(now.getFullYear(), now.getMonth(), 1, 0,0,0,0);
+    const end   = new Date(now.getFullYear(), now.getMonth()+1, 1, 0,0,0,0);
+
+    // UI refs
+    const $form = document.getElementById("altaForm");
+    const $vendedor = document.getElementById("vendedor");
+    const $escuela  = document.getElementById("escuela");
+    const $bolsas   = document.getElementById("bolsas");
+    const $msg      = document.getElementById("altaMsg");
+    const $tbody    = document.getElementById("tbody");
+    const $totales  = document.getElementById("totalesMes");
+
+    // Alta
+    $form.addEventListener("submit", async (e)=>{
+      e.preventDefault();
+      const vendedor = $vendedor.value.trim();
+      const escuela  = $escuela.value.trim();
+      const bolsas   = Math.max(1, parseInt($bolsas.value,10) || 0);
+
+      if(!vendedor || !escuela || !bolsas){ ping("Completa todos los campos.", true); return; }
+
+      try{
+        await addDoc(COL, { vendedor, escuela, bolsas, createdAt: serverTimestamp() });
+        $form.reset();
+        ping("Registro guardado.", false);
+      }catch(err){
+        console.error(err);
+        ping("Error al guardar: " + (err.message || "desconocido"), true);
+      }
+    });
+
+    function ping(text, isErr){
+      $msg.textContent = text;
+      $msg.className = "hint " + (isErr ? "err" : "ok");
+      setTimeout(()=>{ $msg.className="hint"; }, 2500);
+    }
+
+    // Snapshot del mes actual
+    const qMes = query(
+      COL,
+      where("createdAt", ">=", Timestamp.fromDate(start)),
+      where("createdAt", "<",  Timestamp.fromDate(end)),
+      orderBy("createdAt", "desc")
+    );
+
+    const state = { rows:[], timers:new Map() };
+
+    onSnapshot(qMes, (snap)=>{
+      state.rows = [];
+      let total = 0;
+      snap.forEach(d=>{
+        const x = d.data();
+        const item = {
+          id: d.id,
+          vendedor: x.vendedor || "",
+          escuela:  x.escuela || "",
+          bolsas:   Number(x.bolsas) || 0,
+          createdAt: x.createdAt?.toDate ? x.createdAt.toDate() : null
+        };
+        total += item.bolsas;
+        state.rows.push(item);
+      });
+      render();
+      $totales.textContent = "Total de bolsas registradas en el mes: " + total.toLocaleString("es-MX");
+    }, (err)=>{
+      console.error(err);
+      $tbody.innerHTML = `<tr><td colspan="5" class="err">No se pudieron cargar datos: ${err.message||"Error"}</td></tr>`;
+    });
+
+    function render(){
+      if(state.rows.length===0){
+        $tbody.innerHTML = `<tr><td colspan="5" class="hint">Sin datos este mes.</td></tr>`;
+        return;
+      }
+      $tbody.innerHTML = state.rows.map(r=>{
+        const dateStr = r.createdAt ? new Intl.DateTimeFormat("es-MX",{ dateStyle:"medium", timeStyle:"short" }).format(r.createdAt) : "—";
+        return `
+          <tr data-id="${r.id}">
+            <td contenteditable="plaintext-only" data-k="vendedor">${esc(r.vendedor)}</td>
+            <td contenteditable="plaintext-only" data-k="escuela">${esc(r.escuela)}</td>
+            <td class="num" contenteditable="plaintext-only" data-k="bolsas">${r.bolsas}</td>
+            <td>${dateStr}</td>
+            <td class="num">
+              <div class="actions">
+                <button class="btn del" data-act="del">Eliminar</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join("");
+
+      bindRowEvents();
+    }
+
+    function bindRowEvents(){
+      // edición
+      $tbody.querySelectorAll("[contenteditable]").forEach(cell=>{
+        cell.addEventListener("keydown", e=>{
+          if(e.key==="Enter"){ e.preventDefault(); cell.blur(); }
+          if(e.key==="Escape"){ e.preventDefault(); document.execCommand("undo"); cell.blur(); }
+        });
+        cell.addEventListener("blur", () => saveCell(cell));
+        cell.addEventListener("input", ()=>{
+          const tr = cell.closest("tr");
+          const id = tr.dataset.id;
+          clearTimeout(state.timers.get(id));
+          const t = setTimeout(()=>saveCell(cell), 500);
+          state.timers.set(id, t);
+        });
+      });
+
+      // eliminar
+      $tbody.querySelectorAll('[data-act="del"]').forEach(btn=>{
+        btn.addEventListener("click", async ()=>{
+          const tr = btn.closest("tr");
+          const id = tr.dataset.id;
+          if(!confirm("¿Eliminar este registro?")) return;
+          try{
+            await deleteDoc(doc(COL, id));
+          }catch(err){
+            alert("No se pudo eliminar: " + (err.message||"Error"));
+          }
+        });
+      });
+    }
+
+    async function saveCell(cell){
+      const tr = cell.closest("tr");
+      if(!tr) return;
+      const id  = tr.dataset.id;
+      const key = cell.dataset.k;
+      let val   = cell.textContent.trim();
+
+      if(key==="bolsas"){
+        const n = parseInt(val,10);
+        if(!Number.isFinite(n) || n < 0){ cell.textContent = "0"; alert("Bolsas debe ser número entero ≥ 0"); return; }
+        val = n;
+      }
+      try{
+        await updateDoc(doc(COL, id), { [key]: val });
+        cell.style.backgroundColor = "rgba(34,197,94,.12)";
+        setTimeout(()=>{ cell.style.backgroundColor = ""; }, 300);
+      }catch(err){
+        console.error(err);
+        cell.style.backgroundColor = "rgba(239,68,68,.12)";
+        alert("No se pudo guardar: " + (err.message||"Error"));
+      }
+    }
+
+    // Export CSV del mes
+    document.getElementById("exportCSV").addEventListener("click", async ()=>{
+      const snap = await getDocs(qMes);
+      const rows = [["vendedor","escuela","bolsas","createdAt"]];
+      snap.forEach(d=>{
+        const x = d.data();
+        const dt = x.createdAt?.toDate ? x.createdAt.toDate().toISOString() : "";
+        rows.push([safe(x.vendedor), safe(x.escuela), Number(x.bolsas)||0, dt]);
+      });
+      const csv = rows.map(r=>r.map(s=>String(s).includes(",")?`"${String(s).replace(/"/g,'""')}"`:s).join(",")).join("\n");
+      const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "ventas_mes.csv";
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+
+    // Logout botón
+    document.getElementById("logoutBtn").addEventListener("click", ()=>{
+      sessionStorage.removeItem("auth");
+      location.replace("index.html");
+    });
+
+    // helpers
+    function esc(s){ return String(s||"").replace(/[&<>"]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
+    function safe(s){ return (s==null?"":String(s)).replace(/\r?\n/g," "); }
+  </script>
+</body>
+</html>

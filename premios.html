@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Ranking mensual · Gummy Bank</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <style>
+    :root{
+      --bg:#0f1115; --panel:#11151d; --card:#151a23; --line:#243041;
+      --ink:#e7ecf3; --muted:#9fb0c9;
+      --gold1:#ffd700; --gold2:#ffb300; --gold3:#ff7a00;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:
+        radial-gradient(1100px 700px at 15% -10%, rgba(31,111,235,.10), transparent 60%),
+        radial-gradient(900px 600px at 120% 0%, rgba(0,191,255,.10), transparent 60%),
+        var(--bg);
+      color:var(--ink);
+      font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial;
+    }
+    .topbar{
+      position:sticky; top:0; z-index:10;
+      background:linear-gradient(180deg, rgba(17,21,29,.92), rgba(17,21,29,.75));
+      border-bottom:1px solid var(--line); backdrop-filter:saturate(140%) blur(6px);
+    }
+    .topbar-wrap{max-width:1100px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .title{margin:0;font-size:18px}
+    .hint{color:var(--muted);font-size:13px}
+    .logout-btn{
+      background:#ff4747; border:none; color:white;
+      padding:6px 14px; border-radius:8px; font-size:14px;
+      cursor:pointer; font-weight:600;
+      transition:background .2s, transform .06s ease;
+    }
+    .logout-btn:active{ transform: translateY(1px); }
+    .logout-btn:hover{background:#e03a3a}
+    .wrap{max-width:1100px;margin:18px auto;padding:0 16px}
+
+    /* Burbuja dorada centrada con destellos */
+    .hero{display:grid; place-items:center; margin:6px 0 18px}
+    .bubble{
+      --size:180px;
+      width:var(--size); height:var(--size);
+      border-radius:999px; position:relative; display:grid; place-items:center;
+      text-align:center; color:#1f1400; font-weight:900;
+      background:
+        radial-gradient(60% 60% at 30% 28%, rgba(255,255,255,.35), transparent 60%),
+        radial-gradient(70% 70% at 70% 30%, rgba(255,213,0,.25), transparent 60%),
+        conic-gradient(from 220deg, var(--gold1), var(--gold2), var(--gold3), var(--gold2), var(--gold1));
+      box-shadow:
+        inset 0 0 18px rgba(255,255,255,.18),
+        0 10px 28px rgba(0,0,0,.45),
+        0 0 0 2px rgba(60,40,0,.6);
+      animation: spinSheen 10s linear infinite;
+    }
+    .bubble::before{
+      content:""; position:absolute; inset:-8px; border-radius:inherit;
+      background:conic-gradient(from 0deg, rgba(255,255,255,.0) 0 70%, rgba(255,255,255,.25) 80%, rgba(255,255,255,.0) 90% 100%);
+      filter:blur(2px); animation: ring 4.8s linear infinite;
+      pointer-events:none;
+    }
+    .bubble::after{
+      content:""; position:absolute; width:14px; height:14px; border-radius:50%;
+      background:radial-gradient(circle, #ffffff 0 40%, rgba(255,255,255,0) 70%);
+      top:16%; left:22%; opacity:.9; filter:blur(.4px);
+      animation: twinkle 1.8s ease-in-out infinite;
+      pointer-events:none;
+    }
+    .spark{position:absolute; width:10px; height:10px; border-radius:50%;
+      background:radial-gradient(circle, #fff 0 40%, rgba(255,255,255,0) 70%);
+      opacity:.0; filter:blur(.3px); pointer-events:none;}
+    .s1{top:68%; left:78%; animation: twinkle 2.2s .2s ease-in-out infinite;}
+    .s2{top:28%; left:78%; animation: twinkle 2.6s .6s ease-in-out infinite;}
+    .s3{top:78%; left:28%; animation: twinkle 2.0s .9s ease-in-out infinite;}
+    .bubble .num{font-size:32px; line-height:1}
+    .bubble .sub{font-size:12px; opacity:.9; font-weight:700}
+
+    @keyframes spinSheen {0%{filter:saturate(120%)} 50%{filter:saturate(130%)} 100%{filter:saturate(120%)}}
+    @keyframes ring {0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)}}
+    @keyframes twinkle {0%,100%{opacity:0; transform:scale(.8)} 50%{opacity:.9; transform:scale(1.2)}}
+
+    /* Card tabla centrada y compacta */
+    .card{
+      background:linear-gradient(180deg, rgba(21,26,35,.9), rgba(21,26,35,.8));
+      border:1px solid var(--line); border-radius:16px; box-shadow:0 12px 40px rgba(0,0,0,.28); overflow:hidden
+    }
+    .card h3{margin:0; padding:12px 14px; border-bottom:1px solid #192233; font-size:16px}
+    .table-wrap{overflow:auto; max-height:70vh}
+    table{width:100%; border-collapse:separate; border-spacing:0; table-layout:auto; min-width:0}
+    thead th{
+      position:sticky; top:0; z-index:1; background:#11151d; color:#cfe0ff;
+      border-bottom:1px solid #1d2a3d; font-weight:700; font-size:13px;
+      text-align:center; padding:10px 8px;
+    }
+    th,td{
+      padding:10px 8px;
+      border-bottom:1px solid #1a2435;
+      text-align:center;
+      white-space:nowrap;
+    }
+    .rank{font-weight:800}
+    .medal-1{color:#ffd700} .medal-2{color:#c0c0c0} .medal-3{color:#cd7f32}
+    .school{color:#a8c8ff}
+    .empty{color:var(--muted); text-align:center; padding:18px; white-space:normal}
+    .foot{color:var(--muted); font-size:12px; text-align:center; margin:14px 0 24px}
+
+    @media (max-width:900px){
+      th,td{padding:10px 6px; font-size:14px}
+      .bubble{--size:190px}
+    }
+    @media (max-width:640px){
+      th,td{padding:8px 4px; font-size:13px}
+      .bubble{--size:200px}
+      .bubble .num{font-size:34px}
+      .table-wrap{max-height:none}
+      table{min-width:0}
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-wrap">
+      <h1 class="title">Ranking mensual · Recompensas</h1>
+      <div style="display:flex;align-items:center;gap:12px">
+        <!-- AQUÍ ESTÁ EL BOTÓN -->
+        <button id="logoutBtn" class="logout-btn" type="button">Cerrar sesión</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <!-- Burbuja dorada -->
+    <section class="hero" aria-label="Premio mensual">
+      <div class="bubble">
+        <div class="num" id="premioNum">$0</div>
+        <div class="sub">Premio mensual</div>
+        <span class="spark s1"></span>
+        <span class="spark s2"></span>
+        <span class="spark s3"></span>
+      </div>
+    </section>
+
+    <!-- Ranking -->
+    <section class="card">
+      <h3>Mejores vendedores del mes</h3>
+      <div class="table-wrap">
+        <table id="tabla">
+          <thead>
+            <tr>
+              <th>Top</th>
+              <th>Vendedor</th>
+              <th>Escuela</th>
+              <th>Bolsas</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            <tr><td colspan="4" class="empty">Cargando datos...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="foot">© 2025 Gummy Bank · Brilla la moneda, no los secretos.</div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import {
+      getFirestore, collection, query, where, onSnapshot, Timestamp
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    import {
+      getAuth, signOut, onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+    // Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyAJJgDg5SUPvvHgPtDNhIy1f1fiGpBHBw",
+      authDomain: "registro-gomitas.firebaseapp.com",
+      projectId: "registro-gomitas",
+      storageBucket: "registro-gomitas.appspot.com",
+      messagingSenderId: "435485731864",
+      appId: "1:435485731864:web:43dff09753a4c9d507e76d"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+    const auth = getAuth(app);
+
+    // Botón cerrar sesión (Auth + fallback a sessionStorage)
+    const logoutBtn = document.getElementById("logoutBtn");
+    logoutBtn.addEventListener("click", async ()=>{
+      try { await signOut(auth); } catch(e) { /* si no hay usuario, no importa */ }
+      try { sessionStorage.removeItem("auth"); } catch(_) {}
+      window.location.href = "index.html"; // ajusta si tu login tiene otro nombre
+    });
+
+    // Si no hay usuario logueado con Auth, el botón igual se muestra (es solo visualización).
+    onAuthStateChanged(auth, user=>{
+      // si quieres ocultarlo cuando no hay sesión, descomenta:
+      // logoutBtn.style.display = user ? "inline-block" : "none";
+    });
+
+    // ====== Ranking ======
+    const $tbody  = document.getElementById("tbody");
+    const $premio = document.getElementById("premioNum");
+    const MXN = v => v.toLocaleString("es-MX",{style:"currency",currency:"MXN",maximumFractionDigits:0});
+
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1, 0,0,0,0);
+    const endOfMonth   = new Date(now.getFullYear(), now.getMonth()+1, 1, 0,0,0,0);
+
+    const COL = collection(db, "ventasLogs");
+    const q   = query(
+      COL,
+      where("createdAt", ">=", Timestamp.fromDate(startOfMonth)),
+      where("createdAt", "<",  Timestamp.fromDate(endOfMonth))
+    );
+
+    onSnapshot(q, (snap)=>{
+      const bySeller = new Map();
+      let totalBolsas = 0;
+
+      snap.forEach(d=>{
+        const x = d.data();
+        const vendedor = (x.vendedor || "Desconocido").trim();
+        const escuela  = (x.escuela  || "N/A").trim();
+        const bolsas   = Number(x.bolsas) || 0;
+
+        totalBolsas += bolsas;
+        const prev = bySeller.get(vendedor) || { vendedor, escuela, bolsas:0 };
+        prev.bolsas += bolsas;
+        prev.escuela = escuela || prev.escuela;
+        bySeller.set(vendedor, prev);
+      });
+
+      const rows = Array.from(bySeller.values()).sort((a,b)=> b.bolsas - a.bolsas);
+      renderTable(rows);
+
+      // Solo mostramos la cifra final, sin detalles del cálculo en UI
+      const ventasTotales = totalBolsas * 24;
+      const premio        = ventasTotales * 0.05;
+      $premio.textContent = MXN(Math.round(premio));
+    }, (err)=>{
+      console.error(err);
+      $tbody.innerHTML = `<tr><td colspan="4" class="empty">Error: ${err.message||"Error"}</td></tr>`;
+    });
+
+    function renderTable(rows){
+      if (!rows.length){
+        $tbody.innerHTML = `<tr><td colspan="4" class="empty">Sin ventas registradas este mes.</td></tr>`;
+        return;
+      }
+      const top = rows.slice(0, 100);
+      $tbody.innerHTML = top.map((r,i)=>{
+        const rank = i+1;
+        const medal = rank===1?"medal-1":rank===2?"medal-2":rank===3?"medal-3":"";
+        return `
+          <tr>
+            <td class="rank ${medal}">${rank}</td>
+            <td>${esc(r.vendedor)}</td>
+            <td><span class="school">${esc(r.escuela)}</span></td>
+            <td>${r.bolsas.toLocaleString("es-MX")}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function esc(s){ return String(s||"").replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
+  </script>
+</body>
+</html>

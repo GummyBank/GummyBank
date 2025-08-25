@@ -8,69 +8,44 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
     <style>
-      #logo-gummy-bank {
-        width: 90vw;
-        max-width: 1000px;
-        height: auto;
-        display: block;
-        margin: 20px auto;
-      }
+/* ====== Marca/Imágenes ====== */
+#logo-gummy-bank{width:90vw;max-width:1000px;height:auto;display:block;margin:20px auto}
+.imagen-recompensa{width:90vw;max-width:1000px;height:auto;display:block;margin:20px auto;margin-left:-5px}
+.imagen-madera-ajustada{transform:scale(1.04);margin-left:-15px}
 
-      .imagen-recompensa {
-        width: 90vw;
-        max-width: 1000px;
-        height: auto;
-        display: block;
-        margin: 20px auto;
-        margin-left: -5px;
-      }
+/* ====== Bóvedas ====== */
+.vault.cristal{box-shadow:0 0 20px rgba(0,255,255,.5);border:2px solid rgba(0,255,255,.4)}
+.vault.plateada{box-shadow:0 0 20px rgba(200,200,200,.5);border:2px solid rgba(180,180,180,.4)}
+.vault.dorada{box-shadow:0 0 20px rgba(255,215,0,.5);border:2px solid rgba(255,215,0,.4)}
+.vault.cristal button{background:linear-gradient(90deg,#00eaff,#00bfff)}
+.vault.plateada button{background:linear-gradient(90deg,#aaa,#ddd);color:#000}
+.vault.dorada button{background:linear-gradient(90deg,gold,#f90)}
+.vault.madera{box-shadow:0 0 20px rgba(139,69,19,.6);border:2px solid rgba(160,82,45,.5);background:linear-gradient(135deg,#8b5a2b,#deb887);color:#fff}
+.vault.madera button{background:linear-gradient(90deg,#8b4513,#d2b48c);color:#fff}
 
-      .vault.cristal {
-        box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
-        border: 2px solid rgba(0, 255, 255, 0.4);
-      }
+/* ====== Lluvia: SIEMPRE al fondo ====== */
+#lluvia-container{position:fixed;inset:0;z-index:-1;pointer-events:none}
+main,header,section.rewards,#mini-juego,.vault{position:relative;z-index:1}
 
-      .vault.plateada {
-        box-shadow: 0 0 20px rgba(200, 200, 200, 0.5);
-        border: 2px solid rgba(180, 180, 180, 0.4);
-      }
+/* ====== Modales ====== */
+.modal-overlay{position:fixed;inset:0;display:none;z-index:10040;background:rgba(0,0,0,.55);backdrop-filter:blur(2px)}
+.custom-modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:10050}
 
-      .vault.dorada {
-        box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-        border: 2px solid rgba(255, 215, 0, 0.4);
-      }
-
-      .vault.cristal button {
-        background: linear-gradient(90deg, #00eaff, #00bfff);
-      }
-
-      .vault.plateada button {
-        background: linear-gradient(90deg, #aaa, #ddd);
-        color: #000;
-      }
-
-      .vault.dorada button {
-        background: linear-gradient(90deg, gold, #f90);
-      }
-
-      /* Estilo madera */
-      .vault.madera {
-        box-shadow: 0 0 20px rgba(139, 69, 19, 0.6);
-        border: 2px solid rgba(160, 82, 45, 0.5);
-        background: linear-gradient(135deg, #8b5a2b, #deb887);
-        color: white;
-      }
-
-      .vault.madera button {
-        background: linear-gradient(90deg, #8b4513, #d2b48c);
-        color: white;
-      }
-
-      .imagen-madera-ajustada {
-  transform: scale(1.04);
-  margin-left: -15px;
-}
-
+/* ====== Modal de registro ====== */
+#modal-registro.custom-modal{width:min(420px,92vw);padding:18px 16px}
+#modal-registro{max-width:420px;width:92vw;box-sizing:border-box}
+#modal-registro h2{margin:0 0 12px;font-size:20px;color:#e7ecf3;text-align:center}
+#modal-registro form{margin:0;display:grid;gap:10px}
+#modal-registro input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid #2b3b55;background:#0f172a;color:#e7ecf3;outline:none;box-sizing:border-box}
+#modal-registro input::placeholder{color:#8aa0c2}
+#modal-registro input:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.25)}
+#modal-registro .acciones{display:grid;gap:8px;margin-top:4px}
+#modal-registro button{width:100%;padding:12px 14px;border-radius:12px;border:1px solid transparent;font-weight:600;cursor:pointer;transition:transform .12s ease,box-shadow .12s ease,filter .12s ease;box-sizing:border-box}
+#modal-registro button[type="submit"]{background:linear-gradient(90deg,#22c55e,#84cc16);color:#0b1220}
+#modal-registro button[type="button"]{background:#111827;color:#e5e7eb;border-color:#263042}
+#modal-registro button:active{transform:translateY(1px)}
+body.modal-open{overflow:hidden}
+#modal-registro input,#modal-registro button{pointer-events:auto}
     </style>
   </head>
 
@@ -78,128 +53,869 @@
     <header>
       <div class="top-bar">
         <div class="left-group">
-          <a href="https://www.instagram.com/gummybank?igsh=MW82Z3hvN2VjbWYxZw%3D%3D&utm_source=qr" target="_blank" style="text-decoration: none;">
+          <a href="https://www.instagram.com/gummybank_" target="_blank" style="text-decoration:none">
             <i class="bi bi-instagram"><span>gummybank</span></i>
           </a>
           <i class="bi bi-whatsapp"><span>grupos</span></i>
         </div>
-        <div class="icon-question" style="display: flex; align-items: center; gap: 10px">
-          <i class="bi bi-info-circle"></i>
-          <span id="lock-icon" style="cursor: pointer; font-size: 20px">🔒</span>
+        <div class="icon-question" style="display:flex;align-items:center;gap:10px">
+          <i class="bi bi-info-circle" aria-label="Información"></i>
+          <span id="lock-icon" style="cursor:pointer;font-size:20px" aria-label="Administrador">🔒</span>
         </div>
       </div>
     </header>
 
     <main>
       <div id="lluvia-container"></div>
+
       <div class="animated-bag">
         <img alt="Gummy Bank" src="img/titulo.jpg" id="logo-gummy-bank" />
       </div>
+<!-- ================== MINI JUEGO 25 CASILLAS ================== -->
+<section id="mini-juego" style="width:90%;max-width:800px;margin:24px auto;padding:16px;border-radius:15px;background:transparent;color:#eee;font-family:'Poppins',system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;box-sizing:border-box;overflow:hidden;min-height:520px;position:relative;z-index:0;">
+  <style>
+    @media (max-width:460px){
+      #mini-juego{padding:6px!important}
+      #mini-juego #board{gap:6px!important}
+      #mini-juego #board button{font-size:clamp(13px,4.2vw,16px)!important;border-radius:12px!important}
+    }
+    @media (max-width:360px){
+      #mini-juego{padding:6px!important}
+      #mini-juego #board{gap:5px!important}
+      #mini-juego #board button{font-size:clamp(12px,4.6vw,15px)!important}
+    }
 
-      <section class="rewards">
-        <!-- BÓVEDA MADERA -->
-        <div class="vault madera">
-          <img alt="Premio Madera" src="./img/Madera.png" class="imagen-recompensa imagen-madera-ajustada" />
-          <canvas class="liquid-canvas" id="canvas-madera"></canvas>
-          <p>Meta de Empaques <span class="count" data-meta="25">0</span> / 25</p>
-          <button onclick='registrarCodigo("madera")'>Registrar Código</button>
-          <div class="contenedor-tarjetas" id="tarjetas-madera"></div>
-        </div>
+    /* Tablero */
+    #mini-juego #board{
+      --cell:clamp(60px,16vw,110px);
+      width:92%;
+      margin:0 auto 10px;
+      display:grid;
+      grid-template-columns:repeat(5,minmax(0,var(--cell)));
+      gap:8px;
+      user-select:none
+    }
+    #mini-juego #board button{
+      display:grid;
+      place-items:center;
+      aspect-ratio:1/1;
+      border-radius:14px;
+      border:1px solid #243041;
+      background:linear-gradient(135deg,#0e1420,#0b0f18);
+      color:#e7ecf3;
+      font-weight:800;
+      letter-spacing:.2px;
+      font-size:clamp(14px,2.5vw,18px);
+      cursor:pointer;
+      transition:transform .18s ease,background .15s ease,border-color .15s ease,box-shadow .15s ease;
+      transform-style:preserve-3d;
+      padding:6px
+    }
+    #mini-juego #board button:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(0,0,0,.35)}
+    #mini-juego #board button:disabled{opacity:.9;cursor:not-allowed;transform:none;box-shadow:none}
 
-        <div class="vault cristal">
-          <img alt="Premio Cristal" src="./img/Cristal.png" class="imagen-recompensa" />
-          <canvas class="liquid-canvas" id="canvas-cristal"></canvas>
-          <p>Meta de Empaques <span class="count" data-meta="100">0</span> / 100</p>
-          <button onclick='registrarCodigo("cristal")'>Registrar Código</button>
-          <div class="contenedor-tarjetas" id="tarjetas-cristal"></div>
-        </div>
+    #mini-juego .cell-img{width:82%;height:82%;object-fit:contain;display:block;pointer-events:none}
 
-        <div class="vault plateada">
-          <img alt="Premio Plata" src="./img/plata.png" class="imagen-recompensa" />
-          <canvas class="liquid-canvas" id="canvas-plateada"></canvas>
-          <p>Meta de Empaques <span class="count" data-meta="250">0</span> / 250</p>
-          <button onclick='registrarCodigo("plateada")'>Registrar Código</button>
-          <div class="contenedor-tarjetas" id="tarjetas-plateada"></div>
-        </div>
+    /* Animaciones */
+    @keyframes flip{0%{transform:rotateY(0)}50%{transform:rotateY(90deg)}100%{transform:rotateY(0)}}
+    @keyframes shuffle{0%{transform:translate(0,0) rotate(0)}25%{transform:translate(1px,-1px) rotate(-1deg)}50%{transform:translate(-1px,1px) rotate(1deg)}75%{transform:translate(1px,1px) rotate(0)}100%{transform:translate(0,0) rotate(0)}}
+    .is-flipping{animation:flip .5s both}
+    .is-shuffling{animation:shuffle .6s ease-in-out}
+    .pop{animation:pop .25s ease}
+    @keyframes pop{0%{transform:scale(.92)}100%{transform:scale(1)}}
 
-        <div class="vault dorada">
-          <img alt="Premio Oro" src="./img/oro.png" class="imagen-recompensa" />
-          <canvas class="liquid-canvas" id="canvas-dorada"></canvas>
-          <p>Meta de Empaques <span class="count" data-meta="500">0</span> / 500</p>
-          <button onclick='registrarCodigo("dorada")'>Registrar Código</button>
-          <div class="contenedor-tarjetas" id="tarjetas-dorada"></div>
-        </div>
+    /* Estados revelados */
+    .prize-200{background:linear-gradient(145deg,#064e3b,#0b6b52)!important;border-color:#18c38a!important;box-shadow:0 8px 30px rgba(14,159,110,.25)}
+    .prize-gomita{background:linear-gradient(145deg,#3b0764,#5b0aa0)!important;border-color:#9b5cf7!important;box-shadow:0 8px 30px rgba(124,58,237,.25)}
+    .prize-nada{background:linear-gradient(145deg,#191c24,#1b1f2a)!important;border-color:#2d3547!important}
 
-        <section class="ranking">
-          <center><h3>Ranking de Ventas</h3></center>
-          <div id="ranking-container"></div>
-        </section>
-      </section>
+    /* Modal */
+    #mini-modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(4,6,12,.66);backdrop-filter:blur(2px);z-index:9999}
+    #mini-modal-card{width:min(540px,92vw);border:1px solid #2b3750;border-radius:20px;box-shadow:0 24px 80px rgba(0,0,0,.45);padding:22px;background:
+      radial-gradient(500px 220px at 20% 0%,rgba(99,102,241,.12),transparent 60%),
+      radial-gradient(500px 220px at 80% 100%,rgba(34,197,94,.12),transparent 60%),
+      #0b1220}
+    #mini-modal-card.success{border-color:#16a34a;background:
+      radial-gradient(600px 240px at 20% 0%,rgba(34,197,94,.12),transparent 60%),
+      #071c12}
+    #mini-modal-card.warn{border-color:#7c3aed;background:
+      radial-gradient(600px 240px at 20% 0%,rgba(124,58,237,.14),transparent 60%),
+      #13072b}
+    #mini-modal-card.neutral{border-color:#475569;background:
+      radial-gradient(600px 240px at 20% 0%,rgba(100,116,139,.10),transparent 60%),
+      #0b1220}
 
-      <div id="overlay" style="display: none"></div>
-      <div class="custom-modal" id="customModal" style="display: none">
-        <h2>Registro con éxito</h2>
-        <p>¡Mucha suerte!</p>
-        <button onclick="closeModal()">OK</button>
+    /* Headline y copy ricos */
+    #mini-modal-card .headline{
+      display:block; text-align:center; line-height:1.1; margin:2px 0 8px;
+      letter-spacing:.2px; font-weight:900;
+    }
+    #mini-modal-card .headline .xl{
+      display:inline-block; font-size:clamp(26px,5.6vw,36px);
+    }
+    #mini-modal-card .headline .md{
+      display:inline-block; font-size:clamp(18px,3.6vw,22px); font-weight:800; opacity:.95;
+    }
+    #mini-modal-card .headline .accent{
+      background:linear-gradient(90deg,#22c55e,#86efac);
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+      text-shadow:0 8px 30px rgba(34,197,94,.25);
+    }
+    #mini-modal-card .headline .accent-purple{
+      background:linear-gradient(90deg,#a78bfa,#22d3ee);
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+      text-shadow:0 8px 30px rgba(124,58,237,.28);
+    }
+    #mini-modal-title{margin:0}
+    #mini-modal-msg{margin:0}
+
+    #mini-modal-card .msg{
+      text-align:center; margin:6px auto 10px; max-width:36ch;
+    }
+    #mini-modal-card .msg .big{
+      display:block; font-size:clamp(16px,3.6vw,20px); font-weight:800; margin-bottom:4px;
+    }
+    #mini-modal-card .msg .note{
+      display:block; font-size:clamp(13px,3vw,15px); opacity:.95;
+    }
+    #mini-modal-card .msg .warn{
+      color:#fde68a; font-weight:800;
+    }
+
+    #mini-modal-figure{display:flex;align-items:center;justify-content:center;margin:6px 0 12px}
+    #mini-modal-figure img{width:min(180px,52%);height:auto;filter:drop-shadow(0 10px 28px rgba(0,0,0,.35))}
+    .cta{margin:10px auto 0;display:inline-flex;gap:8px;align-items:center;border-radius:999px;padding:10px 16px;border:1px solid #2b3750;background:#121c2e;color:#e7ecf3;font-weight:700}
+    .cta:hover{transform:translateY(-1px)}
+    #mini-modal-actions{display:flex;justify-content:center;gap:10px;margin-top:8px;flex-wrap:wrap}
+    #mini-modal-ok{padding:10px 16px;border-radius:12px;border:1px solid #1f2937;background:#1f6feb;color:#fff;cursor:pointer;font-weight:700;min-width:120px;text-align:center}
+
+    /* Etiquetas */
+    .kicker{font-size:12px;letter-spacing:.4px;text-transform:uppercase;color:#9fb0c9;text-align:center;margin:0 0 6px}
+    .subtitle{font-size:clamp(14px,2vw,16px);text-align:center;color:#cbd5e1;margin:0 0 8px}
+
+    /* Phone modal mejorado */
+    #phone-modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.6);z-index:10000}
+    .phone-card{
+      width:min(440px,92vw);background:#0b1220;border:1px solid #334155;border-radius:16px;
+      box-shadow:0 20px 60px rgba(0,0,0,.4);padding:16px 14px
+    }
+    .phone-title{margin:0 0 6px;font-size:clamp(18px,4.8vw,20px);text-align:center}
+    .phone-sub{margin:0 0 12px;opacity:.9;text-align:center}
+    .phone-row{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap}
+    .phone-input{
+      flex:1;min-width:180px;max-width:260px;padding:12px 14px;border-radius:14px;border:1px solid #334155;background:#0f172a;color:#eee;outline:none;text-align:center;font-weight:700;letter-spacing:.8px
+    }
+    .phone-btn{padding:12px 14px;border-radius:14px;border:1px solid #1f2937;background:#1f6feb;color:#fff;cursor:pointer;font-weight:800;min-width:120px}
+    .phone-btn.secondary{border:1px solid #475569;background:#1f2937;color:#e5e7eb}
+    .phone-err{min-height:18px;margin-top:8px;font-size:13px;color:#fca5a5;text-align:center}
+  </style>
+
+  <!-- Header con overlay de canvas para confeti -->
+  <div style="position:relative;width:100%;max-width:520px;margin:0 auto 8px;line-height:0;isolation:isolate;">
+    <img src="img/gan200.png" alt="Título" style="display:block;width:100%;height:auto;border-radius:12px">
+    <canvas id="miniCanvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:block;"></canvas>
+  </div>
+
+  <p class="kicker">1 oportunidad por código</p>
+  <div id="board"></div>
+
+  <center>
+    <div style="display:flex;width:92%;gap:8px;align-items:center;margin:10px 0 14px;flex-wrap:wrap;justify-content:center">
+      <input id="codigo-input" type="text" placeholder="Ingresa tu código" style="flex:1;min-width:220px;padding:12px 14px;border-radius:14px;border:1px solid #2b3750;background:#0f172a;color:#e7ecf3;outline:none;font-weight:600;text-align:center">
+      <button id="validar-btn" style="padding:12px 16px;border-radius:14px;border:1px solid #2b3750;background:linear-gradient(135deg,#2563eb,#1f6feb);color:#fff;cursor:pointer;font-weight:800;letter-spacing:.2px">Validar y jugar</button>
+    </div>
+    <div id="codigo-status" class="subtitle" style="min-height:22px;margin-bottom:6px;"></div>
+  </center>
+
+  <!-- Modal de resultado -->
+  <div id="mini-modal">
+    <div id="mini-modal-card" class="neutral">
+      <div id="mini-modal-figure" aria-hidden="true"></div>
+      <h3 id="mini-modal-title" style="margin:0"></h3>
+      <p id="mini-modal-msg" style="margin:0"></p>
+      <div id="mini-modal-actions">
+        <a id="modal-cta" class="cta" href="#" target="_blank" rel="noopener noreferrer" style="display:none">Abrir Instagram</a>
+        <button id="mini-modal-ok">Cerrar</button>
       </div>
+    </div>
+  </div>
 
-      <script src="js/main.obf.js" type="module"></script>
-      <script src="js/funcionalidad.js" type="module"></script>
-
-      <div class="modal-info" id="infoModal" style="display: none">
-        <div class="modal-content-info">
-          <center><h3>Instrucciones y Condiciones</h3></center>
-          <p><strong>¿Cómo participar?</strong>
-          <ul>
-            <li>Compra tu bolsita de gomitas con código único.
-            <li>Da clic en <strong>Registrar Código</strong> en la bóveda que desees participar.
-            <li>Ingresa el código y tu número de teléfono.
-            <li>¡Listo! espera a que se llene la bóveda para el sorteo.
-          </ul>
-
-          <p><strong>Tipos de bóvedas</strong>
-          <ul>
-            <li>🪵 <strong>Madera</strong>: Se desbloquea con 25 códigos
-            <li>🔹 <strong>Cristal</strong>: Se desbloquea con 100 códigos
-            <li>⚪ <strong>Plateada</strong>: Se desbloquea con 250 códigos
-            <li>🟡 <strong>Dorada</strong>: Se desbloquea con 500 códigos
-          </ul>
-
-          <p><strong>Reglas importantes</strong>
-          <ul>
-            <li>Puedes participar cuantas veces quieras en una sola ruleta.
-            <li>Cada código es único y solo se usa una vez.
-            <li>Cada código se puede registrar en una sola bóveda.
-            <li>Si ya fue usado, no se puede volver a registrar.
-            <li>Tu número se usará para contactarte si ganas.
-            <li>Si tu número es registrado incorrectamente, no podrás reclamar el premio.
-            <li>Si ganas y no respondes en 24 horas, tu premio será sorteado nuevamente.
-            <li>Para reclamar tu premio debes seguir la página de Instagram gummybank_.
-            <li>Toda trampa será detectada y penalizada.
-          </ul>
-
-          <p><strong>Ranking de Escuelas</strong>
-          <ul>
-            <li>Cada código suma puntos a tu escuela.
-            <li>La escuela con más puntos tendrá un premio.
-            <li>Los premios se sortearán en Instagram.
-            <li>Ranking actualizado cada 15 y 30 del mes.
-          </ul>
-
-          <p><strong>Privacidad</strong>
-          <ul>
-            <li>No compartimos tu número con terceros. Solo se usa para contactarte si eres ganador.
-          </ul>
-
-          <center><h2>¡Suerte!</h2></center>
-          <button onclick="cerrarInfoModal()">Cerrar</button>
-        </div>
+  <!-- Modal teléfono mejorado -->
+  <div id="phone-modal">
+    <div class="phone-card">
+      <h3 class="phone-title">Confirma tu teléfono</h3>
+      <p class="phone-sub">Para registrar tu participación, ingresa tu número.</p>
+      <div class="phone-row">
+        <input id="phone-input" class="phone-input" inputmode="tel" autocomplete="tel" maxlength="15" placeholder="8 a 15 dígitos">
+        <button id="phone-ok" class="phone-btn">Continuar</button>
+        <button id="phone-cancel" class="phone-btn secondary">Cancelar</button>
       </div>
+      <div id="phone-error" class="phone-err"></div>
+    </div>
+  </div>
+</section>
 
-      <div class="modal-overlay" id="overlay-info" style="display: none"></div>
-      <footer style="text-align: center; margin-top: 40px; padding: 20px; color: #aaa; font-size: 0.9rem">
-        © 2025 Gummy Bank All rights reserved<br />Moy and Juan
-      </footer>
+<!-- ========= LÓGICA (UN SOLO MÓDULO) ========= -->
+<script type="module">
+  import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+  import {
+    getFirestore, doc, getDoc, serverTimestamp, setDoc, updateDoc,
+    writeBatch, collection
+  } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+  // ====== CONFIG ======
+  const IG_URL = window.IG_URL || "https://instagram.com/tu_pagina"; // cámbialo por tu IG real
+
+  const firebaseConfig = window.firebaseConfig || {
+    apiKey: "AIzaSyAJJgDg5SUPvvHgPtDNhIy1f1fiGpBHBw",
+    authDomain: "registro-gomitas.firebaseapp.com",
+    projectId: "registro-gomitas",
+    storageBucket: "registro-gomitas.appspot.com",
+    messagingSenderId: "435485731864",
+    appId: "1:435485731864:web:43dff09753a4c9d507e76d",
+    measurementId: "G-20KEW71X9G"
+  };
+  const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Normaliza el ID como en Firestore: MAYÚSCULAS sin basura.
+  const toId = s => (s || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+
+  const TOTAL_CASILLAS=25, PREMIO_GOMITA=3, PREMIO_DINERO=1, PREMIO_NADA=TOTAL_CASILLAS-PREMIO_GOMITA-PREMIO_DINERO;
+
+  const $board=document.getElementById("board"),
+        $status=document.getElementById("codigo-status"),
+        $codigoInput=document.getElementById("codigo-input"),
+        $validarBtn=document.getElementById("validar-btn"),
+        $modal=document.getElementById("mini-modal"),
+        $modalCard=document.getElementById("mini-modal-card"),
+        $modalTitle=document.getElementById("mini-modal-title"),
+        $modalMsg=document.getElementById("mini-modal-msg"),
+        $modalOk=document.getElementById("mini-modal-ok"),
+        $modalFigure=document.getElementById("mini-modal-figure"),
+        $modalCta=document.getElementById("modal-cta"),
+        $phoneModal=document.getElementById("phone-modal"),
+        $phoneInput=document.getElementById("phone-input"),
+        $phoneOk=document.getElementById("phone-ok"),
+        $phoneCancel=document.getElementById("phone-cancel"),
+        $phoneError=document.getElementById("phone-error"),
+        $canvas=document.getElementById("miniCanvas");
+
+  let codigoValido=null, telefonoValido=null, juegoHabilitado=false, yaJugo=false;
+
+  // ====== ICONOS ======
+  const svgURI = s => 'data:image/svg+xml;utf8,' + encodeURIComponent(s.trim());
+  const IMG = {
+    HIDDEN: svgURI(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="18" fill="#111827"/><text x="50%" y="56%" text-anchor="middle" dominant-baseline="middle" font-family="system-ui,Segoe UI,Roboto" font-size="64" fill="#9fb0c9">?</text></svg>`),
+    X: svgURI(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="18" fill="#1b2332"/><path d="M30 30 L90 90 M90 30 L30 90" stroke="#d1d5db" stroke-width="14" stroke-linecap="round"/></svg>`),
+    GOMITA: 'img/gomita.png',
+    P200: svgURI(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="18" fill="#064e3b"/><circle cx="60" cy="60" r="36" fill="#0e9f6e"/><text x="50%" y="56%" text-anchor="middle" dominant-baseline="middle" font-family="system-ui,Segoe UI,Roboto" font-size="38" fill="#e6fffa">$200</text></svg>`)
+  };
+
+  function setIcon(btn, kind){
+    const alt = kind==='P200' ? '$200' : kind==='GOMITA' ? 'Gomitas' : kind==='X' ? 'Sin premio' : 'Oculto';
+    btn.innerHTML = `<img class="cell-img" alt="${alt}" src="${IMG[kind]}">`;
+    btn.setAttribute('aria-label', alt);
+  }
+  function setRevealStyles(btn, premio){
+    btn.classList.remove('prize-200','prize-gomita','prize-nada');
+    if(premio==='200') btn.classList.add('prize-200');
+    else if(premio==='gomita') btn.classList.add('prize-gomita');
+    else btn.classList.add('prize-nada');
+  }
+
+  // ====== Estado inicial: mostrar premios y bloquear ======
+  mostrarPremiosIniciales();
+
+  $validarBtn.addEventListener("click",async()=>{
+    const code=toId($codigoInput.value);
+    if(!code){pintarStatus("Ingresa un código válido.","#ff6b6b");bloquearTablero();return;}
+    try{
+      const esValido=await validarCodigoDisponible(code);
+      if(!esValido){pintarStatus("Código inválido o ya usado.","#ff6b6b");bloquearTablero();return;}
+      codigoValido=code; juegoHabilitado=true; yaJugo=false;
+      try{ telefonoValido=await pedirTelefono(); }
+      catch(_){ pintarStatus("Participación cancelada.","#fca5a5"); return; }
+      pintarStatus("Tienes un intento. Mezclando...","#3fb950");
+      await animarVolteoYMezcla();
+    }catch(e){console.error(e);pintarStatus("Error al validar.","#ff6b6b");}
+  });
+
+  function mostrarPremiosIniciales(){
+    const pool=[...Array(PREMIO_DINERO).fill("200"),...Array(PREMIO_GOMITA).fill("gomita"),...Array(PREMIO_NADA).fill("nada")];
+    for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+    $board.innerHTML="";
+    pool.forEach(p=>{
+      const btn=document.createElement("button");
+      if(p==="200"){ setIcon(btn,'P200'); setRevealStyles(btn,'200'); }
+      else if(p==="gomita"){ setIcon(btn,'GOMITA'); setRevealStyles(btn,'gomita'); }
+      else{ setIcon(btn,'X'); setRevealStyles(btn,'nada'); }
+      btn.disabled=true;
+      $board.appendChild(btn);
+    });
+  }
+
+  async function animarVolteoYMezcla(){
+    const buttons=Array.from($board.children);
+    // ocultar todos
+    await Promise.all(buttons.map((btn,i)=>new Promise(res=>{
+      setTimeout(()=>{
+        setIcon(btn,'HIDDEN');
+        btn.classList.remove("prize-200","prize-gomita","prize-nada");
+        btn.style.background="linear-gradient(135deg,#0e1420,#0b0f18)";
+        btn.style.borderColor="#243041";
+        res();
+      },i*35);
+    })));
+    configurarPremiosRandom();
+    // shake ligero
+    buttons.forEach((btn,i)=>{setTimeout(()=>{btn.classList.add("is-shuffling");setTimeout(()=>btn.classList.remove("is-shuffling"),650);},i*12);});
+    habilitarTablero();
+    pintarStatus("Código validado. Elige una casilla.","#3fb950");
+  }
+
+  function bloquearTablero(){Array.from($board.children).forEach(btn=>btn.disabled=true);juegoHabilitado=false;}
+  function habilitarTablero(){Array.from($board.children).forEach(btn=>btn.disabled=false);juegoHabilitado=true;}
+
+  function configurarPremiosRandom(){
+    const pool=[...Array(PREMIO_DINERO).fill("200"),...Array(PREMIO_GOMITA).fill("gomita"),...Array(PREMIO_NADA).fill("nada")];
+    for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+    Array.from($board.children).forEach((btn,idx)=>{
+      btn.dataset.premio=pool[idx];
+      setIcon(btn,'HIDDEN');
+      btn.disabled=false;
+      btn.onclick=()=>onClickCasilla(btn);
+      btn.style.background="linear-gradient(135deg,#0e1420,#0b0f18)";
+      btn.style.borderColor="#243041";
+    });
+  }
+
+  async function onClickCasilla(btn){
+    if(!juegoHabilitado||!codigoValido||yaJugo)return;
+    yaJugo=true; // solo un intento
+    bloquearTablero();
+
+    const premio=btn.dataset.premio;
+
+    // 1) Revelar elección
+    await revelarCasilla(btn, premio);
+
+    // 2) Persistir (marcar usado + registrar resultado) DESPUÉS de revelar la elegida
+    try{
+      await persistirResultado(codigoValido, telefonoValido, premio);
+    }catch(e){
+      console.error("No se pudo persistir el resultado:", e);
+    }
+
+    // 3) Revelar todas las demás
+    await revelarResto(btn);
+
+    // 4) Celebración y modal final bonito (con títulos formateados y CTA)
+    if (premio === "200") {
+      lanzarConfeti("gold");
+      openResultModal(null, null, "success", { type: "200" });
+    } else if (premio === "gomita") {
+      lanzarConfeti("purple");
+      openResultModal(null, null, "warn", { type: "gomita" });
+    } else {
+      openResultModal(null, null, "neutral", { type: "nada" });
+    }
+  }
+
+  function revelarCasilla(btn,premio){
+    return new Promise(res=>{
+      btn.classList.add("is-flipping");
+      setTimeout(()=>{
+        if(premio==="200"){ setIcon(btn,'P200'); setRevealStyles(btn,'200'); }
+        else if(premio==="gomita"){ setIcon(btn,'GOMITA'); setRevealStyles(btn,'gomita'); }
+        else { setIcon(btn,'X'); setRevealStyles(btn,'nada'); }
+        btn.classList.remove("is-flipping");
+        btn.classList.add("pop");
+        setTimeout(()=>{btn.classList.remove("pop");res();},180);
+      },180);
+    });
+  }
+
+  function revelarResto(chosenBtn){
+    const buttons=Array.from($board.children);
+    let delay=120;
+    const promises=[];
+    for(const b of buttons){
+      if(b===chosenBtn) continue;
+      const premio=b.dataset.premio;
+      promises.push(new Promise(r=>{
+        setTimeout(()=>{
+          if(premio==="200"){ setIcon(b,'P200'); setRevealStyles(b,'200'); }
+          else if(premio==="gomita"){ setIcon(b,'GOMITA'); setRevealStyles(b,'gomita'); }
+          else { setIcon(b,'X'); setRevealStyles(b,'nada'); }
+          r();
+        }, delay);
+        delay += 60; // efecto dominó
+      }));
+    }
+    return Promise.all(promises);
+  }
+
+  function pintarStatus(msg,color){$status.textContent=msg;$status.style.color=color||"#9fb0c9";}
+
+  async function validarCodigoDisponible(rawCode){
+    const code = toId(rawCode);
+    const ref=doc(db,"codigos",code);
+    const snap=await getDoc(ref);
+    if(!snap.exists())return false;
+    const data=snap.data()||{};
+    if((data.estado||"").toLowerCase()==="usado")return false;
+    return true;
+  }
+
+  // Persistencia: marca el código como USADO y registra el play con resultado
+  async function persistirResultado(codeRaw, phone, premio){
+    const code = toId(codeRaw);
+    const playRef=doc(collection(db,"minijuego_plays"));
+    const codeRef=doc(db,"codigos",code);
+    const batch = writeBatch(db);
+    batch.set(playRef,{codigo:code, telefono: phone, resultado: premio, createdAt:serverTimestamp()});
+    batch.set(codeRef,{
+      estado:"usado",
+      usadoEn:"MiniJuego",
+      usadoAt:serverTimestamp(),
+      telefono: phone,
+      resultado: premio === '200' ? '200' : (premio === 'gomita' ? 'gomitas' : 'sin premio')
+    },{merge:true});
+    await batch.commit();
+  }
+
+  // ======= Registro en BÓVEDAS (igual que antes) =======
+  window.handleRegistroCodigo = async ({codigo, telefono, boveda})=>{
+    const code = toId(codigo);
+    if(!/^[A-Z0-9]{8}$/.test(code)) { alert("Código inválido."); return false; }
+    if(!/^\d{10}$/.test(telefono||"")) { alert("Teléfono inválido (10 dígitos)."); return false; }
+    if(!["madera","cristal","plateada","dorada"].includes(boveda)){ alert("Bóveda inválida."); return false; }
+
+    const ref = doc(db,"codigos",code);
+    const snap = await getDoc(ref);
+    if(!snap.exists()){ alert("Este código no existe."); return false; }
+    const data = snap.data() || {};
+    if((data.estado||"").toLowerCase()==="usado"){ alert("Este código ya fue usado."); return false; }
+
+    const batch = writeBatch(db);
+    batch.set(ref, { estado:"usado", telefono, boveda, registradoAt: serverTimestamp() }, { merge:true });
+    const destinoRef = doc(collection(db, boveda), code);
+    batch.set(destinoRef, { codigo: code, telefono, boveda, registrado: serverTimestamp() });
+    await batch.commit();
+
+    try{
+      const cont = document.getElementById(`tarjetas-${boveda}`);
+      if(cont){
+        const card = document.createElement("div");
+        card.className = "card-codigo";
+        card.innerHTML = `<strong>Código:</strong> ${code}<br><strong>Teléfono:</strong> ${telefono}`;
+        cont.prepend(card);
+      }
+      const countEl = document.querySelector(`.vault.${boveda} .count`);
+      if(countEl){ countEl.textContent = String(Number(countEl.textContent||"0") + 1); }
+    }catch(_){}
+
+    const okM = document.getElementById("customModal"), ov = document.getElementById("overlay");
+    if(okM && ov){ okM.style.display="block"; ov.style.display="block"; }
+    return true;
+  };
+
+  // ===== Modal resultado con titulares potentes y CTA =====
+  function openResultModal(_title,_msg,variant,{type}={}){
+    $modalFigure.innerHTML = "";
+    $modalCard.classList.remove('success','warn','neutral');
+    if(variant) $modalCard.classList.add(variant);
+
+    // Imagen/figura
+    if(type==="gomita"){
+      const im=document.createElement('img');
+      im.src=IMG.GOMITA; im.alt="Gomitas";
+      $modalFigure.appendChild(im);
+    }else if(type==="200"){
+      const im=document.createElement('img');
+      im.src=IMG.P200; im.alt="$200";
+      $modalFigure.appendChild(im);
+    }
+
+    // Headline y mensaje ricos
+    if (type === "200") {
+      $modalTitle.innerHTML = `
+        <div class="headline">
+          <span class="md">¡PREMIO MAYOR!</span><br>
+          <span class="xl accent">$200</span>
+        </div>
+      `;
+      $modalMsg.innerHTML = `
+        <div class="msg">
+          <span class="big">Te lo llevaste todo.</span>
+          <span class="note warn">TOMA CAPTURA DE PANTALLA</span>
+          <span class="note">Envíala por DM a nuestro Instagram para reclamar tu premio.</span>
+        </div>
+      `;
+      $modalCta.style.display='inline-flex';
+      $modalCta.href = IG_URL;
+      $modalCta.textContent = 'Abrir Instagram';
+    } else if (type === "gomita") {
+      $modalTitle.innerHTML = `
+        <div class="headline">
+          <span class="md">¡GOMITAS</span> <span class="md accent-purple">GANADAS!</span>
+        </div>
+      `;
+      $modalMsg.innerHTML = `
+        <div class="msg">
+          <span class="big">Dulce victoria.</span>
+          <span class="note warn">TOMA CAPTURA DE PANTALLA</span>
+          <span class="note">Mándala por DM en Instagram y reclama tus gomitas.</span>
+        </div>
+      `;
+      $modalCta.style.display='inline-flex';
+      $modalCta.href = IG_URL;
+      $modalCta.textContent = 'Abrir Instagram';
+    } else {
+      $modalTitle.innerHTML = `
+        <div class="headline">
+          <span class="md">SIN PREMIO</span><br>
+          <span class="xl">ESTA VEZ</span>
+        </div>
+      `;
+      $modalMsg.innerHTML = `
+        <div class="msg">
+          <span class="big">Quiza la proxima tengas más suerte.</span>
+          <span class="note">Sigue participando con más códigos que la próxima puede ser tuya.</span>
+        </div>
+      `;
+      $modalCta.style.display='none';
+    }
+
+    $modal.style.display='flex';
+    $modalOk.focus();
+  }
+  function closeResultModal(){
+    $modal.style.display='none';
+    $codigoInput.value='';
+    codigoValido=null; telefonoValido=null;
+    pintarStatus('Ingresa un código para jugar.','#9fb0c9');
+  }
+  $modalOk.addEventListener('click',closeResultModal);
+  $modal.addEventListener('click',(e)=>{if(e.target===$modal)closeResultModal();});
+  window.addEventListener('keydown',(e)=>{if($modal.style.display==='flex'&&(e.key==='Escape'||e.key==='Enter'))closeResultModal();});
+
+  // ===== Teléfono mejorado (móvil-friendly) =====
+  function validarTelefono(value){
+    const digits=(value||'').replace(/\D/g,'');
+    return digits.length>=8 && digits.length<=15 ? digits : null;
+  }
+  function abrirPhoneModal(){
+    $phoneError.textContent='';
+    $phoneInput.value='';
+    $phoneModal.style.display='flex';
+    setTimeout(()=>{$phoneInput.focus();},0);
+  }
+  function cerrarPhoneModal(){ $phoneModal.style.display='none'; }
+
+  function pedirTelefono(){
+    return new Promise((resolve,reject)=>{
+      abrirPhoneModal();
+
+      const onOk=()=>{
+        const v=validarTelefono($phoneInput.value);
+        if(!v){ $phoneError.textContent='Ingresa un teléfono válido (8 a 15 dígitos).'; return; }
+        cerrarPhoneModal(); resolve(v);
+      };
+      const onCancel=()=>{ cerrarPhoneModal(); reject(new Error('cancelado')); };
+
+      $phoneOk.onclick=onOk;
+      $phoneCancel.onclick=onCancel;
+      $phoneModal.onclick=(e)=>{ if(e.target===$phoneModal) onCancel(); };
+
+      // Enter confirma, Escape cancela
+      const handler=(e)=>{
+        if($phoneModal.style.display==='flex'&&e.key==='Enter') onOk();
+        if($phoneModal.style.display==='flex'&&e.key==='Escape') onCancel();
+      };
+      window.addEventListener('keydown',handler,{once:true});
+    });
+  }
+
+  // ===== Confeti en canvas =====
+  function lanzarConfeti(palette='gold'){
+    const ctx = $canvas.getContext('2d');
+    const rect = $canvas.getBoundingClientRect();
+    $canvas.width = rect.width * devicePixelRatio;
+    $canvas.height = rect.height * devicePixelRatio;
+    const scale = devicePixelRatio;
+    ctx.scale(scale, scale);
+
+    const colors = palette==='gold'
+      ? ["#ffd700","#ffb300","#ff7a00","#fff2a8"]
+      : ["#9b5cf7","#7c3aed","#c084fc","#e9d5ff"];
+    const pieces = Array.from({length: 110}, ()=>({
+      x: Math.random()*rect.width,
+      y: -20 - Math.random()*60,
+      w: 6+Math.random()*6,
+      h: 8+Math.random()*10,
+      vx: -1 + Math.random()*2,
+      vy: 2 + Math.random()*2.5,
+      rot: Math.random()*Math.PI,
+      vr: -0.2 + Math.random()*0.4,
+      color: colors[(Math.random()*colors.length)|0],
+      life: 220 + Math.random()*120
+    }));
+
+    let running = true;
+    const start = performance.now();
+    function tick(t){
+      if(!running) return;
+      const elapsed = t - start;
+      ctx.clearRect(0,0,rect.width,rect.height);
+      for(const p of pieces){
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rot += p.vr;
+        p.vy += 0.02;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+        ctx.restore();
+      }
+      if(elapsed < 2600) requestAnimationFrame(tick);
+      else { running=false; ctx.clearRect(0,0,rect.width,rect.height); }
+    }
+    requestAnimationFrame(tick);
+  }
+</script>
+<!-- ================== FIN MINI JUEGO ================== -->
+
+<!-- ==== AVISO BREVES BÓVEDAS ==== -->
+<section style="text-align:center; padding:20px 16px; margin:20px auto; max-width:750px; color:#cbd5e1; font-family:'Poppins',sans-serif;">
+  <h3 style="margin:0; font-size:25px; font-weight:600; color:#facc15;">
+    🔐 Bóvedas
+  </h3>
+  <p style="margin:8px auto 0; font-size:15px; line-height:1.5; max-width:500px;">
+    Detrás de cada bóveda te espera una oportunidad… <br>Elige la tuya y ve por el Premio Mayor.
+  </p>
+</section>
+
+
+<section class="rewards">
+  <div class="vault madera">
+    <img alt="Premio Madera" src="./img/Madera.png" class="imagen-recompensa imagen-madera-ajustada" />
+    <canvas class="liquid-canvas" id="canvas-madera"></canvas>
+    <p>Meta de Empaques <span class="count" data-meta="25">0</span> / 25</p>
+    <button onclick='registrarCodigo("madera")'>Registrar Código</button>
+    <div class="contenedor-tarjetas" id="tarjetas-madera"></div>
+  </div>
+
+  <div class="vault cristal">
+    <img alt="Premio Cristal" src="./img/Cristal.png" class="imagen-recompensa" />
+    <canvas class="liquid-canvas" id="canvas-cristal"></canvas>
+    <p>Meta de Empaques <span class="count" data-meta="100">0</span> / 100</p>
+    <button onclick='registrarCodigo("cristal")'>Registrar Código</button>
+    <div class="contenedor-tarjetas" id="tarjetas-cristal"></div>
+  </div>
+
+  <div class="vault plateada">
+    <img alt="Premio Plata" src="./img/plata.png" class="imagen-recompensa" />
+    <canvas class="liquid-canvas" id="canvas-plateada"></canvas>
+    <p>Meta de Empaques <span class="count" data-meta="250">0</span> / 250</p>
+    <button onclick='registrarCodigo("plateada")'>Registrar Código</button>
+    <div class="contenedor-tarjetas" id="tarjetas-plateada"></div>
+  </div>
+
+  <div class="vault dorada">
+    <img alt="Premio Oro" src="./img/oro.png" class="imagen-recompensa" />
+    <canvas class="liquid-canvas" id="canvas-dorada"></canvas>
+    <p>Meta de Empaques <span class="count" data-meta="500">0</span> / 500</p>
+    <button onclick='registrarCodigo("dorada")'>Registrar Código</button>
+    <div class="contenedor-tarjetas" id="tarjetas-dorada"></div>
+  </div>
+
+  <section class="ranking" style="width:100%;">
+    <div id="ranking-container"></div>
+    <div id="ranking-updated"></div>
+  </section>
+</section>
+
+<!-- Overlay y modal de éxito -->
+<div id="overlay" style="display:none"></div>
+<div class="custom-modal" id="customModal" style="display:none">
+  <h2>Registro con éxito</h2>
+  <p>¡Mucha suerte!</p>
+  <button onclick="closeModal()">OK</button>
+</div>
+
+<!-- ===== Modal de REGISTRO simple (sin lógica duplicada) ===== -->
+<div class="custom-modal" id="modal-registro" role="dialog" aria-modal="true" aria-labelledby="reg-title" style="display:none">
+  <h2 id="reg-title">Registrar código</h2>
+  <form id="form-registro" novalidate>
+    <input id="codigo" name="codigo" placeholder="Código (8)" maxlength="8" pattern="[A-Z0-9]{8}" required />
+    <input id="telefono" name="telefono" placeholder="Teléfono (10)" inputmode="numeric" maxlength="10" pattern="\\d{10}" required />
+    <input type="hidden" id="boveda-seleccionada" name="boveda" />
+    <div class="acciones">
+      <button type="submit">Registrar</button>
+      <button type="button" id="btn-cerrar-registro">Cancelar</button>
+    </div>
+  </form>
+</div>
+<div class="modal-overlay" id="overlay-registro" style="display:none"></div>
+
+<script>
+// Utilidad: toma SIEMPRE el último si hay duplicados
+const pickLast = (sel) => { const n = document.querySelectorAll(sel); return n[n.length-1] || null; };
+
+const $body = document.body;
+const $overlayRegistro = pickLast('#overlay-registro');
+const $modalRegistro   = pickLast('#modal-registro');
+const $formRegistro    = $modalRegistro ? $modalRegistro.querySelector('#form-registro') : null;
+const $inpCodigo       = $modalRegistro ? $modalRegistro.querySelector('#codigo') : null;
+const $inpTel          = $modalRegistro ? $modalRegistro.querySelector('#telefono') : null;
+const $inpBoveda       = $modalRegistro ? $modalRegistro.querySelector('#boveda-seleccionada') : null;
+const $btnCerrarReg    = $modalRegistro ? $modalRegistro.querySelector('#btn-cerrar-registro') : null;
+
+function safe(fn){ try{ fn(); }catch(_){} }
+function trapFocus(container){
+  const f = container.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');
+  const first = f[0], last = f[f.length-1];
+  function handler(e){
+    if(e.key !== 'Tab') return;
+    if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+  }
+  container.addEventListener('keydown', handler);
+  return ()=> container.removeEventListener('keydown', handler);
+}
+let untrap = null;
+
+function abrirModalRegistro(boveda){
+  if(!$modalRegistro || !$overlayRegistro) return;
+  safe(()=> $inpBoveda.value = boveda || '');
+  $overlayRegistro.style.display = 'block';
+  $modalRegistro.style.display   = 'block';
+  $body.classList.add('modal-open');
+  setTimeout(()=> safe(()=> $inpCodigo.focus()), 0);
+  untrap = trapFocus($modalRegistro);
+}
+function cerrarModalRegistro(){
+  if(!$modalRegistro || !$overlayRegistro) return;
+  $overlayRegistro.style.display = 'none';
+  $modalRegistro.style.display   = 'none';
+  $body.classList.remove('modal-open');
+  if(untrap) untrap();
+  safe(()=> $formRegistro.reset());
+}
+safe(()=> $overlayRegistro.addEventListener('click', cerrarModalRegistro));
+window.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && $overlayRegistro && $overlayRegistro.style.display==='block') cerrarModalRegistro(); });
+safe(()=> $btnCerrarReg.addEventListener('click', cerrarModalRegistro));
+
+function normalizarCodigo(v){ return (v||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8); }
+function normalizarTel(v){ return (v||'').replace(/\D/g,'').slice(0,10); }
+safe(()=> $inpCodigo.addEventListener('input', ()=> $inpCodigo.value = normalizarCodigo($inpCodigo.value)));
+safe(()=> $inpTel.addEventListener('input', ()=> $inpTel.value = normalizarTel($inpTel.value)));
+
+safe(()=> $formRegistro.addEventListener('submit', async (e)=>{
+  e.preventDefault(); e.stopImmediatePropagation(); // mata listeners viejos si los hubiera
+  const codigo   = normalizarCodigo($inpCodigo.value);
+  const telefono = normalizarTel($inpTel.value);
+  const boveda   = ($inpBoveda && $inpBoveda.value) || '';
+  if(codigo.length!==8){ alert("Código inválido."); $inpCodigo.focus(); return; }
+  if(telefono.length!==10){ alert("Teléfono inválido (10 dígitos)."); $inpTel.focus(); return; }
+
+  if(typeof window.handleRegistroCodigo === 'function'){
+    try{ const ok = await window.handleRegistroCodigo({codigo, telefono, boveda}); if(ok) cerrarModalRegistro(); }
+    catch(err){ console.error(err); alert("No se pudo registrar el código. Intenta de nuevo."); }
+  }else{
+    alert("No se encontró el manejador de registro.");
+  }
+}));
+
+window.registrarCodigo = function(boveda){ abrirModalRegistro(boveda); };
+if ($modalRegistro) {
+  $modalRegistro.addEventListener('keydown', e => e.stopPropagation(), true);
+  $modalRegistro.addEventListener('keyup',   e => e.stopPropagation(), true);
+}
+const _abrir = abrirModalRegistro;
+abrirModalRegistro = function(boveda){ _abrir(boveda); document.body.classList.add('modal-open'); };
+if ($inpCodigo) setTimeout(()=> $inpCodigo.focus(), 0);
+
+// Modal de éxito
+window.closeModal = function () {
+  document.getElementById("customModal").style.display = "none";
+  document.getElementById("overlay").style.display = "none";
+};
+
+// Info y “admin” light (igual que antes)
+const infoIcon = document.querySelector(".bi-info-circle");
+if (infoIcon) {
+  infoIcon.addEventListener("click", () => {
+    document.getElementById("infoModal").style.display = "block";
+    document.getElementById("overlay-info").style.display = "block";
+  });
+}
+window.cerrarInfoModal = function () {
+  document.getElementById("infoModal").style.display = "none";
+  document.getElementById("overlay-info").style.display = "none";
+};
+const lockIcon = document.getElementById("lock-icon");
+if (lockIcon) {
+  lockIcon.addEventListener("click", () => {
+    const usuario = prompt("Usuario:"); if (usuario == null) return;
+    const contrasena = prompt("Contraseña:"); if (contrasena == null) return;
+    if (usuario === "admin" && contrasena === "1234")      { sessionStorage.setItem("auth","true");        location.href="admin.html"; }
+    else if (usuario === "panel" && contrasena === "12345"){ sessionStorage.setItem("ventas_auth","true"); location.href="ventas.html"; }
+    else if (usuario === "vendedor" && contrasena === "123456"){ sessionStorage.setItem("vendedor_auth","true"); location.href="premios.html"; }
+    else if (usuario === "registroven" && contrasena === "1234567"){ sessionStorage.setItem("registro_auth","true"); location.href="registro-premios.html"; }
+    else { alert("Acceso denegado."); }
+  });
+}
+</script>
+
+<!-- Si tu main.obf.js pinta animaciones/lluvia, déjalo. NO incluimos funcionalidad.js para evitar choques. -->
+<script src="js/main.obf.js" type="module"></script>
+
+<!-- Modal de información -->
+<div class="modal-info" id="infoModal" style="display:none">
+  <div class="modal-content-info">
+    <center><h3>Instrucciones y Condiciones</h3></center>
+    <p><strong>¿Cómo participar?</strong>
+    <ul>
+      <li>Compra tu bolsita de gomitas con código único.
+      <li>Da clic en <strong>Registrar Código</strong> en la bóveda que desees participar.
+      <li>Ingresa el código y tu número de teléfono.
+      <li>Espera a que se llene la bóveda para el sorteo.
+    </ul>
+
+    <p><strong>Tipos de bóvedas</strong>
+    <ul>
+      <li>🪵 <strong>Madera</strong>: 25 códigos
+      <li>🔹 <strong>Cristal</strong>: 100 códigos
+      <li>⚪ <strong>Plateada</strong>: 250 códigos
+      <li>🟡 <strong>Dorada</strong>: 500 códigos
+    </ul>
+
+    <p><strong>Reglas importantes</strong>
+    <ul>
+      <li>Cada código es único y solo se usa una vez.
+      <li>Cada código se puede registrar en una sola bóveda.
+      <li>Si ganas y no respondes en 24 horas, tu premio será sorteado nuevamente.
+      <li>Para reclamar tu premio debes seguir la página de Instagram gummybank_.
+    </ul>
+
+    <p><strong>Privacidad</strong>
+    <ul><li>Tu número solo se usa para contactarte si eres ganador.</ul>
+
+    <center><h2>¡Suerte!</h2></center>
+    <button onclick="cerrarInfoModal()">Cerrar</button>
+  </div>
+</div>
+<div class="modal-overlay" id="overlay-info" style="display:none"></div>
+
+<footer style="text-align:center;margin-top:40px;padding:20px;color:#aaa;font-size:.9rem">
+  © 2025 Gummy Bank. All rights reserved<br/>Moy and Juan
+</footer>
+
     </main>
   </body>
 </html>

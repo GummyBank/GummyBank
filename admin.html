@@ -1,146 +1,317 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Panel Admin - Bóvedas</title>
+  <meta charset="UTF-8" />
+  <title>Panel Admin · Bóvedas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Paleta consistente con el sitio -->
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #111;
-      color: #fff;
-      padding: 20px;
+    :root{
+      --bg:#0f1115;
+      --panel:#11151d;
+      --card:#151a23;
+      --line:#243041;
+      --ink:#e7ecf3;
+      --muted:#9fb0c9;
+      --accent:#1f6feb;
+      --accent-2:#00bfff;
+      --danger:#ef4444;
+      --danger-2:#b91c1c;
+      --ok:#22c55e;
+
+      /* acentos por bóveda */
+      --madera-1:#8b5a2b;  --madera-2:#d2b48c;
+      --cristal-1:#00eaff; --cristal-2:#00bfff;
+      --plateada-1:#bbb;   --plateada-2:#ddd;
+      --dorada-1:#ffd700;  --dorada-2:#ff9900;
+
+      /* acentos mini juego */
+      --mini-1:#7c3aed; --mini-2:#22c55e;
     }
-    h2 {
-      border-bottom: 1px solid #444;
-      padding-bottom: 5px;
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:
+        radial-gradient(1200px 800px at 15% -10%, rgba(31,111,235,.12), transparent 60%),
+        radial-gradient(800px 600px at 110% 10%, rgba(0,191,255,.12), transparent 60%),
+        var(--bg);
+      color:var(--ink);
+      font:15px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Arial;
     }
-    .boveda {
-      margin-bottom: 40px;
-      padding: 15px;
-      background-color: #1e1e1e;
-      border: 1px solid #333;
-      border-radius: 8px;
+
+    /* Header */
+    .topbar{
+      position:sticky; top:0; z-index:20;
+      backdrop-filter:saturate(140%) blur(6px);
+      background:linear-gradient(180deg, rgba(17,21,29,.9), rgba(17,21,29,.75));
+      border-bottom:1px solid var(--line);
     }
-    .boveda#madera {
-      border-color: #8b5a2b;
-      background-color: #2e1a0b;
+    .topbar-wrap{
+      max-width:1100px; margin:0 auto; padding:10px 16px;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
     }
-    ul {
-      list-style: none;
-      padding-left: 0;
+    .title{margin:0; font-size:18px; letter-spacing:.2px}
+    .actions{display:flex; gap:8px; flex-wrap:wrap}
+    .btn{
+      appearance:none; border:1px solid var(--line); background:#1b2330; color:var(--ink);
+      padding:8px 12px; border-radius:10px; cursor:pointer; font-weight:600;
+      transition:transform .05s ease, filter .15s ease, border-color .15s ease, background .15s ease;
     }
-    li {
-      background-color: #222;
-      padding: 5px 10px;
-      margin: 2px 0;
-      border-radius: 4px;
+    .btn:hover{filter:brightness(1.08)}
+    .btn:active{transform:translateY(1px)}
+    .btn-danger{background:linear-gradient(180deg, rgba(239,68,68,.18), rgba(239,68,68,.12)); border-color:#3a1e23; color:#ffb4b4}
+    .btn-danger:hover{background:linear-gradient(180deg, rgba(239,68,68,.24), rgba(239,68,68,.18))}
+    .btn-ghost{background:transparent}
+    .btn-outline{background:transparent; border:1px dashed #2a3548; color:#cfe0ff}
+    .btn-outline:hover{background:#0f141e}
+    .btn-neutral{background:#1b2330}
+    .btn-green{background:linear-gradient(180deg, rgba(34,197,94,.25), rgba(34,197,94,.18)); border-color:#244b35; color:#b6ffce}
+    .btn-green:hover{filter:brightness(1.08)}
+
+    .hint{color:var(--muted); font-size:13px}
+
+    /* Layout */
+    .wrap{max-width:1100px; margin:18px auto; padding:0 16px}
+    .grid{display:grid; gap:16px; grid-template-columns:1fr}
+    @media (min-width:720px){ .grid{grid-template-columns:1fr 1fr} }
+    @media (min-width:1060px){ .grid{grid-template-columns:1fr 1fr} }
+
+    /* Card genérica */
+    .card{
+      background:linear-gradient(180deg, rgba(21,26,35,.9), rgba(21,26,35,.85));
+      border:1px solid var(--line); border-radius:16px;
+      box-shadow:0 12px 40px rgba(0,0,0,.28);
+      overflow:hidden;
+      display:flex; flex-direction:column; min-height:320px;
     }
-    .botones {
-      margin-top: 10px;
+    .card-head{
+      padding:14px 14px 10px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      border-bottom:1px solid #192233;
     }
-    button {
-      padding: 10px 20px;
-      margin-right: 10px;
-      background-color: crimson;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
+    .vh{display:flex; align-items:center; gap:10px;}
+    .vh h2{margin:0; font-size:16px}
+    .vap{font-size:12px; color:var(--muted); border-left:1px dashed #2a3548; padding-left:10px;}
+
+    /* Chips por tipo */
+    .chip{padding:4px 10px; border-radius:999px; font-weight:700; font-size:12px;}
+    .madera .chip{background:linear-gradient(90deg, var(--madera-1), var(--madera-2)); color:#1c130b}
+    .cristal .chip{background:linear-gradient(90deg, var(--cristal-1), var(--cristal-2)); color:#042a30}
+    .plateada .chip{background:linear-gradient(90deg, var(--plateada-1), var(--plateada-2)); color:#202020}
+    .dorada .chip{background:linear-gradient(90deg, var(--dorada-1), var(--dorada-2)); color:#2a1f00}
+    .mini .chip{background:linear-gradient(90deg, var(--mini-1), var(--mini-2)); color:#0a0a0a}
+
+    .list{
+      padding:10px 12px 12px; flex:1 1 auto; min-height:140px;
+      max-height:300px; overflow:auto;
+      scrollbar-width:thin; scrollbar-color:#2a3548 transparent;
     }
-    button:hover {
-      background-color: darkred;
+    .list ul{list-style:none; margin:0; padding:0}
+    .item{
+      background:#0f141e; border:1px solid #1c2636; color:#cfe0ff;
+      padding:8px 10px; border-radius:10px; margin:6px 0;
+      display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap;
+      font-variant-numeric:tabular-nums;
     }
-    #overlay, #confirmModal {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background-color: rgba(0,0,0,0.7);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 10;
+    .code{opacity:.9}
+    .phone{color:#9bd3ff; font-weight:700}
+    .badge{
+      font-size:12px; padding:2px 8px; border-radius:999px; border:1px solid #2a3548; color:#dbeafe;
     }
-    #confirmModalContent {
-      background: #222;
-      padding: 30px;
-      border-radius: 10px;
-      text-align: center;
-      max-width: 400px;
+    .badge.gomita{background:rgba(124,58,237,.18); border-color:#5b349e}
+    .badge.p200{background:rgba(14,159,110,.18); border-color:#199b72}
+    .badge.nada{background:rgba(148,163,184,.15); border-color:#334155}
+    .ts{font-size:12px; color:#9fb0c9}
+
+    .empty{
+      color:var(--muted); text-align:center; padding:28px 8px; border:1px dashed #263248; border-radius:12px;
+      background:repeating-linear-gradient(45deg, rgba(31,111,235,.06) 0 6px, transparent 6px 12px);
     }
-    #confirmModalContent button {
-      margin-top: 20px;
-      background-color: #28a745;
+
+    .card-foot{
+      display:flex; flex-wrap:wrap; gap:8px; padding:12px; border-top:1px solid #192233;
+      background:linear-gradient(180deg, rgba(17,21,29,.6), rgba(17,21,29,.4));
     }
-    #confirmModalContent .cancel {
-      background-color: #777;
-      margin-left: 10px;
+    .foot-right{margin-left:auto; display:flex; gap:8px}
+
+    /* Modal */
+    #overlay{
+      position:fixed; inset:0; display:none; place-items:center; z-index:50;
+      background:rgba(0,0,0,.6);
+    }
+    .modal{
+      width:min(460px, 92vw); background:#101726; border:1px solid #243041; border-radius:16px;
+      box-shadow:0 20px 70px rgba(0,0,0,.45);
+      padding:18px;
+    }
+    .modal h3{margin:0 0 6px; font-size:18px}
+    .modal p{margin:0 0 16px; color:var(--muted)}
+    .modal .row{display:flex; gap:10px; justify-content:flex-end}
+
+    /* Footer */
+    .foot{
+      max-width:1100px; margin:16px auto 28px; padding:0 16px;
+      color:var(--muted); font-size:12px; text-align:center;
+    }
+
+    /* Mobile niceties */
+    @media (max-width:520px){
+      .title{font-size:16px}
+      .actions{width:100%; justify-content:space-between}
+      .card-foot{justify-content:stretch}
+      .foot-right{margin-left:0; width:100%; justify-content:space-between}
     }
   </style>
 </head>
 <body>
+  <!-- Guard de sesión -->
   <script>
     const auth = sessionStorage.getItem("auth");
     if (auth !== "true") {
       sessionStorage.clear();
       window.location.replace("index.html");
     }
-  </script>  
+  </script>
 
-  <header style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #111; color: white;">
-    <h2 style="margin: 0;">Panel de Administración</h2>
-    <button onclick="cerrarSesion()" style="background: crimson; color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer;">Cerrar sesión</button>
-  </header>
-
-  <!-- 🪵 Bóveda Madera -->
-  <div class="boveda" id="madera">
-    <h2>Bóveda Madera</h2>
-    <ul id="lista-madera"></ul>
-    <div class="botones">
-      <button onclick="confirmarEliminacion('madera', 'ultimos')">Eliminar últimos 25</button>
-      <button onclick="confirmarEliminacion('madera', 'todos')">Eliminar todos</button>
-    </div>
-  </div>
-
-  <div class="boveda" id="cristal">
-    <h2>Bóveda Cristal</h2>
-    <ul id="lista-cristal"></ul>
-    <div class="botones">
-      <button onclick="confirmarEliminacion('cristal', 'ultimos')">Eliminar últimos 100</button>
-      <button onclick="confirmarEliminacion('cristal', 'todos')">Eliminar todos</button>
-    </div>
-  </div>
-
-  <div class="boveda" id="plateada">
-    <h2>Bóveda Plateada</h2>
-    <ul id="lista-plateada"></ul>
-    <div class="botones">
-      <button onclick="confirmarEliminacion('plateada', 'ultimos')">Eliminar últimos 250</button>
-      <button onclick="confirmarEliminacion('plateada', 'todos')">Eliminar todos</button>
-    </div>
-  </div>
-
-  <div class="boveda" id="dorada">
-    <h2>Bóveda Dorada</h2>
-    <ul id="lista-dorada"></ul>
-    <div class="botones">
-      <button onclick="confirmarEliminacion('dorada', 'ultimos')">Eliminar últimos 500</button>
-      <button onclick="confirmarEliminacion('dorada', 'todos')">Eliminar todos</button>
-    </div>
-  </div>
-
-  <div id="overlay">
-    <div id="confirmModal">
-      <div id="confirmModalContent">
-        <p id="confirmText">¿Estás seguro de realizar esta acción?</p>
-        <button id="confirmBtn">Sí, eliminar</button>
-        <button class="cancel" onclick="cerrarModal()">Cancelar</button>
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-wrap">
+      <h1 class="title">Panel de Administración</h1>
+      <div class="actions">
+        <button class="btn btn-danger" onclick="cerrarSesion()">Cerrar sesión</button>
       </div>
     </div>
   </div>
 
+  <div class="wrap">
+    <p class="hint" style="margin:8px 0 14px">Administra registros por bóveda y jugadas del mini juego.</p>
+
+    <section class="grid">
+      <!-- MADERA -->
+      <article class="card madera" id="madera-card">
+        <div class="card-head">
+          <div class="vh">
+            <span class="chip">🪵 Madera</span>
+            <h2>Madera</h2>
+            <span class="vap">Límite: 25</span>
+          </div>
+        </div>
+        <div class="list">
+          <ul id="lista-madera"><li class="empty">Sin registros aún</li></ul>
+        </div>
+        <div class="card-foot">
+          <button class="btn btn-outline" onclick="confirmarEliminacion('madera','ultimos')">Eliminar últimos 25</button>
+          <div class="foot-right">
+            <button class="btn btn-danger" onclick="confirmarEliminacion('madera','todos')">Eliminar todos</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- CRISTAL -->
+      <article class="card cristal" id="cristal-card">
+        <div class="card-head">
+          <div class="vh">
+            <span class="chip">🔹 Cristal</span>
+            <h2>Cristal</h2>
+            <span class="vap">Límite: 100</span>
+          </div>
+        </div>
+        <div class="list">
+          <ul id="lista-cristal"><li class="empty">Sin registros aún</li></ul>
+        </div>
+        <div class="card-foot">
+          <button class="btn btn-outline" onclick="confirmarEliminacion('cristal','ultimos')">Eliminar últimos 100</button>
+          <div class="foot-right">
+            <button class="btn btn-danger" onclick="confirmarEliminacion('cristal','todos')">Eliminar todos</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- PLATEADA -->
+      <article class="card plateada" id="plateada-card">
+        <div class="card-head">
+          <div class="vh">
+            <span class="chip">⚪ Plateada</span>
+            <h2>Plateada</h2>
+            <span class="vap">Límite: 250</span>
+          </div>
+        </div>
+        <div class="list">
+          <ul id="lista-plateada"><li class="empty">Sin registros aún</li></ul>
+        </div>
+        <div class="card-foot">
+          <button class="btn btn-outline" onclick="confirmarEliminacion('plateada','ultimos')">Eliminar últimos 250</button>
+          <div class="foot-right">
+            <button class="btn btn-danger" onclick="confirmarEliminacion('plateada','todos')">Eliminar todos</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- DORADA -->
+      <article class="card dorada" id="dorada-card">
+        <div class="card-head">
+          <div class="vh">
+            <span class="chip">🟡 Dorada</span>
+            <h2>Dorada</h2>
+            <span class="vap">Límite: 500</span>
+          </div>
+        </div>
+        <div class="list">
+          <ul id="lista-dorada"><li class="empty">Sin registros aún</li></ul>
+        </div>
+        <div class="card-foot">
+          <button class="btn btn-outline" onclick="confirmarEliminacion('dorada','ultimos')">Eliminar últimos 500</button>
+          <div class="foot-right">
+            <button class="btn btn-danger" onclick="confirmarEliminacion('dorada','todos')">Eliminar todos</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- MINI JUEGO -->
+      <article class="card mini" id="mini-card">
+        <div class="card-head">
+          <div class="vh">
+            <span class="chip">🎲 Mini juego</span>
+            <h2>Jugadas</h2>
+            <span class="vap">Muestra código, teléfono y premio</span>
+          </div>
+        </div>
+        <div class="list">
+          <ul id="lista-minijuego"><li class="empty">Sin jugadas aún</li></ul>
+        </div>
+        <div class="card-foot">
+          <button class="btn btn-outline" onclick="confirmarEliminacion('minijuego','ultimos')">Eliminar últimas 200</button>
+          <div class="foot-right">
+            <button class="btn btn-danger" onclick="confirmarEliminacion('minijuego','todos')">Eliminar todas</button>
+          </div>
+        </div>
+      </article>
+    </section>
+  </div>
+
+  <div class="foot">© 2025 Gummy Bank</div>
+
+  <!-- Modal confirmación -->
+  <div id="overlay">
+    <div class="modal">
+      <h3 id="confirmTitle">Confirmar eliminación</h3>
+      <p id="confirmText">¿Seguro que quieres hacer esto?</p>
+      <div class="row">
+        <button class="btn btn-neutral" onclick="cerrarModal()">Cancelar</button>
+        <button id="confirmBtn" class="btn btn-green">Sí, eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lógica -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getFirestore, collection, query, orderBy, limit, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    import {
+      getFirestore, collection, query, orderBy, limit, getDocs, deleteDoc, doc
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAJJgDg5SUPvvHgPtDNhIy1f1fiGpBHBw",
@@ -152,91 +323,154 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    const db  = getFirestore(app);
 
-    const LIMITE_POR_BOVEDA = {
-      madera: 25,
-      cristal: 100,
-      plateada: 250,
-      dorada: 500
+    const LIMITE_POR_BOVEDA = { madera:25, cristal:100, plateada:250, dorada:500, minijuego:200 };
+
+    const UL = {
+      madera:      document.getElementById("lista-madera"),
+      cristal:     document.getElementById("lista-cristal"),
+      plateada:    document.getElementById("lista-plateada"),
+      dorada:      document.getElementById("lista-dorada"),
+      minijuego:   document.getElementById("lista-minijuego"),
     };
 
+    function fmtFecha(ts){
+      try{
+        const d = ts?.toDate ? ts.toDate() : (ts instanceof Date ? ts : null);
+        if(!d) return "—";
+        return d.toLocaleString(undefined, {year:'2-digit',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+      }catch{ return "—"; }
+    }
+
     async function cargarRegistros(boveda) {
-      const lista = document.getElementById("lista-" + boveda);
-      lista.innerHTML = "";
+      const ul = UL[boveda];
+      ul.innerHTML = `<li class="empty">Cargando...</li>`;
 
-      const ref = collection(db, boveda);
-      const q = query(ref, orderBy("registrado", "desc"));
-      const snap = await getDocs(q);
+      let ref, q;
+      if (boveda === "minijuego") {
+        ref = collection(db, "minijuego_plays");
+        q   = query(ref, orderBy("createdAt", "desc"));
+      } else {
+        ref = collection(db, boveda);
+        q   = query(ref, orderBy("registrado", "desc"));
+      }
 
-      snap.forEach(docSnap => {
-        const data = docSnap.data();
-        if (data.telefono) {
-          const li = document.createElement("li");
-          li.textContent = `${data.codigo} - ${data.telefono}`;
-          lista.appendChild(li);
+      const snap= await getDocs(q);
+
+      if (snap.empty) {
+        ul.innerHTML = `<li class="empty">${boveda==='minijuego'?'Sin jugadas aún':'Sin registros aún'}</li>`;
+        return;
+      }
+
+      const frag = document.createDocumentFragment();
+      snap.forEach(d => {
+        const x = d.data();
+        const li = document.createElement("li");
+        li.className = "item";
+
+        if (boveda === "minijuego") {
+          const premio = (x.resultado || "").toString().toLowerCase();
+          let badgeClass = "badge ";
+          if (premio === "200") badgeClass += "p200";
+          else if (premio === "gomita" || premio === "gomitas") badgeClass += "gomita";
+          else badgeClass += "nada";
+
+          li.innerHTML = `
+            <span class="code">${x.codigo || "—"}</span>
+            <span class="phone">${x.telefono || "—"}</span>
+            <span class="${badgeClass}">${premio==='200'?'$200':(premio||'sin premio')}</span>
+            <span class="ts">${fmtFecha(x.createdAt)}</span>
+          `;
+        } else {
+          if (!x.telefono) return;
+          li.innerHTML = `
+            <span class="code">${x.codigo || "—"}</span>
+            <span class="phone">${x.telefono}</span>
+            <span class="ts">${fmtFecha(x.registrado)}</span>
+          `;
         }
+        frag.appendChild(li);
       });
+      ul.innerHTML = "";
+      ul.appendChild(frag);
     }
 
     async function eliminarDocumentos(boveda, tipo) {
-      const ref = collection(db, boveda);
-      let q;
-
-      if (tipo === "ultimos") {
-        const cantidad = LIMITE_POR_BOVEDA[boveda] || 100;
-        q = query(ref, orderBy("registrado", "desc"), limit(cantidad));
+      let ref, q;
+      if (boveda === "minijuego") {
+        ref = collection(db, "minijuego_plays");
+        if (tipo === "ultimos") {
+          const cantidad = LIMITE_POR_BOVEDA[boveda] || 200;
+          q = query(ref, orderBy("createdAt","desc"), limit(cantidad));
+        } else {
+          q = query(ref);
+        }
       } else {
-        q = query(ref);
+        ref = collection(db, boveda);
+        if (tipo === "ultimos") {
+          const cantidad = LIMITE_POR_BOVEDA[boveda] || 100;
+          q = query(ref, orderBy("registrado","desc"), limit(cantidad));
+        } else {
+          q = query(ref);
+        }
       }
 
       const snap = await getDocs(q);
-      let eliminados = 0;
-      for (const d of snap.docs) {
-        await deleteDoc(doc(db, boveda, d.id));
-        eliminados++;
-      }
+      if (snap.empty) return 0;
 
-      alert("Eliminados " + eliminados + " registros de la bóveda " + boveda);
-      cargarRegistros(boveda);
+      let count = 0;
+      for (const d of snap.docs) {
+        await deleteDoc(doc(db, (boveda === "minijuego" ? "minijuego_plays" : boveda), d.id));
+        count++;
+      }
+      return count;
     }
 
+    // Modal control
     let bovedaSeleccionada = "";
     let tipoEliminacion = "";
 
-    window.confirmarEliminacion = function (boveda, tipo) {
+    window.confirmarEliminacion = function(boveda, tipo){
       bovedaSeleccionada = boveda;
       tipoEliminacion = tipo;
 
       const limite = LIMITE_POR_BOVEDA[boveda] || 100;
       const texto = tipo === "ultimos"
-        ? `¿Eliminar los últimos ${limite} registros de la bóveda ${boveda}?`
-        : `¿Eliminar todos los registros actuales de la bóveda ${boveda}?`;
+        ? `Vas a eliminar los últimos ${limite} registros de ${boveda === 'minijuego' ? 'jugadas del Mini juego' : 'la bóveda ' + boveda.toUpperCase()}.`
+        : `Vas a eliminar TODOS los registros actuales de ${boveda === 'minijuego' ? 'jugadas del Mini juego' : 'la bóveda ' + boveda.toUpperCase()}.`;
 
-      document.getElementById("confirmText").textContent = texto;
-      document.getElementById("overlay").style.display = "flex";
-      document.getElementById("confirmModal").style.display = "flex";
+      document.getElementById("confirmTitle").textContent = "Confirmar eliminación";
+      document.getElementById("confirmText").textContent  = texto + " Esta acción no se puede deshacer.";
+      document.getElementById("overlay").style.display = "grid";
     };
 
-    window.cerrarModal = function () {
+    window.cerrarModal = function(){
       document.getElementById("overlay").style.display = "none";
-      document.getElementById("confirmModal").style.display = "none";
     };
 
-    document.getElementById("confirmBtn").addEventListener("click", () => {
-      eliminarDocumentos(bovedaSeleccionada, tipoEliminacion);
+    document.getElementById("confirmBtn").addEventListener("click", async ()=>{
+      const eliminados = await eliminarDocumentos(bovedaSeleccionada, tipoEliminacion).catch(err=>{
+        alert("No se pudo eliminar: " + (err?.message || "Error desconocido"));
+        return 0;
+      });
       cerrarModal();
+      if (eliminados > 0) {
+        await cargarRegistros(bovedaSeleccionada);
+        // Feedback visual
+        const cardId = bovedaSeleccionada === 'minijuego' ? 'mini-card' : `${bovedaSeleccionada}-card`;
+        const card = document.getElementById(cardId);
+        card.style.boxShadow = "0 0 0 2px rgba(34,197,94,.35), 0 12px 40px rgba(0,0,0,.28)";
+        setTimeout(()=>{ card.style.boxShadow = "0 12px 40px rgba(0,0,0,.28)"; }, 800);
+      }
     });
 
-    // Cargar registros de todas las bóvedas
-    cargarRegistros("madera");
-    cargarRegistros("cristal");
-    cargarRegistros("plateada");
-    cargarRegistros("dorada");
+    // Inicial
+    ["madera","cristal","plateada","dorada","minijuego"].forEach(cargarRegistros);
   </script>
 
   <script>
-    function cerrarSesion() {
+    function cerrarSesion(){
       sessionStorage.removeItem("auth");
       window.location.replace("index.html");
     }
