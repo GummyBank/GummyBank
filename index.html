@@ -70,7 +70,7 @@ body.modal-open{overflow:hidden}
       <div class="animated-bag">
         <img alt="Gummy Bank" src="img/titulo.jpg" id="logo-gummy-bank" />
       </div>
-<!-- ================== MINI JUEGO 25 CASILLAS ================== -->
+<!-- ================== MINI JUEGO 36 CASILLAS (6x6) ================== -->
 <section id="mini-juego" style="width:90%;max-width:800px;margin:24px auto;padding:16px;border-radius:15px;background:transparent;color:#eee;font-family:'Poppins',system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;box-sizing:border-box;overflow:hidden;min-height:520px;position:relative;z-index:0;">
   <style>
     @media (max-width:460px){
@@ -86,11 +86,13 @@ body.modal-open{overflow:hidden}
 
     /* Tablero */
     #mini-juego #board{
-      --cell:clamp(60px,16vw,110px);
+      /* CHANGED: reducir celda para meter 6 columnas sin crecer el bloque */
+      --cell:clamp(50px,13.5vw,90px);
       width:92%;
       margin:0 auto 10px;
       display:grid;
-      grid-template-columns:repeat(5,minmax(0,var(--cell)));
+      /* CHANGED: 5 -> 6 columnas */
+      grid-template-columns:repeat(6,minmax(0,var(--cell)));
       gap:8px;
       user-select:none
     }
@@ -263,7 +265,7 @@ body.modal-open{overflow:hidden}
   } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
   // ====== CONFIG ======
-  const IG_URL = window.IG_URL || "https://instagram.com/tu_pagina"; // cámbialo por tu IG real
+  const IG_URL = window.IG_URL || "https://instagram.com/tu_pagina";
 
   const firebaseConfig = window.firebaseConfig || {
     apiKey: "AIzaSyAJJgDg5SUPvvHgPtDNhIy1f1fiGpBHBw",
@@ -277,10 +279,10 @@ body.modal-open{overflow:hidden}
   const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  // Normaliza el ID como en Firestore: MAYÚSCULAS sin basura.
   const toId = s => (s || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
 
-  const TOTAL_CASILLAS=25, PREMIO_GOMITA=3, PREMIO_DINERO=1, PREMIO_NADA=TOTAL_CASILLAS-PREMIO_GOMITA-PREMIO_DINERO;
+  /* CHANGED: 25 -> 36 */
+  const TOTAL_CASILLAS=36, PREMIO_GOMITA=3, PREMIO_DINERO=1, PREMIO_NADA=TOTAL_CASILLAS-PREMIO_GOMITA-PREMIO_DINERO;
 
   const $board=document.getElementById("board"),
         $status=document.getElementById("codigo-status"),
@@ -302,7 +304,6 @@ body.modal-open{overflow:hidden}
 
   let codigoValido=null, telefonoValido=null, juegoHabilitado=false, yaJugo=false;
 
-  // ====== ICONOS ======
   const svgURI = s => 'data:image/svg+xml;utf8,' + encodeURIComponent(s.trim());
   const IMG = {
     HIDDEN: svgURI(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="18" fill="#111827"/><text x="50%" y="56%" text-anchor="middle" dominant-baseline="middle" font-family="system-ui,Segoe UI,Roboto" font-size="64" fill="#9fb0c9">?</text></svg>`),
@@ -323,7 +324,7 @@ body.modal-open{overflow:hidden}
     else btn.classList.add('prize-nada');
   }
 
-  // ====== Estado inicial: mostrar premios y bloquear ======
+  // Estado inicial: mostrar premios y bloquear
   mostrarPremiosIniciales();
 
   $validarBtn.addEventListener("click",async()=>{
@@ -356,7 +357,6 @@ body.modal-open{overflow:hidden}
 
   async function animarVolteoYMezcla(){
     const buttons=Array.from($board.children);
-    // ocultar todos
     await Promise.all(buttons.map((btn,i)=>new Promise(res=>{
       setTimeout(()=>{
         setIcon(btn,'HIDDEN');
@@ -364,10 +364,9 @@ body.modal-open{overflow:hidden}
         btn.style.background="linear-gradient(135deg,#0e1420,#0b0f18)";
         btn.style.borderColor="#243041";
         res();
-      },i*35);
+      },i*30);
     })));
     configurarPremiosRandom();
-    // shake ligero
     buttons.forEach((btn,i)=>{setTimeout(()=>{btn.classList.add("is-shuffling");setTimeout(()=>btn.classList.remove("is-shuffling"),650);},i*12);});
     habilitarTablero();
     pintarStatus("Código validado. Elige una casilla.","#3fb950");
@@ -391,25 +390,21 @@ body.modal-open{overflow:hidden}
 
   async function onClickCasilla(btn){
     if(!juegoHabilitado||!codigoValido||yaJugo)return;
-    yaJugo=true; // solo un intento
+    yaJugo=true;
     bloquearTablero();
 
     const premio=btn.dataset.premio;
 
-    // 1) Revelar elección
     await revelarCasilla(btn, premio);
 
-    // 2) Persistir (marcar usado + registrar resultado) DESPUÉS de revelar la elegida
     try{
       await persistirResultado(codigoValido, telefonoValido, premio);
     }catch(e){
       console.error("No se pudo persistir el resultado:", e);
     }
 
-    // 3) Revelar todas las demás
     await revelarResto(btn);
 
-    // 4) Celebración y modal final bonito (con títulos formateados y CTA)
     if (premio === "200") {
       lanzarConfeti("gold");
       openResultModal(null, null, "success", { type: "200" });
@@ -449,7 +444,7 @@ body.modal-open{overflow:hidden}
           else { setIcon(b,'X'); setRevealStyles(b,'nada'); }
           r();
         }, delay);
-        delay += 60; // efecto dominó
+        delay += 60;
       }));
     }
     return Promise.all(promises);
@@ -467,7 +462,6 @@ body.modal-open{overflow:hidden}
     return true;
   }
 
-  // Persistencia: marca el código como USADO y registra el play con resultado
   async function persistirResultado(codeRaw, phone, premio){
     const code = toId(codeRaw);
     const playRef=doc(collection(db,"minijuego_plays"));
@@ -484,7 +478,7 @@ body.modal-open{overflow:hidden}
     await batch.commit();
   }
 
-  // ======= Registro en BÓVEDAS (igual que antes) =======
+  // Registro en Bóvedas (igual que antes)
   window.handleRegistroCodigo = async ({codigo, telefono, boveda})=>{
     const code = toId(codigo);
     if(!/^[A-Z0-9]{8}$/.test(code)) { alert("Código inválido."); return false; }
@@ -520,13 +514,12 @@ body.modal-open{overflow:hidden}
     return true;
   };
 
-  // ===== Modal resultado con titulares potentes y CTA =====
+  // Modal resultado
   function openResultModal(_title,_msg,variant,{type}={}){
     $modalFigure.innerHTML = "";
     $modalCard.classList.remove('success','warn','neutral');
     if(variant) $modalCard.classList.add(variant);
 
-    // Imagen/figura
     if(type==="gomita"){
       const im=document.createElement('img');
       im.src=IMG.GOMITA; im.alt="Gomitas";
@@ -537,7 +530,6 @@ body.modal-open{overflow:hidden}
       $modalFigure.appendChild(im);
     }
 
-    // Headline y mensaje ricos
     if (type === "200") {
       $modalTitle.innerHTML = `
         <div class="headline">
@@ -600,7 +592,7 @@ body.modal-open{overflow:hidden}
   $modal.addEventListener('click',(e)=>{if(e.target===$modal)closeResultModal();});
   window.addEventListener('keydown',(e)=>{if($modal.style.display==='flex'&&(e.key==='Escape'||e.key==='Enter'))closeResultModal();});
 
-  // ===== Teléfono mejorado (móvil-friendly) =====
+  // Teléfono
   function validarTelefono(value){
     const digits=(value||'').replace(/\D/g,'');
     return digits.length>=8 && digits.length<=15 ? digits : null;
@@ -628,7 +620,6 @@ body.modal-open{overflow:hidden}
       $phoneCancel.onclick=onCancel;
       $phoneModal.onclick=(e)=>{ if(e.target===$phoneModal) onCancel(); };
 
-      // Enter confirma, Escape cancela
       const handler=(e)=>{
         if($phoneModal.style.display==='flex'&&e.key==='Enter') onOk();
         if($phoneModal.style.display==='flex'&&e.key==='Escape') onCancel();
@@ -637,7 +628,7 @@ body.modal-open{overflow:hidden}
     });
   }
 
-  // ===== Confeti en canvas =====
+  // Confeti
   function lanzarConfeti(palette='gold'){
     const ctx = $canvas.getContext('2d');
     const rect = $canvas.getBoundingClientRect();
