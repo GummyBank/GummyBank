@@ -248,8 +248,8 @@ body.modal-open{overflow:hidden}
 <script type="module">
   import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
   import {
-    getFirestore, doc, getDoc, serverTimestamp, setDoc, updateDoc,
-    writeBatch, collection, runTransaction, increment
+    getFirestore, doc, getDoc, serverTimestamp, setDoc,
+    writeBatch, collection, runTransaction
   } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
   // ====== CONFIG ======
@@ -330,7 +330,7 @@ body.modal-open{overflow:hidden}
     else btn.classList.add('prize-nada');
   }
 
-  // Estado inicial: mostrar premios y bloquear (con posible $200 “de utilería”)
+  // Estado inicial: vitrina (puede mostrar $200 de utilería)
   mostrarPremiosIniciales();
 
   $validarBtn.addEventListener("click",async()=>{
@@ -351,15 +351,13 @@ body.modal-open{overflow:hidden}
     }catch(e){console.error(e);pintarStatus("Error al validar.","#ff6b6b");}
   });
 
-  // Previsualización con posible $200 de utilería
+  // Vitrina inicial
   function mostrarPremiosIniciales(){
-    const fakeShowJackpot = Math.random() < 0.7; // 70% chances de mostrar $200 visual
-
+    const fakeShowJackpot = Math.random() < 0.7; // 70% mostrar $200 visual
     const pool = [];
     if (fakeShowJackpot) pool.push("200");
     for (let i=0;i<PREMIO_GOMITA;i++) pool.push("gomita");
     for (let i=pool.length;i<TOTAL_CASILLAS;i++) pool.push("nada");
-
     for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
 
     $board.innerHTML="";
@@ -455,18 +453,36 @@ body.modal-open{overflow:hidden}
     });
   }
 
+  // Revelado del resto: si NO hay $200 real y jackpot está deshabilitado,
+  // inyecta un $200 SOLO VISUAL en una celda que NO fue elegida.
   function revelarResto(chosenBtn){
     const buttons=Array.from($board.children);
+    const hasReal200 = buttons.some(b=>b.dataset.premio==='200');
+    let fake200Btn = null;
+
+    if(!hasReal200 && !jackpotEnabled){
+      const others = buttons.filter(b=>b!==chosenBtn);
+      fake200Btn = others[(Math.random()*others.length)|0];
+    }
+
     let delay=120;
     const promises=[];
     for(const b of buttons){
       if(b===chosenBtn) continue;
       const premio=b.dataset.premio;
+
       promises.push(new Promise(r=>{
         setTimeout(()=>{
-          if(premio==="200"){ setIcon(b,'P200'); setRevealStyles(b,'200'); }
-          else if(premio==="gomita"){ setIcon(b,'GOMITA'); setRevealStyles(b,'gomita'); }
-          else { setIcon(b,'X'); setRevealStyles(b,'nada'); }
+          if(fake200Btn && b===fake200Btn){
+            // Mostrar $200 visual sin tocar dataset
+            setIcon(b,'P200'); setRevealStyles(b,'200');
+          }else if(premio==="200"){
+            setIcon(b,'P200'); setRevealStyles(b,'200');
+          }else if(premio==="gomita"){
+            setIcon(b,'GOMITA'); setRevealStyles(b,'gomita');
+          }else{
+            setIcon(b,'X'); setRevealStyles(b,'nada');
+          }
           r();
         }, delay);
         delay += 60;
@@ -487,7 +503,7 @@ body.modal-open{overflow:hidden}
     return true;
   }
 
-  // Persistencia con transacción y contador de intentos del jackpot
+  // Persistencia + contador de intentos del jackpot
   async function persistirResultado(codeRaw, phone, premio){
     const code = toId(codeRaw);
     const playRef=doc(collection(db,"minijuego_plays"));
@@ -500,7 +516,7 @@ body.modal-open{overflow:hidden}
       const meta = metaSnap.exists() ? (metaSnap.data()||{}) : { sinceLastWin: 0 };
       const current = Number(meta.sinceLastWin||0);
 
-      // Blindaje: si llega "200" pero aún no hay umbral, degradar a "gomita"
+      // Blindaje extremo: si llegara "200" antes del umbral, degradar a "gomita"
       let finalPremio = premio;
       if (premio === "200" && current < JACKPOT_MIN_ATTEMPTS) {
         finalPremio = "gomita";
@@ -732,6 +748,7 @@ body.modal-open{overflow:hidden}
   }
 </script>
 <!-- ================== FIN MINI JUEGO ================== -->
+
 
 
 
