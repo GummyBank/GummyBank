@@ -272,7 +272,9 @@ body.modal-open{overflow:hidden}
   const TOTAL_CASILLAS=36, PREMIO_GOMITA=3, PREMIO_DINERO=1, PREMIO_NADA=TOTAL_CASILLAS-PREMIO_GOMITA-PREMIO_DINERO;
 
   // Jackpot control
-  const JACKPOT_MIN_ATTEMPTS = 60; // umbral para habilitar $200 real
+  const JACKPOT_MIN_ATTEMPTS = 200; 
+
+
   let jackpotEnabled = false;      // se setea por consulta a Firestore
   const jackpotRef = doc(db, "minijuego_meta", "jackpot");
 
@@ -749,9 +751,156 @@ body.modal-open{overflow:hidden}
 </script>
 <!-- ================== FIN MINI JUEGO ================== -->
 
+<!-- ================== TEASER: NUEVO JUEGO PRÓXIMAMENTE ================== -->
+<section id="teaser-nuevo-juego" style="width:92%;max-width:920px;margin:28px auto 48px;isolation:isolate">
+  <style>
+    /* Scope para evitar choques de estilos */
+    #teaser-nuevo-juego{
+      --bg:#0b1220; --panel:#0f172a; --line:#2b3750; --ink:#e7ecf3; --muted:#9fb0c9;
+      --accent1:#22d3ee; --accent2:#a78bfa; --accent3:#34d399; --glow:rgba(34,211,238,.25);
+      position:relative;
+    }
+    #teaser-nuevo-juego .wrap{
+      position:relative;border-radius:20px;border:1px solid var(--line);
+      padding:18px; background:
+        radial-gradient(900px 400px at 10% -10%, rgba(167,139,250,.16), transparent 60%),
+        radial-gradient(900px 400px at 110% 110%, rgba(52,211,153,.14), transparent 60%),
+        linear-gradient(180deg, rgba(31,41,55,.35), transparent 40%),
+        var(--panel);
+      box-shadow:0 24px 80px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.02);
+      overflow:hidden;
+    }
+    /* Glow orbes de fondo */
+    #teaser-nuevo-juego .orb{
+      position:absolute; border-radius:999px; filter:blur(32px); opacity:.6; mix-blend-mode:screen;
+      animation: floaty 9s ease-in-out infinite;
+    }
+    #teaser-nuevo-juego .orb.a{ width:220px; height:220px; background:radial-gradient(circle at 30% 30%, var(--accent1), transparent 60%); top:-40px; left:-40px; }
+    #teaser-nuevo-juego .orb.b{ width:260px; height:260px; background:radial-gradient(circle at 70% 70%, var(--accent2), transparent 60%); bottom:-60px; right:-60px; animation-delay: -2s; }
+    @keyframes floaty{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
 
+    /* Header */
+    #teaser-nuevo-juego .header{
+      text-align:center; color:var(--ink); margin:6px 8px 10px;
+    }
+    #teaser-nuevo-juego .kicker{
+      display:inline-block; padding:6px 10px; border:1px solid var(--line); border-radius:999px;
+      font-size:12px; letter-spacing:.35px; text-transform:uppercase; color:var(--muted);
+      background:rgba(2,6,23,.5);
+    }
+    #teaser-nuevo-juego .title{
+      margin:6px 0 0; line-height:1.02; font-weight:900;
+      font-size:clamp(28px, 6.5vw, 56px);
+      letter-spacing:.2px;
+      background:linear-gradient(90deg, var(--accent1), var(--accent2));
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+      text-shadow:0 10px 36px var(--glow);
+    }
+    #teaser-nuevo-juego .subtitle{
+      margin:6px auto 0; color:#cbd5e1; font-size:clamp(14px,2.7vw,18px); max-width:60ch;
+    }
 
+    /* Countdown */
+    #teaser-nuevo-juego .countdown{
+      margin:16px auto 8px; width:min(760px, 96%); display:grid; gap:10px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    #teaser-nuevo-juego .slot{
+      position:relative; background:linear-gradient(135deg, #0e1420, #0b0f18);
+      border:1px solid var(--line); border-radius:16px; padding:14px 10px;
+      text-align:center; color:var(--ink); box-shadow:0 10px 28px rgba(0,0,0,.35);
+    }
+    #teaser-nuevo-juego .num{
+      font-weight:900; line-height:1; letter-spacing:.5px;
+      font-size:clamp(26px, 7.2vw, 42px);
+      text-shadow:0 8px 26px rgba(0,0,0,.35);
+    }
+    #teaser-nuevo-juego .label{
+      display:block; margin-top:4px; color:var(--muted); font-size:clamp(11px,2.7vw,13px); letter-spacing:.3px;
+      text-transform:uppercase;
+    }
 
+    /* Footer con fecha y CTA fantasma */
+    #teaser-nuevo-juego .footer{
+      margin:14px auto 6px; text-align:center; color:var(--muted);
+      font-size:clamp(12px,2.5vw,14px);
+    }
+
+    /* Responsive tweaks */
+    @media (max-width:560px){
+      #teaser-nuevo-juego .wrap{ padding:14px }
+      #teaser-nuevo-juego .countdown{ gap:8px }
+      #teaser-nuevo-juego .slot{ padding:12px 8px; border-radius:14px }
+    }
+  </style>
+
+  <div class="wrap">
+    <div class="orb a"></div>
+    
+
+    <header class="header">
+      <span class="kicker">NUEVO JUEGO</span>
+      <h2 class="title">PRÓXIMAMENTE</h2>
+      <p class="subtitle">Cuenta regresiva para el lanzamiento del nuevo juego. Prueba tu suerte.</p>
+    </header>
+
+    <div class="countdown" aria-live="polite">
+      <div class="slot"><div id="cd-days" class="num">--</div><span class="label">Días</span></div>
+      <div class="slot"><div id="cd-hours" class="num">--</div><span class="label">Horas</span></div>
+      <div class="slot"><div id="cd-mins" class="num">--</div><span class="label">Min</span></div>
+      <div class="slot"><div id="cd-secs" class="num">--</div><span class="label">Seg</span></div>
+    </div>
+
+    <p id="cd-footer" class="footer">Lunes 1 de septiembre</p>
+  </div>
+
+  <script>
+    // Objetivo: Lunes 1 septiembre 2025 07:00 AM (hora local del visitante)
+    // Mes 0-indexado: 8 = septiembre
+    const TARGET = new Date(2025, 8, 1, 7, 0, 0, 0);
+
+    const elDays = document.getElementById('cd-days');
+    const elHours = document.getElementById('cd-hours');
+    const elMins = document.getElementById('cd-mins');
+    const elSecs = document.getElementById('cd-secs');
+    const elFooter = document.getElementById('cd-footer');
+
+    function pad(n){ return n < 10 ? '0' + n : '' + n; }
+
+    function render(){
+      const now = new Date();
+      let diff = TARGET - now;
+
+      if (diff <= 0){
+        // Si ya es la hora, congelamos a 00 y cambiamos leyenda
+        elDays.textContent = '00';
+        elHours.textContent = '00';
+        elMins.textContent = '00';
+        elSecs.textContent = '00';
+        elFooter.textContent = '¡ES HOY! 7:00 AM';
+        return;
+      }
+
+      const sec = Math.floor(diff / 1000);
+      const days = Math.floor(sec / 86400);
+      const hrs  = Math.floor((sec % 86400) / 3600);
+      const mins = Math.floor((sec % 3600) / 60);
+      const secs = sec % 60;
+
+      elDays.textContent  = pad(days);
+      elHours.textContent = pad(hrs);
+      elMins.textContent  = pad(mins);
+      elSecs.textContent  = pad(secs);
+    }
+
+    render();
+    const _cdTimer = setInterval(()=>{
+      render();
+      if (new Date() >= TARGET) clearInterval(_cdTimer);
+    }, 1000);
+  </script>
+</section>
+<!-- ================== FIN TEASER ================== -->
 
 
 <!-- ==== AVISO BREVES BÓVEDAS ==== -->
