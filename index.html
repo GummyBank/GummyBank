@@ -590,9 +590,15 @@ const MG_db  = getFirestore(MG_app);
    - MG_TOTAL = número de casillas
    - En CSS: #MG-board -> grid-template-columns:repeat(N,...)
 ------------------------------------------------------- */
+
+
+
+
 const MG_TOTAL = 36; // 6x6 actual
 const MG_COUNTS = { p1500: 1, p500: 1, p200: 2, gomita: 5 };
-const MG_THRESH = { p1500: 500, p500: 300, p200: 100, gomita: 70 };
+const MG_THRESH = { p1500: 500, p500: 300, p200: 100, gomita: 0 };
+
+
 
 /* ----------------- Referencias en DB ----------------- */
 const MG_controlRef = doc(MG_db, "mega7x7_meta", "control"); // contadores globales
