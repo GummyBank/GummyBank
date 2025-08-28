@@ -71,7 +71,7 @@ body.modal-open{overflow:hidden}
         <img alt="Gummy Bank" src="img/titulo.jpg" id="logo-gummy-bank" />
       </div>
 
-      <!-- ================== TEASER: NUEVO JUEGO PRÓXIMAMENTE ================== -->
+      <!-- ================== TEASER: NUEVO JUEGO PRÓXIMAMENTE ================== 
 <section id="teaser-nuevo-juego" style="width:92%;max-width:920px;margin:28px auto 48px;isolation:isolate">
   <style>
     /* Scope para evitar choques de estilos */
@@ -220,8 +220,724 @@ body.modal-open{overflow:hidden}
     }, 1000);
   </script>
 </section>
-<!-- ================== FIN TEASER ================== -->
+================== FIN TEASER ================== -->
 
+<!-- ================== MEGA JUEGO 7x7 (aislado con prefijo MG_) ================== -->
+<section id="MG-juego" style="width:92%;max-width:960px;margin:24px auto;padding:12px;border-radius:18px;background:transparent;color:#eef3fb;font-family:'Poppins',system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;box-sizing:border-box;overflow:visible;position:relative;z-index:0;">
+ <style>
+  /* =================== MEGA 7x7 - CSS ===================
+   Notas:
+   - Todo lo del tablero se queda casi igual.
+   - La tarjeta #MG-card ahora es MUY compacta (ancho máx 340px).
+   - Inputs apilados (100%) para que jamás sobresalgan de la card.
+   - Botón al 100% dentro de la card. Nada se sale, nada flota.
+   ===================================================== */
+
+/* ---------- Header / Canvas (igual, solo retoques suaves) ---------- */
+#MG-head{
+  position:relative; width:100%; max-width:720px; margin:0 auto 10px; line-height:0; isolation:isolate;
+}
+#MG-title{
+  display:block; width:100%; height:auto; border-radius:14px; box-shadow:0 12px 44px rgba(0,0,0,.35);
+}
+#MG-canvas{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none; display:block; }
+
+/* ---------- Tablero 7x7 ---------- */
+#MG-board{
+  --cell:clamp(52px,12vw,92px);
+  width:96%; margin:2px auto 10px;
+  display:grid; grid-template-columns:repeat(6,minmax(0,var(--cell))); gap:8px;
+  user-select:none;
+}
+#MG-board button{
+  display:grid; place-items:center; aspect-ratio:1/1;
+  border-radius:12px; border:1px solid #2b3b58;
+  background:
+    radial-gradient(520px 260px at -10% -20%, rgba(56,189,248,.06), transparent 50%),
+    radial-gradient(520px 260px at 110% 120%, rgba(147,51,234,.06), transparent 50%),
+    linear-gradient(135deg,#0b0f18,#0f172a);
+  color:#e7ecf3; font-weight:900; letter-spacing:.2px; font-size:clamp(12px,2vw,17px);
+  cursor:pointer; transition:transform .18s ease,background .15s ease,border-color .15s ease,box-shadow .15s ease;
+  transform-style:preserve-3d; padding:6px;
+  box-shadow:0 0 0 1px rgba(40,54,82,.45), inset 0 0 24px rgba(255,255,255,.02);
+}
+#MG-board button:hover{ transform:translateY(-2px); box-shadow:0 10px 26px rgba(0,0,0,.35); }
+#MG-board button:disabled{ opacity:.92; cursor:not-allowed; transform:none; box-shadow:none; }
+
+.MG-cell-img{ width:88%; height:88%; object-fit:contain; display:block; pointer-events:none; transition:transform .15s ease; }
+/* destacar premios grandes al revelarse */
+#MG-board button.MG-1500 .MG-cell-img{ transform:scale(1.16); }
+#MG-board button.MG-500  .MG-cell-img{ transform:scale(1.12); }
+#MG-board button.MG-200  .MG-cell-img{ transform:scale(1.10); }
+
+/* Animaciones del tablero */
+@keyframes MG-flip{0%{transform:rotateY(0)}50%{transform:rotateY(90deg)}100%{transform:rotateY(0)}}
+@keyframes MG-shuffle{0%{transform:translate(0,0) rotate(0)}25%{transform:translate(1px,-1px) rotate(-1deg)}50%{transform:translate(-1px,1px) rotate(1deg)}75%{transform:translate(1px,1px) rotate(0)}100%{transform:translate(0,0) rotate(0)}}
+.MG-is-flipping{ animation:MG-flip .5s both; }
+.MG-is-shuffling{ animation:MG-shuffle .6s ease-in-out; }
+@keyframes MG-pop{0%{transform:scale(.92)}100%{transform:scale(1)}}
+.MG-pop{ animation:MG-pop .25s ease; }
+
+/* Looks al revelar */
+.MG-looks-1500{ background:linear-gradient(145deg,#064e3b,#0b6b52)!important; border-color:#18c38a!important; box-shadow:0 10px 36px rgba(14,159,110,.28); }
+.MG-looks-500 { background:linear-gradient(145deg,#14532d,#1b7a3e)!important; border-color:#34d399!important; box-shadow:0 10px 34px rgba(16,185,129,.25); }
+.MG-looks-200 { background:linear-gradient(145deg,#0b3a54,#0f5d8c)!important; border-color:#38bdf8!important; box-shadow:0 10px 34px rgba(56,189,248,.24); }
+.MG-looks-gomita{ background:linear-gradient(145deg,#3b0764,#5b0aa0)!important; border-color:#9b5cf7!important; box-shadow:0 10px 34px rgba(124,58,237,.25); }
+.MG-looks-nada{ background:linear-gradient(145deg,#191c24,#1b1f2a)!important; border-color:#2d3547!important; }
+
+.MG-kicker{ font-size:12px; letter-spacing:.45px; text-transform:uppercase; color:#9fb0c9; text-align:center; margin:4px 0 8px; }
+
+/* ---------- TARJETA DE CÓDIGOS (COMPACTA) ----------
+   Objetivo: que TODO quede dentro, sin desbordes ni scroll raro.
+   - Máximo 340px de ancho, centrada.
+   - Inputs a 100% (en columna) para no romper la card.
+   - Botón a 100% (pero con bordes redondeados).
+----------------------------------------------------- */
+#MG-card{
+  box-sizing:border-box;
+  width:min(300px,90vw);           /* << controla el ANCHO máximo de la card */
+  margin:8px auto;                 /* siempre centrada */
+  padding:10px 12px;               /* padding compacto */
+  border-radius:12px;
+  background:rgba(12,18,34,.70);
+  border:1px solid #233046;
+  box-shadow:0 6px 18px rgba(0,0,0,.18);
+  overflow:hidden;  
+  box-sizing:border-box;
+  width:100%;
+  max-width:300px;         /* ← AJUSTA AQUÍ el ancho máximo de la caja */
+  margin:8px auto;
+  padding:10px 12px;               /* nada se sale visualmente */
+}
+#MG-card .MG-row{
+  display:flex; gap:8px; flex-wrap:wrap;
+  align-items:center; justify-content:center;
+}
+
+/* fila pequeña de badges */
+#MG-card .MG-headrow{ margin-bottom:4px; }
+
+/* contenedor de inputs: columna forzada para evitar desbordes */
+#MG-card .MG-inputs{
+  width:90%;
+  display:flex; flex-direction:column; gap:8px;  /* apilados */
+}
+
+/* cada input ocupa 100% del ancho de la card */
+/* centrar la columna de inputs dentro de la card */
+#MG-card .MG-inputs{
+  align-items: center;   /* centra los hijos horizontalmente */
+}
+
+/* el wrapper de cada input, centrado y con un ancho tope */
+.MG-input-wrap{
+  position: relative;
+  width: 90%;
+  max-width: 320px;      /* pon el tope que quieras (280–340px va bien) */
+  margin: 0 auto;        /* ← esto lo centra */
+  box-sizing: border-box;
+  align-items:center; justify-content:center;
+}
+
+.MG-input{
+  width:100%; height:38px;          /* << controla la ALTURA del input */
+  padding:6px 36px;                 /* espacio para label e icono */
+  border-radius:10px;
+  border:1px solid #2f3c55;
+  background:#0f172a; color:#e7ecf3; outline:none;
+  font-weight:800; letter-spacing:.8px; text-align:center; font-size:13px;
+  box-sizing:border-box;
+}
+.MG-label{
+  position:absolute; left:10px; top:50%; transform:translateY(-50%);
+  font-size:11px; color:#8aa0c0; pointer-events:none;
+}
+.MG-icon{
+  position:absolute; right:10px; top:50%; transform:translateY(-50%);
+  width:16px; height:16px; opacity:.7; pointer-events:none;
+}
+
+/* badges de estado */
+.MG-badge{
+  font-size:11px; font-weight:800; padding:4px 8px; border-radius:999px;
+  background:#0e1626; color:#cbd5e1; border:1px solid #2a3a52;
+}
+.MG-badge.ok{  background:#0b1f16; color:#8ef0b6; border-color:#185f3f; }
+.MG-badge.err{ background:#1a0c0c; color:#fecaca; border-color:#3f1d1d; }
+
+/* botón dentro de la card, al 100% */
+#MG-validar{
+  width:90%; height:30px;          /* << controla la ALTURA del botón */
+  margin:2px 0 0; border-radius:10px;
+  border:1px solid #2b3750;
+  background:linear-gradient(135deg,#6d28d9,#2563eb);
+  color:#fff; font-weight:900; letter-spacing:.2px; cursor:pointer;
+  box-shadow:0 4px 12px rgba(37,99,235,.22);
+}
+#MG-validar:hover{ transform:translateY(-1px); }
+
+/* mensaje de estado pequeño y centrado */
+#MG-status{ font-size:12px; opacity:.92; margin-top:6px; text-align:center; }
+
+/* ---------- Modales (resultado) ---------- */
+#MG-modal{
+  position:fixed; inset:0; display:none;
+  align-items:center; justify-content:center;
+  background:rgba(4,6,12,.58); backdrop-filter:blur(1.5px); z-index:100000;
+}
+#MG-card-modal{
+  width:min(300px,92vw);
+  border:1px solid #2b3750; border-radius:16px;
+  box-shadow:0 18px 60px rgba(0,0,0,.45); padding:18px;
+  background:
+    radial-gradient(520px 220px at 20% 0%,rgba(99,102,241,.12),transparent 60%),
+    radial-gradient(520px 220px at 80% 100%,rgba(34,197,94,.12),transparent 60%),
+    #0b1220;
+}
+#MG-card-modal.success{ border-color:#16a34a; background:radial-gradient(520px 220px at 20% 0%,rgba(34,197,94,.12),transparent 60%),#071c12; }
+#MG-card-modal.warn{    border-color:#7c3aed; background:radial-gradient(520px 220px at 20% 0%,rgba(124,58,237,.14),transparent 60%),#13072b; }
+#MG-card-modal.neutral{ border-color:#475569; background:radial-gradient(520px 220px at 20% 0%,rgba(100,116,139,.10),transparent 60%),#0b1220; }
+
+#MG-figure{ display:flex; align-items:center; justify-content:center; margin:6px 0 10px; }
+#MG-figure img{ width:min(190px,56%); height:auto; filter:drop-shadow(0 10px 28px rgba(0,0,0,.35)); }
+.MG-headline{ display:block; text-align:center; line-height:1.1; margin:0 0 6px; letter-spacing:.2px; font-weight:900; }
+.MG-headline .xl{ display:inline-block; font-size:clamp(26px,5.6vw,36px); }
+.MG-headline .md{ display:inline-block; font-size:clamp(17px,3.4vw,21px); font-weight:800; opacity:.95; }
+.MG-accent{ background:linear-gradient(90deg,#22c55e,#86efac); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.MG-accent-purple{ background:linear-gradient(90deg,#a78bfa,#22d3ee); -webkit-background-clip:text; background-clip:text; color:transparent; }
+#MG-actions{ display:flex; justify-content:center; gap:8px; margin-top:6px; flex-wrap:wrap; }
+.MG-cta{ display:inline-flex; gap:8px; align-items:center; border-radius:999px; padding:8px 14px; border:1px solid #2b3750; background:#121c2e; color:#e7ecf3; font-weight:800; }
+#MG-ok{ padding:8px 14px; border-radius:12px; border:1px solid #1f2937; background:#1f6feb; color:#fff; cursor:pointer; font-weight:900; min-width:110px; text-align:center; }
+
+/* ---------- Responsive tweaks ---------- */
+@media (max-width:560px){
+  #MG-juego{ padding:10px!important; }
+  #MG-board{ gap:7px!important; }
+  #MG-board button{ border-radius:12px!important; }
+  /* la card sigue siendo compacta, pero aprovecha ancho del móvil */
+  #MG-card{ width:92vw; }
+  #MG-validar{ height:40px; }
+}
+
+  </style>
+
+  <div id="MG-head">
+    <img id="MG-title" src="img/gan201.png" alt="Mega Título">
+    <canvas id="MG-canvas"></canvas>
+  </div>
+
+  <p class="MG-kicker">Modo Mega: 2 códigos por jugada</p>
+
+  <div id="MG-board"></div>
+
+    <div class="MG-row MG-inputs">
+      <div class="MG-input-wrap">
+        <span class="MG-label">Código #1</span>
+        <input id="MG-code1" class="MG-input" type="text" placeholder="AAAA1111">
+        <svg class="MG-icon" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#9fb0c9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="MG-input-wrap">
+        <span class="MG-label">Código #2</span>
+        <input id="MG-code2" class="MG-input" type="text" placeholder="BBBB2222">
+        <svg class="MG-icon" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#9fb0c9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+    <center>
+    <div class="MG-row MG-actions"><button id="MG-validar">Validar y jugar</button></div>
+    <div id="MG-status"></div>
+  </div>
+</section>
+
+<!-- ==== MODALES FUERA DEL SECTION para evitar recortes por overflow/filters ==== -->
+<div id="MG-modal" role="dialog" aria-modal="true">
+  <div id="MG-card-modal" class="neutral">
+    <div id="MG-figure" aria-hidden="true"></div>
+    <h3 id="MG-title-modal" style="margin:0"></h3>
+    <p id="MG-msg" style="margin:0"></p>
+    <div id="MG-actions">
+      <a id="MG-cta" class="MG-cta" href="https://www.instagram.com/gummybank?igsh=MW82Z3hvN2VjbWYxZw%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" style="display:none">Abrir Instagram</a>
+      <button id="MG-ok">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<div id="MG-phone" role="dialog" aria-modal="true" style="position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.55);backdrop-filter:blur(1px);z-index:100001">
+  <div class="MG-phone-card" style="width:min(340px,92vw);background:#0b1220;border:1px solid #334155;border-radius:14px;box-shadow:0 16px 50px rgba(0,0,0,.42);padding:12px">
+    <h3 class="MG-phone-title" style="margin:0 0 4px;font-size:18px;text-align:center">Confirma tu teléfono</h3>
+    <p class="MG-phone-sub" style="margin:0 0 10px;opacity:.9;text-align:center;font-size:14px">Para registrar tu participación, ingresa tu número.</p>
+    <div class="MG-phone-row" style="display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap">
+      <input id="MG-phone-input" class="MG-phone-input" inputmode="tel" autocomplete="tel" maxlength="15" placeholder="8 a 15 dígitos"
+             style="flex:1;min-width:180px;max-width:220px;height:40px;padding:10px 12px;border-radius:10px;border:1px solid #334155;background:#0f172a;color:#eee;outline:none;text-align:center;font-weight:700;letter-spacing:.8px">
+      <button id="MG-phone-ok" class="MG-phone-btn" style="height:40px;padding:10px 12px;border-radius:10px;border:1px solid #1f2937;background:#1f6feb;color:#fff;cursor:pointer;font-weight:800;min-width:110px">Continuar</button>
+      <button id="MG-phone-cancel" class="MG-phone-btn secondary" style="height:40px;padding:10px 12px;border-radius:10px;border:1px solid #475569;background:#1f2937;color:#e5e7eb;min-width:110px">Cancelar</button>
+    </div>
+    <div id="MG-phone-error" class="MG-phone-err" style="min-height:18px;margin-top:6px;font-size:12px;color:#fca5a5;text-align:center"></div>
+  </div>
+</div>
+
+<script type="module">
+/* ========= MEGA 7x7 - LÓGICA (solo JS, diseño intacto) ========= */
+import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+import {
+  getFirestore, doc, getDoc, setDoc, collection,
+  runTransaction, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+/* ---------------- Config Firebase ---------------- */
+const MG_IG_URL = (window.IG_URL || "https://instagram.com/tu_pagina");
+const MG_firebaseConfig = window.firebaseConfig || {
+  apiKey: "AIzaSyAJJgDg5SUPvvHgPtDNhIy1f1fiGpBHBw",
+  authDomain: "registro-gomitas.firebaseapp.com",
+  projectId: "registro-gomitas",
+  storageBucket: "registro-gomitas.appspot.com",
+  messagingSenderId: "435485731864",
+  appId: "1:435485731864:web:43dff09753a4c9d507e76d",
+  measurementId: "G-20KEW71X9G"
+};
+const MG_app = getApps().length ? getApp() : initializeApp(MG_firebaseConfig);
+const MG_db  = getFirestore(MG_app);
+
+/* ---------------- Parámetros del juego ----------------
+   Si cambias el tamaño del tablero:
+   - MG_TOTAL = número de casillas
+   - En CSS: #MG-board -> grid-template-columns:repeat(N,...)
+------------------------------------------------------- */
+const MG_TOTAL = 36; // 6x6 actual
+const MG_COUNTS = { p1500: 1, p500: 1, p200: 2, gomita: 5 };
+const MG_THRESH = { p1500: 500, p500: 300, p200: 100, gomita: 70 };
+
+/* ----------------- Referencias en DB ----------------- */
+const MG_controlRef = doc(MG_db, "mega7x7_meta", "control"); // contadores globales
+const MG_playsCol   = collection(MG_db, "mega7x7_plays");    // jugadas
+
+/* ---------------- Utilidades ---------------- */
+const MG_toId = s => (s||"").trim().toUpperCase().replace(/[^A-Z0-9]/g,"");
+const MG_svg  = s => 'data:image/svg+xml;utf8,' + encodeURIComponent(s.trim());
+const MG_IMG = {
+  HIDDEN: MG_svg(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="18" fill="#111827"/><text x="50%" y="56%" text-anchor="middle" dominant-baseline="middle" font-family="system-ui,Segoe UI,Roboto" font-size="68" fill="#9fb0c9">?</text></svg>`),
+  NADA  : MG_svg(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="18" fill="#1b2332"/><path d="M30 30 L90 90 M90 30 L30 90" stroke="#d1d5db" stroke-width="14" stroke-linecap="round"/></svg>`),
+  GOMITA: "img/gomita.png",
+  P200  : MG_svg(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="18" fill="#0b3a54"/><circle cx="60" cy="60" r="38" fill="#0ea5e9"/><text x="50%" y="56%" text-anchor="middle" dominant-baseline="middle" font-family="system-ui,Segoe UI,Roboto" font-size="42" fill="#e6fffa">$200</text></svg>`),
+  P500  : MG_svg(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="18" fill="#14532d"/><circle cx="60" cy="60" r="40" fill="#22c55e"/><text x="50%" y="56%" text-anchor="middle" dominant-baseline="middle" font-family="system-ui,Segoe UI,Roboto" font-size="44" fill="#e6fffa">$500</text></svg>`),
+  P1500 : MG_svg(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="18" fill="#064e3b"/><circle cx="60" cy="60" r="40" fill="#0e9f6e"/><text x="50%" y="56%" text-anchor="middle" dominant-baseline="middle" font-family="system-ui,Segoe UI,Roboto" font-size="40" fill="#e6fffa">$1500</text></svg>`)
+};
+/* ← IMPORTANTE: ahora manejamos 'HIDDEN' para que muestre el '?' */
+const MG_icon = (k) => {
+  switch (k) {
+    case 'HIDDEN': return MG_IMG.HIDDEN;
+    case 'p1500' : return MG_IMG.P1500;
+    case 'p500'  : return MG_IMG.P500;
+    case 'p200'  : return MG_IMG.P200;
+    case 'gomita': return MG_IMG.GOMITA;
+    default      : return MG_IMG.NADA;
+  }
+};
+
+/* ---------------- DOM ---------------- */
+const MG_board = document.getElementById("MG-board");
+const MG_status= document.getElementById("MG-status");
+const MG_code1 = document.getElementById("MG-code1");
+const MG_code2 = document.getElementById("MG-code2");
+const MG_goBtn = document.getElementById("MG-validar");
+
+const MG_modal = document.getElementById("MG-modal");
+const MG_cardM = document.getElementById("MG-card-modal");
+const MG_tModal= document.getElementById("MG-title-modal");
+const MG_msg   = document.getElementById("MG-msg");
+const MG_cta   = document.getElementById("MG-cta");
+const MG_ok    = document.getElementById("MG-ok");
+const MG_figure= document.getElementById("MG-figure");
+
+const MG_pModal= document.getElementById("MG-phone");
+const MG_pIn   = document.getElementById("MG-phone-input");
+const MG_pOk   = document.getElementById("MG-phone-ok");
+const MG_pCancel=document.getElementById("MG-phone-cancel");
+const MG_pErr  = document.getElementById("MG-phone-error");
+const MG_canvas= document.getElementById("MG-canvas");
+
+/* ---------------- Estado ---------------- */
+let MG_ready=false, MG_codes=null, MG_tel=null, MG_picked=false;
+
+/* ---------------- Helpers UI ---------------- */
+function MG_setIcon(btn, kind){
+  let alt = 'Sin premio';
+  if (kind === 'HIDDEN') alt = 'Oculto';
+  else if (kind === 'p1500') alt = '$1500';
+  else if (kind === 'p500')  alt = '$500';
+  else if (kind === 'p200')  alt = '$200';
+  else if (kind === 'gomita')alt = 'Gomitas';
+
+  btn.innerHTML = `<img class="MG-cell-img" alt="${alt}" src="${MG_icon(kind)}">`;
+  btn.setAttribute('aria-label', alt);
+}
+function MG_setLooks(btn, kind){
+  btn.classList.remove('MG-looks-1500','MG-looks-500','MG-looks-200','MG-looks-gomita','MG-looks-nada','MG-1500','MG-500','MG-200');
+  if(kind==='p1500') btn.classList.add('MG-looks-1500','MG-1500');
+  else if(kind==='p500') btn.classList.add('MG-looks-500','MG-500');
+  else if(kind==='p200') btn.classList.add('MG-looks-200','MG-200');
+  else if(kind==='gomita') btn.classList.add('MG-looks-gomita');
+  else btn.classList.add('MG-looks-nada');
+}
+function MG_paint(msg,color){ MG_status.textContent=msg; MG_status.style.color=color||"#9fb0c9"; }
+
+/* badges opcionales, si no existen no hace nada */
+function MG_badges(ok1, ok2){
+  const b1 = document.getElementById('MG-b1');
+  const b2 = document.getElementById('MG-b2');
+  if (!b1 || !b2) return;
+  b1.classList.remove('ok','err'); b2.classList.remove('ok','err');
+  if (ok1 !== undefined) b1.classList.add(ok1 ? 'ok' : 'err');
+  if (ok2 !== undefined) b2.classList.add(ok2 ? 'ok' : 'err');
+  b1.textContent = ok1 ? 'Código #1 ✓' : 'Código #1';
+  b2.textContent = ok2 ? 'Código #2 ✓' : 'Código #2';
+}
+
+/* ---------------- Vitrina inicial ---------------- */
+MG_makeVitrine();
+function MG_makeVitrine(){
+  const pool=['p1500','p500'];
+  for(let i=0;i<MG_COUNTS.p200;i++)   pool.push('p200');
+  for(let i=0;i<MG_COUNTS.gomita;i++) pool.push('gomita');
+  for(let i=pool.length;i<MG_TOTAL;i++) pool.push('nada');
+  for(let i=pool.length-1;i>0;i--){ const j=(Math.random()*(i+1))|0; [pool[i],pool[j]]=[pool[j],pool[i]]; }
+  MG_board.innerHTML='';
+  pool.forEach(k=>{ const b=document.createElement('button'); MG_setIcon(b,k); MG_setLooks(b,k); b.disabled=true; MG_board.appendChild(b); });
+  MG_paint("Necesitas 2 códigos válidos para jugar.", "#9fb0c9");
+}
+
+/* ---------------- Click “Validar y jugar” ---------------- */
+MG_goBtn.addEventListener("click", async ()=>{
+  const c1 = MG_toId(MG_code1.value), c2 = MG_toId(MG_code2.value);
+  if(!c1 || !c2){ MG_paint("Ingresa los 2 códigos.","#ff6b6b"); MG_lock(); return; }
+  if(c1===c2){ MG_paint("Los códigos deben ser distintos.","#ff6b6b"); MG_lock(); return; }
+
+  try{
+    const ok1 = await MG_checkCode(c1);
+    const ok2 = await MG_checkCode(c2);
+    if(!ok1 || !ok2){ MG_badges(false,false); MG_paint("Código inválido o ya usado.","#ff6b6b"); MG_lock(); return; }
+    MG_badges(true,true);
+
+    try{ MG_tel = await MG_phoneAsk(); }
+    catch(_){ MG_paint("Participación cancelada.","#fca5a5"); return; }
+
+    MG_codes = { c1, c2 };
+    MG_paint("Tienes 1 intento. Mezclando...","#3fb950");
+    await MG_flipShuffle();
+  }catch(e){ console.error(e); MG_paint("Error al validar.","#ff6b6b"); }
+});
+
+/* ---------------- Preparar tablero real ---------------- */
+function MG_lock(){ [...MG_board.children].forEach(b=>b.disabled=true); MG_ready=false; }
+function MG_unlock(){ [...MG_board.children].forEach(b=>b.disabled=false); MG_ready=true; }
+
+async function MG_flipShuffle(){
+  const bs=[...MG_board.children];
+  await Promise.all(bs.map((b,i)=>new Promise(res=>{
+    setTimeout(()=>{
+      MG_setIcon(b,'HIDDEN'); // ← ahora sí muestra el "?"
+      b.classList.remove('MG-looks-1500','MG-looks-500','MG-looks-200','MG-looks-gomita','MG-looks-nada','MG-1500','MG-500','MG-200');
+      b.style.background="linear-gradient(135deg,#0b0f18,#0f172a)"; b.style.borderColor="#2b3b58";
+      res();
+    }, i*20);
+  })));
+  await MG_realPool();
+  bs.forEach((b,i)=>{ setTimeout(()=>{ b.classList.add("MG-is-shuffling"); setTimeout(()=>b.classList.remove("MG-is-shuffling"),650); }, i*10); });
+  MG_unlock(); MG_ready=true; MG_picked=false;
+  MG_paint("Códigos validados. Elige una casilla.","#3fb950");
+}
+
+/* ---------------- Control en Firestore ---------------- */
+async function MG_getControl(){
+  await setDoc(MG_controlRef, {
+    since1500: 0, since500: 0, since200: 0, sinceGomita: 0,
+    wins1500: 0, wins500: 0, wins200: 0, winsGomita: 0,
+    totalPlays: 0, updatedAt: serverTimestamp()
+  }, { merge: true });
+
+  const s = await getDoc(MG_controlRef);
+  const d = s.exists() ? (s.data() || {}) : {};
+  return {
+    since1500:+(d.since1500||0), since500:+(d.since500||0),
+    since200:+(d.since200||0),   sinceGomita:+(d.sinceGomita||0),
+    wins1500:+(d.wins1500||0),   wins500:+(d.wins500||0),
+    wins200:+(d.wins200||0),     winsGomita:+(d.winsGomita||0),
+    totalPlays:+(d.totalPlays||0)
+  };
+}
+
+async function MG_realPool(){
+  const c = await MG_getControl();
+
+  const en = {
+    p1500 : c.since1500   >= MG_THRESH.p1500,
+    p500  : c.since500    >= MG_THRESH.p500,
+    p200  : c.since200    >= MG_THRESH.p200,
+    gomita: c.sinceGomita >= MG_THRESH.gomita
+  };
+
+  const pool=[];
+  if(en.p1500) pool.push('p1500');
+  if(en.p500)  pool.push('p500');
+  for(let i=0;i<(en.p200?MG_COUNTS.p200:0);i++)   pool.push('p200');
+  for(let i=0;i<(en.gomita?MG_COUNTS.gomita:0);i++) pool.push('gomita');
+  for(let i=pool.length;i<MG_TOTAL;i++) pool.push('nada');
+
+  for(let i=pool.length-1;i>0;i--){ const j=(Math.random()*(i+1))|0; [pool[i],pool[j]]=[pool[j],pool[i]]; }
+
+  [...MG_board.children].forEach((b,idx)=>{
+    b.dataset.MGprize = pool[idx];
+    MG_setIcon(b,'HIDDEN');
+    b.disabled=false;
+    b.onclick=()=>MG_onPick(b);
+    b.style.background="linear-gradient(135deg,#0b0f18,#0f172a)";
+    b.style.borderColor="#2b3b58";
+  });
+
+  MG_board.dataset.fake1500   = String(!en.p1500);
+  MG_board.dataset.fake500    = String(!en.p500);
+  MG_board.dataset.fake200    = String(!en.p200);
+  MG_board.dataset.fakeGomita = String(!en.gomita);
+}
+
+/* ---------------- Click en casilla ---------------- */
+async function MG_onPick(btn){
+  if(!MG_ready || !MG_codes || MG_picked) return;
+  MG_picked=true; MG_lock();
+
+  const cand = btn.dataset.MGprize;
+  await MG_reveal(btn, cand);
+
+  try{
+    await MG_persist(MG_codes.c1, MG_codes.c2, MG_tel, cand);
+  }catch(e){
+    console.error(e);
+    MG_paint("No se pudo registrar la jugada.","#fca5a5");
+  }
+
+  await MG_revealRest(btn);
+
+  if(cand==='p1500'){ MG_confetti('gold');  MG_open('success','p1500'); }
+  else if(cand==='p500'){ MG_confetti('gold'); MG_open('success','p500'); }
+  else if(cand==='p200'){ MG_confetti('gold'); MG_open('success','p200'); }
+  else if(cand==='gomita'){ MG_confetti('purple'); MG_open('warn','gomita'); }
+  else MG_open('neutral','nada');
+}
+
+function MG_reveal(btn,kind){
+  return new Promise(res=>{
+    btn.classList.add('MG-is-flipping');
+    setTimeout(()=>{
+      MG_setIcon(btn,kind); MG_setLooks(btn,kind);
+      btn.classList.remove('MG-is-flipping'); btn.classList.add('MG-pop');
+      setTimeout(()=>{ btn.classList.remove('MG-pop'); res(); },160);
+    },160);
+  });
+}
+
+/* Revelado del resto: completa hasta 2×$200 y 5×gomita cuando no estén habilitados */
+function MG_revealRest(chosen){
+  const bs=[...MG_board.children];
+  const avail = bs.filter(b => b !== chosen);
+
+  const countReal = k => bs.filter(b => b.dataset.MGprize === k).length;
+  const take = (n) => { const out=[]; for(let i=0;i<n && avail.length;i++){ const j=(Math.random()*avail.length)|0; out.push(avail.splice(j,1)[0]); } return out; };
+
+  const fakes = [];
+  if (MG_board.dataset.fake1500 === "true" && countReal('p1500') === 0) fakes.push({k:'p1500', bs: take(1)});
+  if (MG_board.dataset.fake500  === "true" && countReal('p500')  === 0) fakes.push({k:'p500',  bs: take(1)});
+
+  if (MG_board.dataset.fake200  === "true"){
+    const need200 = Math.max(0, MG_COUNTS.p200 - countReal('p200'));     // usa configuración
+    if (need200 > 0) fakes.push({k:'p200',  bs: take(need200)});
+  }
+  if (MG_board.dataset.fakeGomita === "true"){
+    const needG = Math.max(0, MG_COUNTS.gomita - countReal('gomita'));   // asegura 5 gomitas
+    if (needG > 0) fakes.push({k:'gomita', bs: take(needG)});
+  }
+
+  let t=110;
+  const ps=[];
+  for(const b of bs){
+    if(b===chosen) continue;
+    ps.push(new Promise(r=>{
+      setTimeout(()=>{
+        const fk = fakes.find(x => x.bs.includes(b));
+        if (fk){ MG_setIcon(b,fk.k); MG_setLooks(b,fk.k); }
+        else { const k=b.dataset.MGprize; MG_setIcon(b,k); MG_setLooks(b,k); }
+        r();
+      }, t);
+      t += 45;
+    }));
+  }
+  return Promise.all(ps);
+}
+
+/* ---------------- Validación de códigos ---------------- */
+async function MG_checkCode(codeRaw){
+  const code = MG_toId(codeRaw);
+  const ref  = doc(MG_db,"codigos",code);
+  const s    = await getDoc(ref);
+  if(!s.exists()) return false;
+  const d = s.data()||{};
+  if((d.estado||"").toLowerCase()==="usado") return false;
+  return true;
+}
+
+/* ---------------- Persistencia + contadores ---------------- */
+async function MG_persist(c1,c2,phone,rawPrize){
+  const r1   = doc(MG_db,"codigos",MG_toId(c1));
+  const r2   = doc(MG_db,"codigos",MG_toId(c2));
+  const play = doc(MG_playsCol);
+
+  const cascade=(cand,elig)=>{
+    switch(cand){
+      case 'p1500': return elig.p1500 ? 'p1500' : elig.p500 ? 'p500' : elig.p200 ? 'p200' : elig.gomita ? 'gomita' : 'nada';
+      case 'p500' : return elig.p500  ? 'p500'  : elig.p200 ? 'p200' : elig.gomita ? 'gomita' : 'nada';
+      case 'p200' : return elig.p200  ? 'p200'  : elig.gomita ? 'gomita' : 'nada';
+      case 'gomita':return elig.gomita? 'gomita': 'nada';
+      default:      return 'nada';
+    }
+  };
+
+  await runTransaction(MG_db, async (tx)=>{
+    const cSnap = await tx.get(MG_controlRef);
+    const cData = cSnap.exists() ? (cSnap.data()||{}) : { since1500:0, since500:0, since200:0, sinceGomita:0, wins1500:0, wins500:0, wins200:0, winsGomita:0, totalPlays:0 };
+
+    const s1 = await tx.get(r1), s2 = await tx.get(r2);
+    if(!s1.exists() || !s2.exists()) throw new Error("Código no existe");
+    const d1=s1.data()||{}, d2=s2.data()||{};
+    if((d1.estado||"").toLowerCase()==="usado" || (d2.estado||"").toLowerCase()==="usado")
+      throw new Error("Código ya usado");
+
+    const elig = {
+      p1500:+(cData.since1500||0)>=MG_THRESH.p1500,
+      p500 :+(cData.since500 ||0)>=MG_THRESH.p500,
+      p200 :+(cData.since200 ||0)>=MG_THRESH.p200,
+      gomita:+(cData.sinceGomita||0)>=MG_THRESH.gomita
+    };
+
+    const final = cascade(rawPrize, elig);
+
+    tx.set(play,{
+      codigo1:MG_toId(c1), codigo2:MG_toId(c2), telefono:phone,
+      rawPrize, finalPrize:final, createdAt:serverTimestamp()
+    });
+
+    tx.set(r1,{ estado:"usado", usadoEn:"MegaJuego7x7", usadoAt:serverTimestamp(), telefono:phone, resultado:final },{ merge:true });
+    tx.set(r2,{ estado:"usado", usadoEn:"MegaJuego7x7", usadoAt:serverTimestamp(), telefono:phone, resultado:final },{ merge:true });
+
+    const next = {
+      since1500:   final==='p1500' ? 0 : +(cData.since1500||0)+1,
+      since500 :   final==='p500'  ? 0 : +(cData.since500 ||0)+1,
+      since200 :   final==='p200'  ? 0 : +(cData.since200 ||0)+1,
+      sinceGomita: final==='gomita'? 0 : +(cData.sinceGomita||0)+1,
+
+      wins1500:   (cData.wins1500  ||0) + (final==='p1500'?1:0),
+      wins500 :   (cData.wins500   ||0) + (final==='p500' ?1:0),
+      wins200 :   (cData.wins200   ||0) + (final==='p200' ?1:0),
+      winsGomita: (cData.winsGomita||0) + (final==='gomita'?1:0),
+
+      totalPlays: (cData.totalPlays||0) + 1,
+      updatedAt: serverTimestamp()
+    };
+
+    tx.set(MG_controlRef, next, { merge:true });
+  });
+}
+
+/* ---------------- Modal resultado ---------------- */
+function MG_open(variant,kind){
+  MG_figure.innerHTML=""; MG_cardM.classList.remove('success','warn','neutral'); if(variant) MG_cardM.classList.add(variant);
+  const im=document.createElement('img'); im.src=MG_icon(kind); im.alt=kind; MG_figure.appendChild(im);
+
+  if(kind==='p1500'){
+    MG_tModal.innerHTML=`<div class="MG-headline"><span class="md">¡PREMIO MAYOR!</span><br><span class="xl MG-accent">$1500</span></div>`;
+    MG_msg.innerHTML = `<div style="text-align:center"><span style="color:#fde68a;font-weight:800">TOMA CAPTURA DE PANTALLA</span><br><span>Envíala por DM en Instagram.</span></div>`;
+    MG_cta.style.display='inline-flex'; MG_cta.href=MG_IG_URL; MG_cta.textContent='Abrir Instagram';
+  } else if(kind==='p500'){
+    MG_tModal.innerHTML=`<div class="MG-headline"><span class="md">¡GANASTE</span> <span class="md MG-accent">$500!</span></div>`;
+    MG_msg.innerHTML = `<div style="text-align:center"><span style="color:#fde68a;font-weight:800">TOMA CAPTURA DE PANTALLA</span><br><span>DM para reclamar.</span></div>`;
+    MG_cta.style.display='inline-flex'; MG_cta.href=MG_IG_URL;
+  } else if(kind==='p200'){
+    MG_tModal.innerHTML=`<div class="MG-headline"><span class="md">¡GANASTE</span> <span class="md MG-accent">$200!</span></div>`;
+    MG_msg.innerHTML = `<div style="text-align:center"><span style="color:#fde68a;font-weight:800">TOMA CAPTURA DE PANTALLA</span><br><span>DM para reclamar.</span></div>`;
+    MG_cta.style.display='inline-flex'; MG_cta.href=MG_IG_URL;
+  } else if(kind==='gomita'){
+    MG_tModal.innerHTML=`<div class="MG-headline"><span class="md">¡GOMITAS</span> <span class="md MG-accent-purple">GANADAS!</span></div>`;
+    MG_msg.innerHTML = `<div style="text-align:center"><span style="color:#fde68a;font-weight:800">TOMA CAPTURA DE PANTALLA</span><br><span>DM para canjear.</span></div>`;
+    MG_cta.style.display='inline-flex'; MG_cta.href=MG_IG_URL;
+  } else {
+    MG_tModal.innerHTML=`<div class="MG-headline"><span class="md">SIN PREMIO</span><br><span class="xl">ESTA VEZ</span></div>`;
+    MG_msg.innerHTML = `<div style="text-align:center"><span>Sigue participando con más códigos.</span></div>`;
+    MG_cta.style.display='none';
+  }
+
+  MG_modal.style.display='flex'; MG_ok.focus();
+}
+function MG_close(){
+  MG_modal.style.display='none';
+  MG_code1.value=''; MG_code2.value='';
+  MG_codes=null; MG_tel=null; MG_ready=false;
+  MG_badges(); MG_paint('Ingresa 2 códigos para jugar.','#9fb0c9');
+}
+MG_ok.addEventListener('click',MG_close);
+MG_modal.addEventListener('click',e=>{ if(e.target===MG_modal) MG_close(); });
+window.addEventListener('keydown',e=>{ if(MG_modal.style.display==='flex'&&(e.key==='Escape'||e.key==='Enter')) MG_close(); });
+
+/* ---------------- Teléfono (modal pequeño) ---------------- */
+function MG_validPhone(v){ const d=(v||'').replace(/\D/g,''); return d.length>=8 && d.length<=15 ? d : null; }
+function MG_phoneOpen(){ MG_pErr.textContent=''; MG_pIn.value=''; MG_pModal.style.display='flex'; setTimeout(()=>MG_pIn.focus(),0); }
+function MG_phoneClose(){ MG_pModal.style.display='none'; }
+function MG_phoneAsk(){
+  return new Promise((res,rej)=>{
+    MG_phoneOpen();
+    const ok=()=>{ const v=MG_validPhone(MG_pIn.value); if(!v){MG_pErr.textContent='Ingresa un teléfono válido (8 a 15 dígitos).'; return;} MG_phoneClose(); res(v); };
+    const cancel=()=>{ MG_phoneClose(); rej(new Error('cancelado')); };
+    MG_pOk.onclick=ok; MG_pCancel.onclick=cancel;
+    MG_pModal.onclick=e=>{ if(e.target===MG_pModal) cancel(); };
+    const h=e=>{ if(MG_pModal.style.display==='flex'&&e.key==='Enter') ok(); if(MG_pModal.style.display==='flex'&&e.key==='Escape') cancel(); };
+    window.addEventListener('keydown',h,{once:true});
+  });
+}
+
+/* ---------------- Confeti (sobre el header) ---------------- */
+function MG_confetti(pal='gold'){
+  const ctx = MG_canvas.getContext('2d');
+  const r   = MG_canvas.getBoundingClientRect();
+  MG_canvas.width  = r.width * devicePixelRatio;
+  MG_canvas.height = r.height * devicePixelRatio;
+  ctx.scale(devicePixelRatio,devicePixelRatio);
+
+  const cols = pal==='gold' ? ["#ffd700","#ffb300","#ff7a00","#fff2a8"]
+                            : ["#9b5cf7","#7c3aed","#c084fc","#e9d5ff"];
+
+  const pcs = Array.from({length:120},()=>({
+    x:Math.random()*r.width, y:-20-Math.random()*60,
+    w:6+Math.random()*6, h:8+Math.random()*10,
+    vx:-1+Math.random()*2, vy:2+Math.random()*2.5,
+    rot:Math.random()*Math.PI, vr:-0.22+Math.random()*0.44,
+    color:cols[(Math.random()*cols.length)|0]
+  }));
+
+  let run=true; const start=performance.now();
+  function tick(t){
+    if(!run) return;
+    const el=t-start;
+    ctx.clearRect(0,0,r.width,r.height);
+    for(const p of pcs){
+      p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr; p.vy+=0.02;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+      ctx.fillStyle=p.color; ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore();
+    }
+    if(el<2400) requestAnimationFrame(tick);
+    else { run=false; ctx.clearRect(0,0,r.width,r.height); }
+  }
+  requestAnimationFrame(tick);
+}
+</script>
+
+
+<!-- ================== FIN MEGA JUEGO ================== -->
 
 
 <!-- ================== MINI JUEGO 36 CASILLAS (6x6) ================== -->
