@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="es">
+<head>
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Reseñas · GummyBank</title>
+
+  <!-- Guard de acceso: corta el paso ANTES de cargar nada -->
+  <style>
+    :root{
+      --bg:#0f1115; --panel:#11151d; --card:#151a23; --line:#243041;
+      --ink:#e7ecf3; --muted:#9fb0c9; --accent:#1f6feb; --ok:#22c55e; --err:#ef4444;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; background:var(--bg); color:var(--ink);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Poppins,sans-serif;
+    }
+    .wrap{max-width:860px; margin:auto; padding:18px}
+
+    .toolbar{
+      display:flex; gap:10px; align-items:center; justify-content:space-between;
+      position:sticky; top:0; z-index:5;
+      background:linear-gradient(180deg, rgba(17,21,29,.96), rgba(17,21,29,.88));
+      backdrop-filter: blur(8px);
+      padding:10px 12px; border-bottom:1px solid color-mix(in srgb, var(--line), transparent 35%);
+    }
+    h1{ margin:0; font-size:clamp(20px,3.4vw,28px); letter-spacing:.2px }
+    .count{ color:var(--muted); font-size:13px }
+
+    .btn{
+      padding:10px 14px; border-radius:12px; border:1px solid transparent;
+      font-weight:700; cursor:pointer; background:#1a2535; color:var(--ink);
+    }
+    .btn:disabled{ opacity:.7; cursor:not-allowed }
+    .btn-ghost{
+      background:transparent; color:var(--ink);
+      border-color: color-mix(in srgb, var(--line), transparent 40%);
+    }
+    .btn-primary{
+      background: radial-gradient(140% 140% at 20% 20%, #68e169, #22c55e 60%, #198c3a 100%);
+      color:#0a120a; border:0;
+      box-shadow: 0 6px 18px rgba(34,197,94,.35), inset 0 1px 2px rgba(255,255,255,.35);
+    }
+    .btn-danger{
+      background: radial-gradient(140% 140% at 20% 20%, #ff9a9a, #ef4444 60%, #b61f1f 100%);
+      color:#1b0606; border:0;
+      box-shadow: 0 6px 18px rgba(239,68,68,.35), inset 0 1px 2px rgba(255,255,255,.35);
+    }
+
+    .list{ display:grid; grid-template-columns:1fr; gap:12px; margin:14px 0 24px }
+    @media (min-width:760px){ .list{ grid-template-columns:1fr 1fr } }
+
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.12));
+      border:1px solid color-mix(in srgb, var(--line), transparent 35%);
+      border-radius:16px; padding:14px;
+      box-shadow:0 8px 24px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.04);
+    }
+    .card-head{
+      display:flex; align-items:center; gap:10px; justify-content:space-between;
+    }
+    .phone{ font-weight:700; font-size:15px; letter-spacing:.3px; display:flex; align-items:center; gap:8px }
+    .status{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:2px 8px; border-radius:999px; font-size:11px;
+      border:1px solid color-mix(in srgb, var(--line), transparent 30%); color:var(--muted);
+    }
+    .meta{ margin-top:4px; color:var(--muted); font-size:12px }
+    .text{ margin-top:10px; font-size:15px; line-height:1.45; white-space:pre-wrap; word-break:break-word }
+
+    .load-more{ display:block; width:100%; max-width:320px; margin:14px auto 30px }
+    .empty{
+      margin:30px 0; color:var(--muted); text-align:center;
+      border:1px dashed color-mix(in srgb, var(--line), transparent 50%);
+      border-radius:14px; padding:18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <h1>Reseñas</h1>
+    <div style="display:flex; gap:10px; align-items:center">
+      <div class="count"><span id="shown">0</span> mostradas</div>
+      <button id="logout" class="btn btn-ghost" title="Cerrar sesión">Cerrar sesión</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div id="list" class="list" aria-live="polite"></div>
+    <p id="empty" class="empty" hidden>No hay reseñas aún.</p>
+    <button id="loadMore" class="btn btn-primary load-more" hidden>Cargar más</button>
+  </div>
+
+  <!-- Lógica de UI no modular -->
+  <script>
+    // Cerrar sesión limpio
+    document.getElementById("logout").addEventListener("click", () => {
+      sessionStorage.removeItem("resena_auth");
+      window.location.href = "index.html";
+    });
+  </script>
+
+  <!-- Firebase y datos -->
+  <script type="module">
+    import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import {
+      getFirestore, collection, query, orderBy, limit, getDocs, startAfter,
+      deleteDoc, doc
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAJJgDg5SUPvvHgPtDNhIy1f1fiGpBHBw",
+      authDomain: "registro-gomitas.firebaseapp.com",
+      projectId: "registro-gomitas",
+      storageBucket: "registro-gomitas.appspot.com",
+      messagingSenderId: "435485731864",
+      appId: "1:435485731864:web:43dff09753a4c9d507e76d"
+    };
+
+    const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+
+    const listEl   = document.getElementById('list');
+    const emptyEl  = document.getElementById('empty');
+    const loadBtn  = document.getElementById('loadMore');
+    const shownEl  = document.getElementById('shown');
+
+    const PAGE_SIZE = 50;
+    let lastDocSnap = null;
+    let loaded = 0;
+
+    const esc = s => (s ?? '')
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;')
+      .replace(/'/g,'&#39;');
+
+    function fmtDate(ts){
+      if (!ts) return "";
+      const d = ts.toDate ? ts.toDate() : new Date(ts);
+      return d.toLocaleString();
+    }
+
+    function renderCard(snap){
+      const d = snap.data();
+      const id = snap.id;
+
+      const card = document.createElement('article');
+      card.className = 'card';
+      card.dataset.id = id;
+
+      card.innerHTML = `
+        <div class="card-head">
+          <div class="phone">📞 ${esc(d.telefono) || '(sin teléfono)'}
+            ${d.estado ? `<span class="status">${esc(d.estado)}</span>` : ''}
+          </div>
+          <button class="btn btn-danger btn-del" title="Eliminar reseña" data-id="${id}">Eliminar</button>
+        </div>
+        <div class="meta">${fmtDate(d.createdAt)}</div>
+        <div class="text">${esc(d.resena)}</div>
+      `;
+
+      const delBtn = card.querySelector('.btn-del');
+      delBtn.addEventListener('click', async () => {
+        if (!confirm('¿Eliminar esta reseña? Esta acción no se puede deshacer.')) return;
+        delBtn.disabled = true;
+        try{
+          await deleteDoc(doc(db, 'resenas', id));
+          card.remove();
+          loaded = Math.max(0, loaded - 1);
+          shownEl.textContent = loaded;
+          if (!listEl.children.length) emptyEl.hidden = false;
+        }catch(err){
+          console.error(err);
+          delBtn.disabled = false;
+          alert('No se pudo eliminar. Revisa permisos de Firestore.');
+        }
+      });
+
+      listEl.appendChild(card);
+    }
+
+    async function loadPage(){
+      loadBtn.disabled = true;
+
+      const baseQ = query(
+        collection(db, 'resenas'),
+        orderBy('createdAt', 'desc'),
+        limit(PAGE_SIZE)
+      );
+
+      const q = lastDocSnap ? query(baseQ, startAfter(lastDocSnap)) : baseQ;
+      const snap = await getDocs(q);
+
+      if (snap.empty && loaded === 0){
+        emptyEl.hidden = false;
+        loadBtn.hidden = true;
+        return;
+      }
+
+      snap.forEach(docSnap => { renderCard(docSnap); loaded++; });
+      shownEl.textContent = loaded;
+
+      lastDocSnap = snap.docs[snap.docs.length - 1] ?? lastDocSnap;
+
+      if (snap.size < PAGE_SIZE){
+        loadBtn.hidden = true;
+      }else{
+        loadBtn.hidden = false;
+        loadBtn.disabled = false;
+      }
+    }
+
+    loadBtn.addEventListener('click', loadPage);
+    loadPage();
+  </script>
+</body>
+</html>

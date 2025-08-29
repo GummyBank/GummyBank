@@ -46,10 +46,12 @@ main,header,section.rewards,#mini-juego,.vault{position:relative;z-index:1}
 #modal-registro button:active{transform:translateY(1px)}
 body.modal-open{overflow:hidden}
 #modal-registro input,#modal-registro button{pointer-events:auto}
+
     </style>
   </head>
 
   <body>
+    <div id="lluvia-container" aria-hidden="true"></div>
     <header>
       <div class="top-bar">
         <div class="left-group">
@@ -226,7 +228,7 @@ body.modal-open{overflow:hidden}
 
 <div id="MG-promo-bar" role="status" aria-live="polite">
   <center>
-  <span class="MG-promo-blink">Evento por tiempo limitado</span>
+  <span class="MG-promo-blink">El nuevo evento termina en:</span>
   <span class="MG-promo-timer" id="MG-countdown">00:00:00</span>
 </div>
 
@@ -238,8 +240,8 @@ body.modal-open{overflow:hidden}
     margin:0 !important; padding:0 12px;
     display:flex; align-items:center; justify-content:center; gap:10px;
     background:
-      linear-gradient(90deg,#0ea5e9, #2563eb 45%, #7c3aed 85%);
-    color:#e7ecf3;
+      linear-gradient(90deg,#e90e0e, #ff1500 45%, #360505 85%);
+    color:#ffffff;
     font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
     font-weight:900; text-transform:uppercase; letter-spacing:.6px;
     box-shadow:0 6px 18px rgba(0,0,0,.22), inset 0 0 24px rgba(255,255,255,.06);
@@ -305,31 +307,256 @@ body.modal-open{overflow:hidden}
     setInterval(tick, 1000);
   })();
 </script>
+<!-- Bloque compacto · GummyBank · pega tal cual -->
+<!-- ====== CARD: Deja tu reseña · GummyBank ====== -->
+<!-- ====== CARD: Deja tu reseña · GummyBank (no modal) ====== -->
+<section class="gb-review-card" aria-labelledby="grc-title">
+  <center>
+  <h3 id="grc-title">Tu opinión cuenta</h3>
+  <p class="grc-sub">
+    <center>
+    Déjanos tu reseña y participa por
+    <strong class="grc-badge">5 paquetes de gomitas y $100 pesos</strong>
+    <span class="grc-meta">Entrega: <strong>Lunes</strong></span>
+    </center>
+  </p>
+  </center>
 
+  <form id="grc-form" novalidate>
+    <label class="grc-lab" for="grc-tel">Número de teléfono (Tu boleto)</label>
+    <input id="grc-tel" name="telefono" inputmode="numeric" autocomplete="tel"
+           placeholder="10 dígitos" class="grc-inp" required minlength="8" maxlength="15" />
 
+    <label class="grc-lab" for="grc-txt">Tu reseña (Confirmacion de participación)</label>
+    <textarea id="grc-txt" name="resena" class="grc-ta" rows="4"
+              placeholder="¿Qué te parece GummyBank?" required minlength="5" maxlength="600"></textarea>
+
+    <div class="grc-row">
+      <small id="grc-count" class="grc-muted">0/600</small>
+      <div class="grc-spacer"></div>
+      <button id="grc-send" class="gb-cta" type="submit" disabled>Enviar reseña</button>
+    </div>
+
+    <p id="grc-msg" class="grc-msg" aria-live="polite"></p>
+  </form>
+</section>
+
+<style>
+  :root{
+  --bg:#0f1115; --panel:#11151d; --line:#243041; --ink:#e7ecf3;
+  --muted:#9fb0c9; --accent:#1f6feb; --accent-2:#00bfff;
+  --ok:#22c55e; --warn:#f59e0b; --err:#ef4444;
+}
+
+/* ===== Card base ===== */
+.gb-review-card{
+  /* que NO tape la lluvia */
+  position: relative;      /* la card queda sobre la lluvia */
+  z-index: 1;
+
+  max-width: min(92vw, 560px);
+  width: 100%;
+  margin: 18px auto;
+  padding: 14px;
+  border-radius: 16px;
+
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Poppins, sans-serif;
+  color: var(--ink);
+  background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.16));
+  border: 1px solid color-mix(in srgb, var(--line), transparent 35%);
+  box-shadow: 0 8px 24px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.04);
+
+  box-sizing: border-box;
+  overflow: hidden;  /* solo corta cosas DENTRO de la card, no la lluvia global */
+  /* contain: inline-size;  ← si tu lluvia está dentro del mismo árbol, puede dar lata. Mejor quítalo. */
+}
+.gb-review-card *, .gb-review-card *::before, .gb-review-card *::after{
+  box-sizing: inherit;
+  -webkit-tap-highlight-color: transparent;
+  min-width: 0;
+}
+
+/* ===== Tipografía y subtítulo ===== */
+.gb-review-card h3{
+  margin: 0 0 6px;
+  font-size: clamp(16px, 2.4vw, 20px);
+}
+.grc-sub{
+  margin: 0 0 12px;
+  font-size: clamp(12px, 2vw, 14px);
+  color: var(--muted);
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  overflow-wrap: anywhere;
+}
+.grc-badge{
+  display: inline-block; padding: 2px 8px; border-radius: 999px;
+  background: radial-gradient(120% 120% at 20% 20%, #ffe9b0, #f4b400 55%, #b87b00 100%);
+  color:#1a1200; font-weight:700; white-space:nowrap;
+  box-shadow: 0 2px 10px rgba(248,191,63,.35), inset 0 1px 2px rgba(255,255,255,.35);
+}
+.grc-meta{ margin-left: auto }
+
+/* ===== Inputs ===== */
+.grc-lab{ display:block; margin:8px 2px 6px; font-size:13px; color:var(--muted) }
+.grc-inp, .grc-ta{
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--line), transparent 35%);
+  background:#121722; color: var(--ink);
+  padding: 10px 12px;
+  font-size: 16px; /* evita auto-zoom en iOS */
+  outline: none;
+}
+.grc-inp:focus, .grc-ta:focus{
+  border-color: var(--accent-2);
+  box-shadow: 0 0 0 3px rgba(0,191,255,.18);
+}
+
+/* ===== Row botón/contador ===== */
+.grc-row{
+  display: flex; gap: 8px; align-items: center; margin-top: 8px;
+  flex-wrap: wrap;
+}
+.grc-row > *{ min-width: 0; }
+.grc-spacer{ flex: 1 }
+.grc-muted{ color: var(--muted); font-size: 12px }
+.grc-msg{ margin: 8px 2px 0; font-size: 13px }
+
+/* ===== Botón ===== */
+.gb-cta{
+  padding: 10px 14px;
+  border: 0; border-radius: 12px; cursor: pointer;
+  background: radial-gradient(140% 140% at 20% 20%, #68d7e1, #22bdc5 60%, #19868c 100%);
+  color:#0a120a; font-weight:700;
+  box-shadow: 0 6px 18px rgba(0, 237, 249, 0.763), inset 0 1px 2px rgba(255,255,255,.35);
+}
+.gb-cta:disabled{ filter: grayscale(.4) brightness(.85); cursor: not-allowed; opacity:.85 }
+
+/* ===== Responsive ===== */
+@media (max-width: 900px){
+  .gb-review-card{ margin:16px auto; padding:14px; border-radius:16px }
+  .grc-row{ gap:10px }
+}
+@media (max-width: 600px){
+  .gb-review-card{ margin:14px 12px; padding:12px; border-radius:14px }
+  .grc-sub{ flex-direction: column; align-items: flex-start; gap: 6px }
+  .grc-meta{ margin-left: 0 }
+  .grc-inp, .grc-ta{ padding:10px 12px }
+  .grc-row{ flex-direction: column; align-items: stretch; gap: 8px }
+  .gb-cta{ width: 100%; text-align: center }
+}
+@media (max-width: 360px){
+  .gb-review-card{ padding:10px; border-radius:12px }
+  .gb-review-card h3{ font-size:16px }
+  .grc-sub{ font-size:12px }
+}
+@media (prefers-reduced-motion: reduce){
+  .gb-review-card *{ transition: none !important; }
+}
+
+/* ===== Lluvia sugerida (asegúrate de tener este contenedor FUERA de la card) ===== */
+#lluvia-container{
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;        /* por debajo del contenido */
+}
+body{ background: var(--bg); position: relative; }
+
+</style>
+
+<script type="module">
+  import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+  import { getFirestore, addDoc, collection, serverTimestamp }
+    from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+  // ===== NOMBRES ÚNICOS PARA EVITAR COLISIONES =====
+  const gbFirebaseConfig = {
+    apiKey: "AIzaSyAJJgDg5SUPvvHgPtDNhIy1f1fiGpBHBw",
+    authDomain: "registro-gomitas.firebaseapp.com",
+    projectId: "registro-gomitas",
+    storageBucket: "registro-gomitas.appspot.com",
+    messagingSenderId: "435485731864",
+    appId: "1:435485731864:web:43dff09753a4c9d507e76d"
+  };
+
+  const gbApp = getApps().length ? getApps()[0] : initializeApp(gbFirebaseConfig);
+  const gbDb  = getFirestore(gbApp);
+
+  // UI refs
+  const $form = document.getElementById('grc-form');
+  const $tel  = document.getElementById('grc-tel');
+  const $txt  = document.getElementById('grc-txt');
+  const $send = document.getElementById('grc-send');
+  const $msg  = document.getElementById('grc-msg');
+  const $count= document.getElementById('grc-count');
+
+  // Helpers
+  const onlyDigits = s => s.replace(/\D+/g,'');
+  const isPhoneOk  = v => /^\d{8,15}$/.test(v);
+
+  // Validación en vivo
+  $tel.addEventListener('input', ()=>{
+    const clean = onlyDigits($tel.value);
+    if (clean !== $tel.value) $tel.value = clean;
+    toggleSubmit();
+  });
+  $txt.addEventListener('input', ()=>{
+    $count.textContent = `${$txt.value.length}/600`;
+    toggleSubmit();
+  });
+  function toggleSubmit(){
+    const ok = isPhoneOk($tel.value) && $txt.value.trim().length >= 5;
+    $send.disabled = !ok;
+  }
+  function resetMsg(){ $msg.textContent = ""; $msg.style.color = ""; }
+
+  // Submit
+  $form.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    if ($send.disabled) return;
+
+    $send.disabled = true; resetMsg();
+
+    const payload = {
+      telefono: $tel.value.trim(),
+      resena: $txt.value.trim(),
+      createdAt: serverTimestamp(),
+      estado: "pendiente"
+    };
+
+    try{
+      await addDoc(collection(gbDb, "resenas"), payload);
+      $msg.textContent = "¡Gracias! Tu reseña fue registrada. Estás participando.";
+      $msg.style.color = "var(--ok)";
+      $form.reset(); $count.textContent = "0/600"; toggleSubmit();
+    }catch(err){
+      console.error(err);
+      $msg.textContent = "No se pudo enviar. Intenta de nuevo.";
+      $msg.style.color = "var(--err)";
+    }finally{
+      $send.disabled = false;
+    }
+  });
+</script>
 
 
 
 
 <!-- ================== MEGA JUEGO 7x7 (aislado con prefijo MG_) ================== -->
 <section id="MG-juego" style="width:92%;max-width:960px;margin:24px auto;padding:12px;border-radius:18px;background:transparent;color:#eef3fb;font-family:'Poppins',system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;box-sizing:border-box;overflow:visible;position:relative;z-index:0;">
- <style>
-  /* =================== MEGA 7x7 — CSS saneado y realmente responsive =================== */
-/* Idea: un ancho maestro --W que cambia por breakpoint. Todo cuelga de ahí. */
 
-:root { /* valores por si se usa fuera del contenedor */
-  --MG-gap: 8px;
-}
+  <style>
+/* =================== MEGA 5x5 — CSS limpio, centrado y responsive =================== */
+:root { --MG-gap: 10px; }
 
 #MG-juego{
-  /* Ancho maestro por defecto (desktop chico) */
-  --W: min(720px, 94vw);
+  --W: min(680px, 94vw);         /* ancho maestro */
   --gap: var(--MG-gap);
   color:#e7ecf3;
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
-  /* centrado total */
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  min-height:100vh; margin:0 auto; text-align:center;
+  display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+  min-height:100vh; margin:0 auto; text-align:center; padding:10px 0 22px;
 }
 
 /* ---------- Header / Canvas ---------- */
@@ -341,22 +568,21 @@ body.modal-open{overflow:hidden}
 }
 #MG-canvas{ position:absolute; inset:0; width:100%; height:22%; pointer-events:none; display:block; }
 
-/* ---------- Tablero (6 columnas en tu HTML actual) ---------- */
-/* No forzamos px/vw por celda. Usamos columnas 1fr y calculamos el tamaño máximo de botón
-   con base en --W y el gap. Resultado: jamás se encoge “de más” ni se desborda. */
+/* ---------- Tablero (5 columnas reales, centrado) ---------- */
 #MG-board{
   width:var(--W);
-  margin:2px auto 10px;
+  margin:4px auto 12px;                 /* centra horizontal */
   display:grid;
-  grid-template-columns:repeat(6, 1fr); /* si cambias a 7, solo cambia este número y el cálculo de max-width abajo */
+  grid-template-columns:repeat(5, minmax(0, 1fr));
   gap:var(--gap);
+  align-items:stretch; justify-items:stretch;
   user-select:none;
 }
 #MG-board button{
-  aspect-ratio:1/1;
-  max-width:calc((var(--W) - (5 * var(--gap))) / 6); /* para 6 columnas; si usas 7: (6 * gap)/7 */
+  width:100%;
+  aspect-ratio:1/1;                      /* cuadradas de verdad */
   display:grid; place-items:center;
-  border-radius:12px; border:1px solid #2b3b58;
+  border-radius:14px; border:1px solid #2b3b58;
   background:
     radial-gradient(520px 260px at -10% -20%, rgba(56,189,248,.06), transparent 50%),
     radial-gradient(520px 260px at 110% 120%, rgba(147,51,234,.06), transparent 50%),
@@ -371,10 +597,11 @@ body.modal-open{overflow:hidden}
 #MG-board button:hover{ transform:translateY(-2px); box-shadow:0 10px 26px rgba(0,0,0,.35); }
 #MG-board button:disabled{ opacity:.92; cursor:not-allowed; transform:none; box-shadow:none; }
 
-.MG-cell-img{ width:88%; height:88%; object-fit:contain; display:block; pointer-events:none; transition:transform .15s ease; }
-#MG-board button.MG-1500 .MG-cell-img{ transform:scale(1.16); }
+.MG-cell-img{ width:86%; height:86%; object-fit:contain; display:block; pointer-events:none; transition:transform .15s ease; }
+#MG-board button.MG-1500 .MG-cell-img{ transform:scale(1.16); }  /* reutilizado por $1000 */
 #MG-board button.MG-500  .MG-cell-img{ transform:scale(1.12); }
 #MG-board button.MG-200  .MG-cell-img{ transform:scale(1.10); }
+#MG-board button.MG-50   .MG-cell-img{ transform:scale(1.08); }
 
 /* Animaciones */
 @keyframes MG-flip{0%{transform:rotateY(0)}50%{transform:rotateY(90deg)}100%{transform:rotateY(0)}}
@@ -384,11 +611,32 @@ body.modal-open{overflow:hidden}
 @keyframes MG-pop{0%{transform:scale(.92)}100%{transform:scale(1)}}
 .MG-pop{ animation:MG-pop .25s ease; }
 
-/* Looks al revelar */
+/* ---------- Looks al revelar ---------- */
 .MG-looks-1500{ background:linear-gradient(145deg,#064e3b,#0b6b52)!important; border-color:#18c38a!important; box-shadow:0 10px 36px rgba(14,159,110,.28); }
 .MG-looks-500 { background:linear-gradient(145deg,#14532d,#1b7a3e)!important; border-color:#34d399!important; box-shadow:0 10px 34px rgba(16,185,129,.25); }
 .MG-looks-200 { background:linear-gradient(145deg,#0b3a54,#0f5d8c)!important; border-color:#38bdf8!important; box-shadow:0 10px 34px rgba(56,189,248,.24); }
-.MG-looks-gomita{ background:linear-gradient(145deg,#3b0764,#5b0aa0)!important; border-color:#9b5cf7!important; box-shadow:0 10px 34px rgba(124,58,237,.25); }
+
+/* ===== $50 con look propio (plateado-azulado) ===== */
+.MG-looks-50{
+  background:
+    radial-gradient(400px 220px at 20% 10%, rgba(226,232,240,.20), transparent 55%),
+    linear-gradient(145deg,#334155,#1f2937) !important;   /* slate oscuro */
+  border:2px solid #cbd5e1 !important;                    /* slate-200 */
+  box-shadow:
+    0 0 0 1px rgba(203,213,225,.35),
+    0 10px 26px rgba(148,163,184,.28),
+    inset 0 0 28px rgba(226,232,240,.10);
+}
+.MG-50{ animation:pulse50 1.35s infinite alternate; }
+@keyframes pulse50{
+  0%   { box-shadow:0 0 8px rgba(203,213,225,.55), inset 0 0 18px rgba(255,255,255,.06); }
+  100% { box-shadow:0 0 18px rgba(226,232,240,.95), inset 0 0 26px rgba(255,255,255,.10); }
+}
+
+.MG-looks-gomita{
+  background:linear-gradient(145deg,#3b0764,#5b0aa0)!important;
+  border-color:#9b5cf7!important; box-shadow:0 10px 34px rgba(124,58,237,.25);
+}
 .MG-looks-nada{ background:linear-gradient(145deg,#191c24,#1b1f2a)!important; border-color:#2d3547!important; }
 
 .MG-kicker{ font-size:12px; letter-spacing:.45px; text-transform:uppercase; color:#9fb0c9; text-align:center; margin:4px 0 8px; }
@@ -396,8 +644,8 @@ body.modal-open{overflow:hidden}
 /* ---------- Tarjeta de códigos ---------- */
 #MG-card{
   width:var(--W);
-  max-width:340px;                /* compacta en desktop */
-  margin:8px auto;
+  max-width:360px;
+  margin:8px auto 0;
   padding:10px 12px;
   border-radius:12px;
   background:rgba(12,18,34,.70);
@@ -456,32 +704,24 @@ body.modal-open{overflow:hidden}
 
 /* ---------- Mobile ---------- */
 @media (max-width:560px){
-  #MG-juego{ --W: 92vw; --gap: 7px; padding:10px!important; }
+  #MG-juego{ --W: 92vw; --gap: 8px; }
   #MG-board{ gap:var(--gap)!important; }
   #MG-board button{ border-radius:12px!important; }
   #MG-card{ width:var(--W); max-width:none; }
   #MG-validar{ height:40px; }
 }
 
-/* ---------- Tablet (≈600–1024 px) ---------- */
+/* ---------- Tablet ---------- */
 @media (min-width:600px) and (max-width:1024px){
-  /* Ajustamos el ancho maestro para tablet */
-  #MG-juego{ --W: min(640px, 92vw); --gap: 9px; }
-
+  #MG-juego{ --W: min(640px, 92vw); --gap: 10px; }
   #MG-head{ width:var(--W); margin:0 auto 12px; }
   #MG-canvas{ height:24%; }
-
   #MG-board{ width:var(--W); gap:var(--gap); }
-  /* Si cambias a 7 columnas, también cambia el cálculo de abajo */
   #MG-board button{
-    max-width:calc((var(--W) - (5 * var(--gap))) / 6);
     padding:8px; border-radius:14px;
     font-size:clamp(13px, 1.8vw, 18px);
   }
-
   .MG-kicker{ font-size:13px; }
-
-  /* La card deja de estirarse a 88vw y se ancla al maestro */
   #MG-card{
     width:var(--W);
     max-width:520px;
@@ -490,9 +730,7 @@ body.modal-open{overflow:hidden}
   .MG-input-wrap{ max-width:480px; }
   .MG-input{ height:44px; font-size:14px; letter-spacing:.7px; padding:8px 36px; border-radius:12px; }
   .MG-label{ left:12px; font-size:12px; }
-
   #MG-validar{ width:100%; height:46px; border-radius:12px; margin-top:8px; }
-
   #MG-card-modal{ width:min(520px, 88vw); padding:22px; border-radius:18px; }
   #MG-figure img{ width:min(240px, 48%); }
   .MG-headline .xl{ font-size:clamp(28px, 4.2vw, 34px); }
@@ -500,33 +738,27 @@ body.modal-open{overflow:hidden}
   #MG-actions{ gap:10px; }
   #MG-ok{ min-width:128px; padding:10px 16px; }
 }
+</style>
 
-/* ---------- Si usas 7x7 real, cambia columnas y el cálculo de max-width ---------- */
-/* Ejemplo para 7 columnas:
-#MG-board{ grid-template-columns:repeat(7,1fr); }
-#MG-board button{ max-width:calc((var(--W) - (6 * var(--gap))) / 7); }
-*/
-
- </style>
 <center>
   <div id="MG-head">
     <img id="MG-title" src="img/gan201.png" alt="Mega Título">
     <canvas id="MG-canvas"></canvas>
   </div>
 
-  <p class="MG-kicker">Modo Mega: 2 códigos por jugada</p>
+  <p class="MG-kicker">Te GARANTIZAMOS un premio con 5 tiros</p>
 
   <div id="MG-board"></div>
 
     <div class="MG-row MG-inputs">
       <div class="MG-input-wrap">
         <span class="MG-label">Código #1</span>
-        <input id="MG-code1" class="MG-input" type="text" placeholder="AAAA1111">
+        <input id="MG-code1" class="MG-input" type="text" placeholder="SUERTE!! :)">
         <svg class="MG-icon" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#9fb0c9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
       <div class="MG-input-wrap">
         <span class="MG-label">Código #2</span>
-        <input id="MG-code2" class="MG-input" type="text" placeholder="BBBB2222">
+        <input id="MG-code2" class="MG-input" type="text" placeholder="LO DE ARRIBA X2">
         <svg class="MG-icon" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#9fb0c9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
     </div>
@@ -564,7 +796,7 @@ body.modal-open{overflow:hidden}
 </div>
 
 <script type="module">
-/* ========= MEGA 7x7 - LÓGICA (solo JS, diseño intacto) ========= */
+/* ========= MEGA 5x5 - LÓGICA (solo JS, diseño intacto) ========= */
 import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
 import {
   getFirestore, doc, getDoc, setDoc, collection,
@@ -590,15 +822,12 @@ const MG_db  = getFirestore(MG_app);
    - MG_TOTAL = número de casillas
    - En CSS: #MG-board -> grid-template-columns:repeat(N,...)
 ------------------------------------------------------- */
-
-
-
-
-const MG_TOTAL = 36; // 6x6 actual
-const MG_COUNTS = { p1500: 1, p500: 1, p200: 2, gomita: 5 };
-const MG_THRESH = { p1500: 500, p500: 300, p200: 100, gomita: 0 };
-
-
+const MG_TOTAL = 25; // 5x5
+const MG_COUNTS = { p1000: 1, p500: 1, p200: 2, p50: 4, gomita: 9 };
+/* Umbrales: los NUEVOS aparecen después de 100 tiros:
+   - p1000 y p50 son nuevos -> 100
+   Los existentes se quedan igual que estaban. */
+const MG_THRESH = { p1000: 100000, p500: 100000, p200: 10000, p50: 5, gomita: 3 };
 
 /* ----------------- Referencias en DB ----------------- */
 const MG_controlRef = doc(MG_db, "mega7x7_meta", "control"); // contadores globales
@@ -613,15 +842,17 @@ const MG_IMG = {
   GOMITA: "img/gomita.png",
   P200  : MG_svg(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="18" fill="#0b3a54"/><circle cx="60" cy="60" r="38" fill="#0ea5e9"/><text x="50%" y="56%" text-anchor="middle" dominant-baseline="middle" font-family="system-ui,Segoe UI,Roboto" font-size="42" fill="#e6fffa">$200</text></svg>`),
   P500  : MG_svg(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="18" fill="#14532d"/><circle cx="60" cy="60" r="40" fill="#22c55e"/><text x="50%" y="56%" text-anchor="middle" dominant-baseline="middle" font-family="system-ui,Segoe UI,Roboto" font-size="44" fill="#e6fffa">$500</text></svg>`),
-  P1500 : MG_svg(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="18" fill="#064e3b"/><circle cx="60" cy="60" r="40" fill="#0e9f6e"/><text x="50%" y="56%" text-anchor="middle" dominant-baseline="middle" font-family="system-ui,Segoe UI,Roboto" font-size="40" fill="#e6fffa">$1500</text></svg>`)
+  P1000 : MG_svg(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="18" fill="#064e3b"/><circle cx="60" cy="60" r="40" fill="#0e9f6e"/><text x="50%" y="56%" text-anchor="middle" dominant-baseline="middle" font-family="system-ui,Segoe UI,Roboto" font-size="40" fill="#e6fffa">$1000</text></svg>`),
+  P50   : MG_svg(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="18" fill="#1e293b"/><circle cx="60" cy="60" r="36" fill="#94a3b8"/><text x="50%" y="56%" text-anchor="middle" dominant-baseline="middle" font-family="system-ui,Segoe UI,Roboto" font-size="46" fill="#0b1220">$50</text></svg>`)
 };
 /* ← IMPORTANTE: ahora manejamos 'HIDDEN' para que muestre el '?' */
 const MG_icon = (k) => {
   switch (k) {
     case 'HIDDEN': return MG_IMG.HIDDEN;
-    case 'p1500' : return MG_IMG.P1500;
+    case 'p1000' : return MG_IMG.P1000;
     case 'p500'  : return MG_IMG.P500;
     case 'p200'  : return MG_IMG.P200;
+    case 'p50'   : return MG_IMG.P50;
     case 'gomita': return MG_IMG.GOMITA;
     default      : return MG_IMG.NADA;
   }
@@ -656,9 +887,10 @@ let MG_ready=false, MG_codes=null, MG_tel=null, MG_picked=false;
 function MG_setIcon(btn, kind){
   let alt = 'Sin premio';
   if (kind === 'HIDDEN') alt = 'Oculto';
-  else if (kind === 'p1500') alt = '$1500';
+  else if (kind === 'p1000') alt = '$1000';
   else if (kind === 'p500')  alt = '$500';
   else if (kind === 'p200')  alt = '$200';
+  else if (kind === 'p50')   alt = '$50';
   else if (kind === 'gomita')alt = 'Gomitas';
 
   btn.innerHTML = `<img class="MG-cell-img" alt="${alt}" src="${MG_icon(kind)}">`;
@@ -666,9 +898,9 @@ function MG_setIcon(btn, kind){
 }
 function MG_setLooks(btn, kind){
   btn.classList.remove('MG-looks-1500','MG-looks-500','MG-looks-200','MG-looks-gomita','MG-looks-nada','MG-1500','MG-500','MG-200');
-  if(kind==='p1500') btn.classList.add('MG-looks-1500','MG-1500');
+  if(kind==='p1000') btn.classList.add('MG-looks-1500','MG-1500'); // reutiliza estilos del antiguo 1500
   else if(kind==='p500') btn.classList.add('MG-looks-500','MG-500');
-  else if(kind==='p200') btn.classList.add('MG-looks-200','MG-200');
+  else if(kind==='p200' || kind==='p50') btn.classList.add('MG-looks-200','MG-200'); // 50 hereda look de 200
   else if(kind==='gomita') btn.classList.add('MG-looks-gomita');
   else btn.classList.add('MG-looks-nada');
 }
@@ -689,8 +921,9 @@ function MG_badges(ok1, ok2){
 /* ---------------- Vitrina inicial ---------------- */
 MG_makeVitrine();
 function MG_makeVitrine(){
-  const pool=['p1500','p500'];
+  const pool=['p1000','p500'];
   for(let i=0;i<MG_COUNTS.p200;i++)   pool.push('p200');
+  for(let i=0;i<MG_COUNTS.p50;i++)    pool.push('p50');
   for(let i=0;i<MG_COUNTS.gomita;i++) pool.push('gomita');
   for(let i=pool.length;i<MG_TOTAL;i++) pool.push('nada');
   for(let i=pool.length-1;i>0;i--){ const j=(Math.random()*(i+1))|0; [pool[i],pool[j]]=[pool[j],pool[i]]; }
@@ -728,7 +961,7 @@ async function MG_flipShuffle(){
   const bs=[...MG_board.children];
   await Promise.all(bs.map((b,i)=>new Promise(res=>{
     setTimeout(()=>{
-      MG_setIcon(b,'HIDDEN'); // ← ahora sí muestra el "?"
+      MG_setIcon(b,'HIDDEN'); // ← muestra "?"
       b.classList.remove('MG-looks-1500','MG-looks-500','MG-looks-200','MG-looks-gomita','MG-looks-nada','MG-1500','MG-500','MG-200');
       b.style.background="linear-gradient(135deg,#0b0f18,#0f172a)"; b.style.borderColor="#2b3b58";
       res();
@@ -741,57 +974,132 @@ async function MG_flipShuffle(){
 }
 
 /* ---------------- Control en Firestore ---------------- */
-async function MG_getControl(){
-  await setDoc(MG_controlRef, {
-    since1500: 0, since500: 0, since200: 0, sinceGomita: 0,
-    wins1500: 0, wins500: 0, wins200: 0, winsGomita: 0,
-    totalPlays: 0, updatedAt: serverTimestamp()
-  }, { merge: true });
+async function MG_getControl(){                             // Función asíncrona que garantiza y lee el documento de control global.
 
-  const s = await getDoc(MG_controlRef);
-  const d = s.exists() ? (s.data() || {}) : {};
+ /* ---------------- Control en Firestore (safe init) ---------------- */
+async function MG_getControl(){
+  // 1) Leer primero
+  const snap = await getDoc(MG_controlRef);
+
+  // 2) Si NO existe, inicializa una sola vez
+  if (!snap.exists()) {
+    await setDoc(MG_controlRef, {
+      since1000: 0, since500: 0, since200: 0, since50: 0, sinceGomita: 0,
+      wins1000: 0,  wins500: 0,  wins200: 0,  wins50: 0,  winsGomita: 0,
+      totalPlays: 0,
+      updatedAt: serverTimestamp()
+    });
+    return {
+      since1000:0, since500:0, since200:0, since50:0, sinceGomita:0,
+      wins1000:0, wins500:0, wins200:0, wins50:0, winsGomita:0,
+      totalPlays:0
+    };
+  }
+
+  // 3) Si SÍ existe, NO resetees. Solo normaliza y, si faltara algo, complétalo sin pisar valores.
+  const d = snap.data() || {};
+  const patch = {};
+  if (d.since1000 == null)  patch.since1000 = 0;
+  if (d.since500  == null)  patch.since500  = 0;
+  if (d.since200  == null)  patch.since200  = 0;
+  if (d.since50   == null)  patch.since50   = 0;
+  if (d.sinceGomita == null)patch.sinceGomita = 0;
+
+  if (d.wins1000  == null)  patch.wins1000  = 0;
+  if (d.wins500   == null)  patch.wins500   = 0;
+  if (d.wins200   == null)  patch.wins200   = 0;
+  if (d.wins50    == null)  patch.wins50    = 0;
+  if (d.winsGomita== null)  patch.winsGomita= 0;
+
+  if (d.totalPlays== null)  patch.totalPlays= 0;
+
+  // Escribe SOLO lo faltante y el updatedAt
+  await setDoc(MG_controlRef, { ...patch, updatedAt: serverTimestamp() }, { merge:true });
+
+  // 4) Devuelve contadores normalizados (números)
   return {
-    since1500:+(d.since1500||0), since500:+(d.since500||0),
-    since200:+(d.since200||0),   sinceGomita:+(d.sinceGomita||0),
-    wins1500:+(d.wins1500||0),   wins500:+(d.wins500||0),
-    wins200:+(d.wins200||0),     winsGomita:+(d.winsGomita||0),
-    totalPlays:+(d.totalPlays||0)
+    since1000:+(d.since1000 ?? 0),
+    since500:+(d.since500 ?? 0),
+    since200:+(d.since200 ?? 0),
+    since50:+(d.since50 ?? 0),
+    sinceGomita:+(d.sinceGomita ?? 0),
+    wins1000:+(d.wins1000 ?? 0),
+    wins500:+(d.wins500 ?? 0),
+    wins200:+(d.wins200 ?? 0),
+    wins50:+(d.wins50 ?? 0),
+    winsGomita:+(d.winsGomita ?? 0),
+    totalPlays:+(d.totalPlays ?? 0)
+  };
+}                                    // merge:true asegura que solo completa campos faltantes y no borra existentes.
+
+  const s = await getDoc(MG_controlRef);                    // Lee el snapshot actual del documento de control.
+  const d = s.exists() ? (s.data() || {}) : {};             // Si existe, extrae sus datos; si no, usa objeto vacío para evitar undefined.
+
+  return {                                                  // Devuelve un objeto “normalizado” solo con números (usa + para convertir).
+    since1000:+(d.since1000||0),                            // Asegura número: si la propiedad no existe, usa 0.
+    since500:+(d.since500||0),
+    since200:+(d.since200||0),
+    since50:+(d.since50||0),
+    sinceGomita:+(d.sinceGomita||0),
+
+    wins1000:+(d.wins1000||0),                              // Totales de premios otorgados, también normalizados.
+    wins500:+(d.wins500||0),
+    wins200:+(d.wins200||0),
+    wins50:+(d.wins50||0),
+    winsGomita:+(d.winsGomita||0),
+
+    totalPlays:+(d.totalPlays||0)                           // Total de jugadas registradas.
   };
 }
 
-async function MG_realPool(){
-  const c = await MG_getControl();
+async function MG_realPool(){                               // Construye el “pool” de premios real para este tablero.
+  const c = await MG_getControl();                          // Obtiene contadores/estadísticas actuales desde Firestore.
 
-  const en = {
-    p1500 : c.since1500   >= MG_THRESH.p1500,
-    p500  : c.since500    >= MG_THRESH.p500,
-    p200  : c.since200    >= MG_THRESH.p200,
-    gomita: c.sinceGomita >= MG_THRESH.gomita
+  const en = {                                              // Flags de habilitación por umbral (true si ya se alcanzó el mínimo).
+    p1000 : c.since1000  >= MG_THRESH.p1000,                // Habilita $1000 si los tiros desde el último >= umbral.
+    p500  : c.since500   >= MG_THRESH.p500,                 // Habilita $500 según su umbral.
+    p200  : c.since200   >= MG_THRESH.p200,                 // Habilita $200 según su umbral.
+    p50   : c.since50    >= MG_THRESH.p50,                  // Habilita $50 según su umbral.
+    gomita: c.sinceGomita>= MG_THRESH.gomita                // Habilita gomitas según su umbral.
   };
 
-  const pool=[];
-  if(en.p1500) pool.push('p1500');
-  if(en.p500)  pool.push('p500');
-  for(let i=0;i<(en.p200?MG_COUNTS.p200:0);i++)   pool.push('p200');
-  for(let i=0;i<(en.gomita?MG_COUNTS.gomita:0);i++) pool.push('gomita');
-  for(let i=pool.length;i<MG_TOTAL;i++) pool.push('nada');
+  const pool=[];                                            // Arreglo final con el contenido de cada casilla (tamaño = MG_TOTAL).
 
-  for(let i=pool.length-1;i>0;i--){ const j=(Math.random()*(i+1))|0; [pool[i],pool[j]]=[pool[j],pool[i]]; }
+  if(en.p1000) pool.push('p1000');                          // Inserta 1 premio $1000 si está habilitado.
+  if(en.p500)  pool.push('p500');                           // Inserta 1 premio $500 si está habilitado.
 
-  [...MG_board.children].forEach((b,idx)=>{
-    b.dataset.MGprize = pool[idx];
-    MG_setIcon(b,'HIDDEN');
-    b.disabled=false;
-    b.onclick=()=>MG_onPick(b);
-    b.style.background="linear-gradient(135deg,#0b0f18,#0f172a)";
-    b.style.borderColor="#2b3b58";
+  for(let i=0;i<(en.p200?MG_COUNTS.p200:0);i++)             // Inserta N premios $200 si están habilitados…
+    pool.push('p200');                                      // …N proviene de MG_COUNTS.p200.
+
+  for(let i=0;i<(en.p50?MG_COUNTS.p50:0);i++)               // Inserta N premios $50 si están habilitados…
+    pool.push('p50');                                       // …N proviene de MG_COUNTS.p50.
+
+  for(let i=0;i<(en.gomita?MG_COUNTS.gomita:0);i++)         // Inserta N “gomita” si están habilitadas…
+    pool.push('gomita');                                    // …N proviene de MG_COUNTS.gomita.
+
+  for(let i=pool.length;i<MG_TOTAL;i++) pool.push('nada');  // Completa hasta MG_TOTAL con “nada” para llenar el tablero.
+
+  for(let i=pool.length-1;i>0;i--){                         // Barajado Fisher–Yates para distribuir premios aleatoriamente.
+    const j=(Math.random()*(i+1))|0;                        // Índice aleatorio entero entre 0 e i.
+    [pool[i],pool[j]]=[pool[j],pool[i]];                    // Intercambia posiciones i y j.
+  }
+
+  [...MG_board.children].forEach((b,idx)=>{                 // Asigna el contenido a cada botón/casilla del tablero.
+    b.dataset.MGprize = pool[idx];                          // Guarda el premio real en data-attribute (para usar al revelar).
+    MG_setIcon(b,'HIDDEN');                                 // Muestra el ícono de “oculto” (el signo ?), no el premio real.
+    b.disabled=false;                                       // Habilita la casilla para que pueda clicarse.
+    b.onclick=()=>MG_onPick(b);                             // Asocia el handler de click que gestiona la selección.
+    b.style.background="linear-gradient(135deg,#0b0f18,#0f172a)"; // Resetea background base visual.
+    b.style.borderColor="#2b3b58";                          // Resetea color de borde base.
   });
 
-  MG_board.dataset.fake1500   = String(!en.p1500);
-  MG_board.dataset.fake500    = String(!en.p500);
-  MG_board.dataset.fake200    = String(!en.p200);
-  MG_board.dataset.fakeGomita = String(!en.gomita);
-}
+  MG_board.dataset.fake1000  = String(!en.p1000);           // Flags para el “reveal” visual: si NO estaba habilitado…
+  MG_board.dataset.fake500   = String(!en.p500);            // …queda “true” y el reveal puede mostrar premios “falsos”
+  MG_board.dataset.fake200   = String(!en.p200);            // …solo de forma visual para completar la vitrina objetivo.
+  MG_board.dataset.fake50    = String(!en.p50);             // Estas flags no afectan el resultado final, solo la animación.
+  MG_board.dataset.fakeGomita= String(!en.gomita);
+}                                                           // Fin de MG_realPool
+
 
 /* ---------------- Click en casilla ---------------- */
 async function MG_onPick(btn){
@@ -810,9 +1118,10 @@ async function MG_onPick(btn){
 
   await MG_revealRest(btn);
 
-  if(cand==='p1500'){ MG_confetti('gold');  MG_open('success','p1500'); }
+  if(cand==='p1000'){ MG_confetti('gold');  MG_open('success','p1000'); }
   else if(cand==='p500'){ MG_confetti('gold'); MG_open('success','p500'); }
   else if(cand==='p200'){ MG_confetti('gold'); MG_open('success','p200'); }
+  else if(cand==='p50'){ MG_confetti('gold'); MG_open('success','p50'); }
   else if(cand==='gomita'){ MG_confetti('purple'); MG_open('warn','gomita'); }
   else MG_open('neutral','nada');
 }
@@ -828,7 +1137,7 @@ function MG_reveal(btn,kind){
   });
 }
 
-/* Revelado del resto: completa hasta 2×$200 y 5×gomita cuando no estén habilitados */
+/* Revelado del resto: asegura 1×$1000, 1×$500, 2×$200, 3×$50 y 7×gomita cuando no estén habilitados */
 function MG_revealRest(chosen){
   const bs=[...MG_board.children];
   const avail = bs.filter(b => b !== chosen);
@@ -837,15 +1146,19 @@ function MG_revealRest(chosen){
   const take = (n) => { const out=[]; for(let i=0;i<n && avail.length;i++){ const j=(Math.random()*avail.length)|0; out.push(avail.splice(j,1)[0]); } return out; };
 
   const fakes = [];
-  if (MG_board.dataset.fake1500 === "true" && countReal('p1500') === 0) fakes.push({k:'p1500', bs: take(1)});
+  if (MG_board.dataset.fake1000 === "true" && countReal('p1000') === 0) fakes.push({k:'p1000', bs: take(1)});
   if (MG_board.dataset.fake500  === "true" && countReal('p500')  === 0) fakes.push({k:'p500',  bs: take(1)});
 
   if (MG_board.dataset.fake200  === "true"){
-    const need200 = Math.max(0, MG_COUNTS.p200 - countReal('p200'));     // usa configuración
+    const need200 = Math.max(0, MG_COUNTS.p200 - countReal('p200'));
     if (need200 > 0) fakes.push({k:'p200',  bs: take(need200)});
   }
+  if (MG_board.dataset.fake50 === "true"){
+    const need50 = Math.max(0, MG_COUNTS.p50 - countReal('p50'));
+    if (need50 > 0) fakes.push({k:'p50',  bs: take(need50)});
+  }
   if (MG_board.dataset.fakeGomita === "true"){
-    const needG = Math.max(0, MG_COUNTS.gomita - countReal('gomita'));   // asegura 5 gomitas
+    const needG = Math.max(0, MG_COUNTS.gomita - countReal('gomita'));
     if (needG > 0) fakes.push({k:'gomita', bs: take(needG)});
   }
 
@@ -885,9 +1198,10 @@ async function MG_persist(c1,c2,phone,rawPrize){
 
   const cascade=(cand,elig)=>{
     switch(cand){
-      case 'p1500': return elig.p1500 ? 'p1500' : elig.p500 ? 'p500' : elig.p200 ? 'p200' : elig.gomita ? 'gomita' : 'nada';
-      case 'p500' : return elig.p500  ? 'p500'  : elig.p200 ? 'p200' : elig.gomita ? 'gomita' : 'nada';
-      case 'p200' : return elig.p200  ? 'p200'  : elig.gomita ? 'gomita' : 'nada';
+      case 'p1000': return elig.p1000 ? 'p1000' : elig.p500 ? 'p500' : elig.p200 ? 'p200' : elig.p50 ? 'p50' : elig.gomita ? 'gomita' : 'nada';
+      case 'p500' : return elig.p500  ? 'p500'  : elig.p200 ? 'p200' : elig.p50 ? 'p50' : elig.gomita ? 'gomita' : 'nada';
+      case 'p200' : return elig.p200  ? 'p200'  : elig.p50 ? 'p50' : elig.gomita ? 'gomita' : 'nada';
+      case 'p50'  : return elig.p50   ? 'p50'   : elig.gomita ? 'gomita' : 'nada';
       case 'gomita':return elig.gomita? 'gomita': 'nada';
       default:      return 'nada';
     }
@@ -895,7 +1209,10 @@ async function MG_persist(c1,c2,phone,rawPrize){
 
   await runTransaction(MG_db, async (tx)=>{
     const cSnap = await tx.get(MG_controlRef);
-    const cData = cSnap.exists() ? (cSnap.data()||{}) : { since1500:0, since500:0, since200:0, sinceGomita:0, wins1500:0, wins500:0, wins200:0, winsGomita:0, totalPlays:0 };
+    const cData = cSnap.exists() ? (cSnap.data()||{}) : {
+      since1000:0, since500:0, since200:0, since50:0, sinceGomita:0,
+      wins1000:0, wins500:0, wins200:0, wins50:0, winsGomita:0, totalPlays:0
+    };
 
     const s1 = await tx.get(r1), s2 = await tx.get(r2);
     if(!s1.exists() || !s2.exists()) throw new Error("Código no existe");
@@ -904,9 +1221,10 @@ async function MG_persist(c1,c2,phone,rawPrize){
       throw new Error("Código ya usado");
 
     const elig = {
-      p1500:+(cData.since1500||0)>=MG_THRESH.p1500,
+      p1000:+(cData.since1000||0)>=MG_THRESH.p1000,
       p500 :+(cData.since500 ||0)>=MG_THRESH.p500,
       p200 :+(cData.since200 ||0)>=MG_THRESH.p200,
+      p50  :+(cData.since50  ||0)>=MG_THRESH.p50,
       gomita:+(cData.sinceGomita||0)>=MG_THRESH.gomita
     };
 
@@ -917,18 +1235,20 @@ async function MG_persist(c1,c2,phone,rawPrize){
       rawPrize, finalPrize:final, createdAt:serverTimestamp()
     });
 
-    tx.set(r1,{ estado:"usado", usadoEn:"MegaJuego7x7", usadoAt:serverTimestamp(), telefono:phone, resultado:final },{ merge:true });
-    tx.set(r2,{ estado:"usado", usadoEn:"MegaJuego7x7", usadoAt:serverTimestamp(), telefono:phone, resultado:final },{ merge:true });
+    tx.set(r1,{ estado:"usado", usadoEn:"MegaJuego5x5", usadoAt:serverTimestamp(), telefono:phone, resultado:final },{ merge:true });
+    tx.set(r2,{ estado:"usado", usadoEn:"MegaJuego5x5", usadoAt:serverTimestamp(), telefono:phone, resultado:final },{ merge:true });
 
     const next = {
-      since1500:   final==='p1500' ? 0 : +(cData.since1500||0)+1,
+      since1000:   final==='p1000' ? 0 : +(cData.since1000||0)+1,
       since500 :   final==='p500'  ? 0 : +(cData.since500 ||0)+1,
       since200 :   final==='p200'  ? 0 : +(cData.since200 ||0)+1,
+      since50  :   final==='p50'   ? 0 : +(cData.since50  ||0)+1,
       sinceGomita: final==='gomita'? 0 : +(cData.sinceGomita||0)+1,
 
-      wins1500:   (cData.wins1500  ||0) + (final==='p1500'?1:0),
+      wins1000:   (cData.wins1000  ||0) + (final==='p1000'?1:0),
       wins500 :   (cData.wins500   ||0) + (final==='p500' ?1:0),
       wins200 :   (cData.wins200   ||0) + (final==='p200' ?1:0),
+      wins50  :   (cData.wins50    ||0) + (final==='p50'  ?1:0),
       winsGomita: (cData.winsGomita||0) + (final==='gomita'?1:0),
 
       totalPlays: (cData.totalPlays||0) + 1,
@@ -944,8 +1264,8 @@ function MG_open(variant,kind){
   MG_figure.innerHTML=""; MG_cardM.classList.remove('success','warn','neutral'); if(variant) MG_cardM.classList.add(variant);
   const im=document.createElement('img'); im.src=MG_icon(kind); im.alt=kind; MG_figure.appendChild(im);
 
-  if(kind==='p1500'){
-    MG_tModal.innerHTML=`<div class="MG-headline"><span class="md">¡PREMIO MAYOR!</span><br><span class="xl MG-accent">$1500</span></div>`;
+  if(kind==='p1000'){
+    MG_tModal.innerHTML=`<div class="MG-headline"><span class="md">¡PREMIO MAYOR!</span><br><span class="xl MG-accent">$1000</span></div>`;
     MG_msg.innerHTML = `<div style="text-align:center"><span style="color:#fde68a;font-weight:800">TOMA CAPTURA DE PANTALLA</span><br><span>Envíala por DM en Instagram.</span></div>`;
     MG_cta.style.display='inline-flex'; MG_cta.href=MG_IG_URL; MG_cta.textContent='Abrir Instagram';
   } else if(kind==='p500'){
@@ -955,6 +1275,10 @@ function MG_open(variant,kind){
   } else if(kind==='p200'){
     MG_tModal.innerHTML=`<div class="MG-headline"><span class="md">¡GANASTE</span> <span class="md MG-accent">$200!</span></div>`;
     MG_msg.innerHTML = `<div style="text-align:center"><span style="color:#fde68a;font-weight:800">TOMA CAPTURA DE PANTALLA</span><br><span>DM para reclamar.</span></div>`;
+    MG_cta.style.display='inline-flex'; MG_cta.href=MG_IG_URL;
+  } else if(kind==='p50'){
+    MG_tModal.innerHTML=`<div class="MG-headline"><span class="md">¡GANASTE</span> <span class="md MG-accent">$50!</span></div>`;
+    MG_msg.innerHTML = `<div style="text-align:center"><span>Presenta la captura para canjear.</span></div>`;
     MG_cta.style.display='inline-flex'; MG_cta.href=MG_IG_URL;
   } else if(kind==='gomita'){
     MG_tModal.innerHTML=`<div class="MG-headline"><span class="md">¡GOMITAS</span> <span class="md MG-accent-purple">GANADAS!</span></div>`;
@@ -1231,7 +1555,7 @@ function MG_confetti(pal='gold'){
 
   const toId = s => (s || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
 
-  const TOTAL_CASILLAS=36, PREMIO_GOMITA=3, PREMIO_DINERO=1, PREMIO_NADA=TOTAL_CASILLAS-PREMIO_GOMITA-PREMIO_DINERO;
+  const TOTAL_CASILLAS=36, PREMIO_GOMITA=6, PREMIO_DINERO=2, PREMIO_NADA=TOTAL_CASILLAS-PREMIO_GOMITA-PREMIO_DINERO;
 
   // Jackpot control
   const JACKPOT_MIN_ATTEMPTS = 200; 
@@ -1713,194 +2037,114 @@ function MG_confetti(pal='gold'){
 </script>
 <!-- ================== FIN MINI JUEGO ================== -->
 
-
-
-
-<!-- ==== AVISO BREVES BÓVEDAS ==== -->
-<section style="text-align:center; padding:20px 16px; margin:20px auto; max-width:750px; color:#cbd5e1; font-family:'Poppins',sans-serif;">
-  <h3 style="margin:0; font-size:25px; font-weight:600; color:#facc15;">
-    🔐 Bóvedas
-  </h3>
-  <p style="margin:8px auto 0; font-size:15px; line-height:1.5; max-width:500px;">
-    Detrás de cada bóveda te espera una oportunidad… <br>Elige la tuya y ve por el Premio Mayor.
-  </p>
-</section>
-
-
-<section class="rewards">
-  <div class="vault madera">
-    <img alt="Premio Madera" src="./img/Madera.png" class="imagen-recompensa imagen-madera-ajustada" />
-    <canvas class="liquid-canvas" id="canvas-madera"></canvas>
-    <p>Meta de Empaques <span class="count" data-meta="25">0</span> / 25</p>
-    <button onclick='registrarCodigo("madera")'>Registrar Código</button>
-    <div class="contenedor-tarjetas" id="tarjetas-madera"></div>
-  </div>
-
-  <div class="vault cristal">
-    <img alt="Premio Cristal" src="./img/Cristal.png" class="imagen-recompensa" />
-    <canvas class="liquid-canvas" id="canvas-cristal"></canvas>
-    <p>Meta de Empaques <span class="count" data-meta="100">0</span> / 100</p>
-    <button onclick='registrarCodigo("cristal")'>Registrar Código</button>
-    <div class="contenedor-tarjetas" id="tarjetas-cristal"></div>
-  </div>
-
-  <div class="vault plateada">
-    <img alt="Premio Plata" src="./img/plata.png" class="imagen-recompensa" />
-    <canvas class="liquid-canvas" id="canvas-plateada"></canvas>
-    <p>Meta de Empaques <span class="count" data-meta="250">0</span> / 250</p>
-    <button onclick='registrarCodigo("plateada")'>Registrar Código</button>
-    <div class="contenedor-tarjetas" id="tarjetas-plateada"></div>
-  </div>
-
-  <div class="vault dorada">
-    <img alt="Premio Oro" src="./img/oro.png" class="imagen-recompensa" />
-    <canvas class="liquid-canvas" id="canvas-dorada"></canvas>
-    <p>Meta de Empaques <span class="count" data-meta="500">0</span> / 500</p>
-    <button onclick='registrarCodigo("dorada")'>Registrar Código</button>
-    <div class="contenedor-tarjetas" id="tarjetas-dorada"></div>
-  </div>
-
-  <section class="ranking" style="width:100%;">
-    <div id="ranking-container"></div>
-    <div id="ranking-updated"></div>
-  </section>
-</section>
-
-<!-- Overlay y modal de éxito -->
-<div id="overlay" style="display:none"></div>
-<div class="custom-modal" id="customModal" style="display:none">
-  <h2>Registro con éxito</h2>
-  <p>¡Mucha suerte!</p>
-  <button onclick="closeModal()">OK</button>
-</div>
-
-<!-- ===== Modal de REGISTRO simple (sin lógica duplicada) ===== -->
-<div class="custom-modal" id="modal-registro" role="dialog" aria-modal="true" aria-labelledby="reg-title" style="display:none">
-  <h2 id="reg-title">Registrar código</h2>
-  <form id="form-registro" novalidate>
-    <input id="codigo" name="codigo" placeholder="Código (8)" maxlength="8" pattern="[A-Z0-9]{8}" required />
-    <input id="telefono" name="telefono" placeholder="Teléfono (10)" inputmode="numeric" maxlength="10" pattern="\\d{10}" required />
-    <input type="hidden" id="boveda-seleccionada" name="boveda" />
-    <div class="acciones">
-      <button type="submit">Registrar</button>
-      <button type="button" id="btn-cerrar-registro">Cancelar</button>
-    </div>
-  </form>
-</div>
-<div class="modal-overlay" id="overlay-registro" style="display:none"></div>
-
-<script>
-// Utilidad: toma SIEMPRE el último si hay duplicados
-const pickLast = (sel) => { const n = document.querySelectorAll(sel); return n[n.length-1] || null; };
-
-const $body = document.body;
-const $overlayRegistro = pickLast('#overlay-registro');
-const $modalRegistro   = pickLast('#modal-registro');
-const $formRegistro    = $modalRegistro ? $modalRegistro.querySelector('#form-registro') : null;
-const $inpCodigo       = $modalRegistro ? $modalRegistro.querySelector('#codigo') : null;
-const $inpTel          = $modalRegistro ? $modalRegistro.querySelector('#telefono') : null;
-const $inpBoveda       = $modalRegistro ? $modalRegistro.querySelector('#boveda-seleccionada') : null;
-const $btnCerrarReg    = $modalRegistro ? $modalRegistro.querySelector('#btn-cerrar-registro') : null;
-
-function safe(fn){ try{ fn(); }catch(_){} }
-function trapFocus(container){
-  const f = container.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');
-  const first = f[0], last = f[f.length-1];
-  function handler(e){
-    if(e.key !== 'Tab') return;
-    if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
-    else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
-  }
-  container.addEventListener('keydown', handler);
-  return ()=> container.removeEventListener('keydown', handler);
-}
-let untrap = null;
-
-function abrirModalRegistro(boveda){
-  if(!$modalRegistro || !$overlayRegistro) return;
-  safe(()=> $inpBoveda.value = boveda || '');
-  $overlayRegistro.style.display = 'block';
-  $modalRegistro.style.display   = 'block';
-  $body.classList.add('modal-open');
-  setTimeout(()=> safe(()=> $inpCodigo.focus()), 0);
-  untrap = trapFocus($modalRegistro);
-}
-function cerrarModalRegistro(){
-  if(!$modalRegistro || !$overlayRegistro) return;
-  $overlayRegistro.style.display = 'none';
-  $modalRegistro.style.display   = 'none';
-  $body.classList.remove('modal-open');
-  if(untrap) untrap();
-  safe(()=> $formRegistro.reset());
-}
-safe(()=> $overlayRegistro.addEventListener('click', cerrarModalRegistro));
-window.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && $overlayRegistro && $overlayRegistro.style.display==='block') cerrarModalRegistro(); });
-safe(()=> $btnCerrarReg.addEventListener('click', cerrarModalRegistro));
-
-function normalizarCodigo(v){ return (v||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8); }
-function normalizarTel(v){ return (v||'').replace(/\D/g,'').slice(0,10); }
-safe(()=> $inpCodigo.addEventListener('input', ()=> $inpCodigo.value = normalizarCodigo($inpCodigo.value)));
-safe(()=> $inpTel.addEventListener('input', ()=> $inpTel.value = normalizarTel($inpTel.value)));
-
-safe(()=> $formRegistro.addEventListener('submit', async (e)=>{
-  e.preventDefault(); e.stopImmediatePropagation(); // mata listeners viejos si los hubiera
-  const codigo   = normalizarCodigo($inpCodigo.value);
-  const telefono = normalizarTel($inpTel.value);
-  const boveda   = ($inpBoveda && $inpBoveda.value) || '';
-  if(codigo.length!==8){ alert("Código inválido."); $inpCodigo.focus(); return; }
-  if(telefono.length!==10){ alert("Teléfono inválido (10 dígitos)."); $inpTel.focus(); return; }
-
-  if(typeof window.handleRegistroCodigo === 'function'){
-    try{ const ok = await window.handleRegistroCodigo({codigo, telefono, boveda}); if(ok) cerrarModalRegistro(); }
-    catch(err){ console.error(err); alert("No se pudo registrar el código. Intenta de nuevo."); }
-  }else{
-    alert("No se encontró el manejador de registro.");
-  }
-}));
-
-window.registrarCodigo = function(boveda){ abrirModalRegistro(boveda); };
-if ($modalRegistro) {
-  $modalRegistro.addEventListener('keydown', e => e.stopPropagation(), true);
-  $modalRegistro.addEventListener('keyup',   e => e.stopPropagation(), true);
-}
-const _abrir = abrirModalRegistro;
-abrirModalRegistro = function(boveda){ _abrir(boveda); document.body.classList.add('modal-open'); };
-if ($inpCodigo) setTimeout(()=> $inpCodigo.focus(), 0);
-
-// Modal de éxito
-window.closeModal = function () {
-  document.getElementById("customModal").style.display = "none";
-  document.getElementById("overlay").style.display = "none";
-};
-
-// Info y “admin” light (igual que antes)
-const infoIcon = document.querySelector(".bi-info-circle");
-if (infoIcon) {
-  infoIcon.addEventListener("click", () => {
-    document.getElementById("infoModal").style.display = "block";
-    document.getElementById("overlay-info").style.display = "block";
-  });
-}
-window.cerrarInfoModal = function () {
-  document.getElementById("infoModal").style.display = "none";
-  document.getElementById("overlay-info").style.display = "none";
-};
-const lockIcon = document.getElementById("lock-icon");
-if (lockIcon) {
-  lockIcon.addEventListener("click", () => {
-    const usuario = prompt("Usuario:"); if (usuario == null) return;
-    const contrasena = prompt("Contraseña:"); if (contrasena == null) return;
-    if (usuario === "admin" && contrasena === "1234")      { sessionStorage.setItem("auth","true");        location.href="admin.html"; }
-    else if (usuario === "panel" && contrasena === "12345"){ sessionStorage.setItem("ventas_auth","true"); location.href="ventas.html"; }
-    else if (usuario === "vendedor" && contrasena === "123456"){ sessionStorage.setItem("vendedor_auth","true"); location.href="premios.html"; }
-    else if (usuario === "registroven" && contrasena === "1234567"){ sessionStorage.setItem("registro_auth","true"); location.href="registro-premios.html"; }
-    else { alert("Acceso denegado."); }
-  });
-}
-</script>
-
 <!-- Si tu main.obf.js pinta animaciones/lluvia, déjalo. NO incluimos funcionalidad.js para evitar choques. -->
 <script src="js/main.obf.js" type="module"></script>
+
+<!-- Contenedor de la lluvia (si ya lo tienes, omite esta línea) -->
+<div id="lluvia-container" aria-hidden="true"></div>
+<!-- Acceso por candado -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const lock = document.getElementById('lock-icon');
+  if (!lock) {
+    console.warn('No se encontró #lock-icon en el DOM.');
+    return;
+  }
+
+  // Mapa de roles -> pass, token de sesión y página de destino
+  const routes = {
+    admin:   { pass: '1234',     token: 'auth',           page: 'admin.html' },
+    panel:   { pass: '12345',     token: 'ventas_auth',    page: 'ventas.html' },
+    vendedor:   { pass: '123456', token: 'vendedor_auth',  page: 'premios.html' },
+    registroven:{ pass: '12345678',     token: 'registro_auth',  page: 'registro-premios.html' },
+    resena:  { pass: '1',       token: 'resena_auth',    page: 'resenas.html' },
+    r:       { pass: '1',       token: 'resena_auth',    page: 'resenas.html' } // alias
+  };
+
+  lock.addEventListener('click', () => {
+    const u = prompt('Usuario:');      if (u == null) return;
+    const p = prompt('Contraseña:');   if (p == null) return;
+
+    const user = String(u).trim().toLowerCase();
+    const pass = String(p).trim();
+    const cfg  = routes[user];
+
+    if (cfg && pass === cfg.pass) {
+      sessionStorage.setItem(cfg.token, 'true');
+      window.location.href = cfg.page;
+    } else {
+      alert('Acceso denegado. Usuario o contraseña incorrectos.');
+    }
+  });
+});
+</script>
+
+<!-- Lluvia de gomitas: script independiente, SIN type="module" -->
+<script>
+(() => {
+  // Usa el contenedor existente o crea uno silenciosamente
+  const cont = document.getElementById('lluvia-container') || (() => {
+    const d = document.createElement('div');
+    d.id = 'lluvia-container';
+    d.setAttribute('aria-hidden','true');
+    document.body.appendChild(d);
+    return d;
+  })();
+
+  function crearLluviaImagen() {
+    const img = new Image();
+    img.src = './img/gomita.png';   // cambia la ruta si la imagen vive en otro lado
+    img.alt = '';
+    img.className = 'gomita';
+
+    // Posición y duración aleatorias
+    img.style.left = (Math.random() * window.innerWidth) + 'px';
+    img.style.animationDuration = (2 + Math.random() * 3) + 's';
+
+    cont.appendChild(img);
+
+    // Limpieza al terminar la animación o por seguridad a los 7s
+    const kill = () => img.remove();
+    img.addEventListener('animationend', kill, { once: true });
+    setTimeout(kill, 7000);
+  }
+
+  // Lluvia continua
+  let timer = setInterval(crearLluviaImagen, 250);
+
+  // Pausa cuando la pestaña no está visible (ahorra CPU)
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      clearInterval(timer);
+      timer = null;
+    } else if (!timer) {
+      timer = setInterval(crearLluviaImagen, 250);
+    }
+  });
+})();
+</script>
+<style>
+ /* Lluvia visible pero detrás del contenido */
+#lluvia-container{
+  position: fixed;
+  inset: 0;
+  z-index: 0;           /* detrás del contenido */
+  pointer-events: none; /* no bloquea clics */
+  overflow: hidden;
+}
+
+/* Todo tu contenido normal por encima */
+header, main, section, footer, .vault, .gb-review-card{
+  position: relative;
+  z-index: 1;
+}
+
+/* Modales siguen dominando */
+.modal-overlay{ position:fixed; inset:0; z-index:10040; }
+.custom-modal{ position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); z-index:10050; }
+
+</style>
+
 
 <!-- Modal de información -->
 <div class="modal-info" id="infoModal" style="display:none">
