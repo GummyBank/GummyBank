@@ -203,35 +203,49 @@ function agregarTarjeta(boveda, codigo, telefono) {
   contenedor.prepend(tarjeta);
 }
 window.agregarTarjeta = agregarTarjeta;
-
 // =====================
-//  ADMIN "LIGHT"
+//  ADMIN "LIGHT" (normalizado)
 // =====================
 const lockIcon = document.getElementById("lock-icon");
 if (lockIcon) {
   lockIcon.addEventListener("click", () => {
-    const usuario = prompt("Usuario:");
-    if (usuario == null) return;
-    const contrasena = prompt("Contraseña:");
-    if (contrasena == null) return;
+    const usuarioRaw = prompt("Usuario:");
+    if (usuarioRaw == null) return;
+    const passRaw = prompt("Contraseña:");
+    if (passRaw == null) return;
+
+    // Normaliza entradas para evitar espacios y mayúsculas traviesas
+    const usuario = String(usuarioRaw).trim().toLowerCase();
+    const contrasena = String(passRaw).trim();
 
     if (usuario === "admin" && contrasena === "123") {
       sessionStorage.setItem("auth", "true");
       window.location.href = "admin.html";
+
     } else if (usuario === "panel" && contrasena === "123") {
       sessionStorage.setItem("ventas_auth", "true");
       window.location.href = "ventas.html";
+
     } else if (usuario === "vende" && contrasena === "encvent") {
       sessionStorage.setItem("vendedor_auth", "true");
       window.location.href = "premios.html";
+
     } else if (usuario === "registro" && contrasena === "123") {
       sessionStorage.setItem("registro_auth", "true");
       window.location.href = "registro-premios.html";
+
+    } else if (usuario === "r" && contrasena === "1") {
+      sessionStorage.setItem("resena_auth", "true");
+      window.location.href = "resenas.html";
+
     } else {
       alert("Acceso denegado. Usuario o contraseña incorrectos.");
+      // Debug opcional:
+      // console.log({usuario, contrasena});
     }
   });
 }
+
 
 // =====================
 //  MODAL INFO

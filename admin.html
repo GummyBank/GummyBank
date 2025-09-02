@@ -26,7 +26,7 @@
       --plateada-1:#bbb;   --plateada-2:#ddd;
       --dorada-1:#ffd700;  --dorada-2:#ff9900;
 
-      /* acentos mini y súper juego */
+      /* acentos mini / súper / triple3 */
       --mini-1:#7c3aed; --mini-2:#22c55e;
       --super-1:#22c55e; --super-2:#0ea5e9;
     }
@@ -128,6 +128,8 @@
     .badge.p200{background:rgba(14,159,110,.18); border-color:#199b72}
     .badge.p500{background:rgba(16,185,129,.18); border-color:#15803d}
     .badge.p1500{background:rgba(245,158,11,.18); border-color:#b45309}
+    .badge.p300{background:rgba(245,158,11,.18); border-color:#b45309}   /* $300 para Triple3 */
+    .badge.pts{background:rgba(59,130,246,.18); border-color:#2563eb}     /* 10 pts para Triple3 */
     .badge.nada{background:rgba(148,163,184,.15); border-color:#334155}
     .ts{font-size:12px; color:var(--muted)}
 
@@ -295,6 +297,26 @@
         </div>
       </article>
 
+      <!-- TRIPLE 3 (3x1) -->
+      <article class="card mini" id="triple3-card">
+        <div class="card-head">
+          <div class="vh">
+            <span class="chip">🔷 Triple 3</span>
+            <h2>Jugadas 3x1</h2>
+            <span class="vap">3 códigos, teléfono y premio</span>
+          </div>
+        </div>
+        <div class="list">
+          <ul id="lista-triple3"><li class="empty">Sin jugadas aún</li></ul>
+        </div>
+        <div class="card-foot">
+          <button class="btn btn-outline" onclick="confirmarEliminacion('triple3','ultimos')">Eliminar últimas 200</button>
+          <div class="foot-right">
+            <button class="btn btn-danger" onclick="confirmarEliminacion('triple3','todos')">Eliminar todas</button>
+          </div>
+        </div>
+      </article>
+
       <!-- SÚPER JUEGO (7x7) -->
       <article class="card super" id="super-card">
         <div class="card-head">
@@ -352,7 +374,8 @@
     const db  = getFirestore(app);
 
     const LIMITE_POR_BOVEDA = {
-      madera:25, cristal:100, plateada:250, dorada:500, minijuego:200, super:200
+      madera:25, cristal:100, plateada:250, dorada:500,
+      minijuego:200, triple3:200, super:200
     };
 
     const UL = {
@@ -361,6 +384,7 @@
       plateada:    document.getElementById("lista-plateada"),
       dorada:      document.getElementById("lista-dorada"),
       minijuego:   document.getElementById("lista-minijuego"),
+      triple3:     document.getElementById("lista-triple3"),
       super:       document.getElementById("lista-super"),
     };
 
@@ -380,6 +404,9 @@
       if (boveda === "minijuego") {
         ref = collection(db, "minijuego_plays");
         q   = query(ref, orderBy("createdAt", "desc"));
+      } else if (boveda === "triple3") {
+        ref = collection(db, "triple3_plays");
+        q   = query(ref, orderBy("createdAt", "desc"));
       } else if (boveda === "super") {
         ref = collection(db, "mega7x7_plays");
         q   = query(ref, orderBy("createdAt", "desc"));
@@ -391,7 +418,10 @@
       const snap= await getDocs(q);
 
       if (snap.empty) {
-        ul.innerHTML = `<li class="empty">${boveda==='minijuego'||boveda==='super'?'Sin jugadas aún':'Sin registros aún'}</li>`;
+        ul.innerHTML = `<li class="empty">${
+          (boveda==='minijuego'||boveda==='super'||boveda==='triple3')
+          ? 'Sin jugadas aún' : 'Sin registros aún'
+        }</li>`;
         if (boveda === "super") await cargarStatsSuper();
         return;
       }
@@ -413,6 +443,26 @@
             <span class="code">${x.codigo || "—"}</span>
             <span class="phone">${x.telefono || "—"}</span>
             <span class="${badgeClass}">${premio==='200'?'$200':(premio||'sin premio')}</span>
+            <span class="ts">${fmtFecha(x.createdAt)}</span>
+          `;
+        } else if (boveda === "triple3") {
+          const codes = Array.isArray(x.codes) ? x.codes : [];
+          const prizeKey = (x.result || "").toString().toUpperCase();
+          let badgeClass = "badge ", label = "pendiente";
+          if (prizeKey === "P300"){ badgeClass += "p300"; label = "$300"; }
+          else if (prizeKey === "GOMI"){ badgeClass += "gomita"; label = "gomitas"; }
+          else if (prizeKey === "P10"){ badgeClass += "pts"; label = "10 pts"; }
+          else if (!prizeKey){ badgeClass += "nada"; label = "—"; }
+          else { badgeClass += "nada"; label = prizeKey; }
+
+          li.innerHTML = `
+            <span class="code">${codes[0] || "—"}</span>
+            <span style="opacity:.6">+</span>
+            <span class="code">${codes[1] || "—"}</span>
+            <span style="opacity:.6">+</span>
+            <span class="code">${codes[2] || "—"}</span>
+            <span class="phone">${x.phone || x.telefono || "—"}</span>
+            <span class="${badgeClass}">${label}</span>
             <span class="ts">${fmtFecha(x.createdAt)}</span>
           `;
         } else if (boveda === "super") {
@@ -454,7 +504,6 @@
     async function cargarStatsSuper(){
       const stats = document.getElementById("super-stats");
       try{
-        // Códigos usados en el 7x7 (se guardan con usadoEn:"MegaJuego7x7")
         const qCodes = query(
           collection(db,"codigos"),
           where("usadoEn","==","MegaJuego7x7")
@@ -462,11 +511,9 @@
         const codesCountSnap = await getCountFromServer(qCodes);
         const codigosUsados = Number(codesCountSnap.data().count || 0);
 
-        // Jugadas registradas (documentos en mega7x7_plays)
         const playsCountSnap = await getCountFromServer(query(collection(db,"mega7x7_plays")));
         const jugadasRegistradas = Number(playsCountSnap.data().count || 0);
 
-        // Jugadas estimadas a partir de códigos (2 códigos = 1 jugada)
         const jugadasCalculadas = Math.floor(codigosUsados / 2);
 
         stats.textContent = `Códigos usados: ${codigosUsados} · Jugadas (códigos/2): ${jugadasCalculadas} · Registradas: ${jugadasRegistradas}`;
@@ -480,6 +527,14 @@
       let ref, q;
       if (boveda === "minijuego") {
         ref = collection(db, "minijuego_plays");
+        if (tipo === "ultimos") {
+          const cantidad = LIMITE_POR_BOVEDA[boveda] || 200;
+          q = query(ref, orderBy("createdAt","desc"), limit(cantidad));
+        } else {
+          q = query(ref);
+        }
+      } else if (boveda === "triple3") {
+        ref = collection(db, "triple3_plays");
         if (tipo === "ultimos") {
           const cantidad = LIMITE_POR_BOVEDA[boveda] || 200;
           q = query(ref, orderBy("createdAt","desc"), limit(cantidad));
@@ -510,7 +565,8 @@
       let count = 0;
       for (const d of snap.docs) {
         const col = (boveda === "minijuego") ? "minijuego_plays" :
-                    (boveda === "super") ? "mega7x7_plays" : boveda;
+                    (boveda === "triple3")   ? "triple3_plays"   :
+                    (boveda === "super")     ? "mega7x7_plays"   : boveda;
         await deleteDoc(doc(db, col, d.id));
         count++;
       }
@@ -528,7 +584,8 @@
       const limite = LIMITE_POR_BOVEDA[boveda] || 100;
       const texto = (()=>{
         const scope = boveda === 'minijuego' ? 'jugadas del Mini juego' :
-                      boveda === 'super' ? 'jugadas del Súper juego' :
+                      boveda === 'triple3'   ? 'jugadas de Triple 3' :
+                      boveda === 'super'     ? 'jugadas del Súper juego' :
                       'la bóveda ' + boveda.toUpperCase();
         return tipo === "ultimos"
           ? `Vas a eliminar los últimos ${limite} registros de ${scope}.`
@@ -555,7 +612,8 @@
         if (bovedaSeleccionada === "super") await cargarStatsSuper();
         // Feedback visual
         const cardId = bovedaSeleccionada === 'minijuego' ? 'mini-card'
-                       : bovedaSeleccionada === 'super' ? 'super-card'
+                       : bovedaSeleccionada === 'triple3'  ? 'triple3-card'
+                       : bovedaSeleccionada === 'super'    ? 'super-card'
                        : `${bovedaSeleccionada}-card`;
         const card = document.getElementById(cardId);
         card.style.boxShadow = "0 0 0 2px rgba(34,197,94,.35), 0 12px 40px rgba(0,0,0,.28)";
@@ -564,7 +622,7 @@
     });
 
     // Inicial
-    ["madera","cristal","plateada","dorada","minijuego","super"].forEach(cargarRegistros);
+    ["madera","cristal","plateada","dorada","minijuego","triple3","super"].forEach(cargarRegistros);
     cargarStatsSuper();
   </script>
 

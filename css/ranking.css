@@ -1,0 +1,245 @@
+/* =========================
+   RANKING · AZUL SÓLIDO + CONTORNOS BRILLANTES
+   ========================= */
+
+:root{
+  --panel:#0a1c35;     /* azul oscuro */
+  --card:#0d2547;      /* un poco más claro */
+  --ink:#ffffff;       /* texto blanco */
+  --muted:#cbd5e1;     /* gris claro */
+  --accent:#00bfff;    /* azul neón */
+  --rowH:58px;
+}
+
+/* ===== Header & Main a 90% ancho ===== */
+header > .wrap,
+main.wrap{
+  width:100%;
+  max-width:1100px;
+  margin:0 auto;
+}
+
+/* ===== Header Ranking ===== */
+header > .wrap{
+  color:var(--ink);
+  background:var(--panel);
+  border:2px solid #fff;
+  border-radius:14px;
+  padding:12px 14px;
+  margin:10px auto 12px;
+  box-shadow:0 0 12px rgba(255,255,255,.9), 0 0 24px rgba(0,191,255,.5);
+}
+header .wrap h1{ margin:0 0 4px; font-weight:700; letter-spacing:.2px }
+header .wrap .sub{ margin:0; color:var(--muted); font-size:.95rem }
+
+/* ===== Podio ===== */
+.top-grid{
+  display:grid; grid-template-columns:1fr;
+  gap:12px; margin:14px 0 18px;
+}
+@media (min-width:640px){
+  .top-grid{ grid-template-columns:1.1fr .9fr .9fr }
+}
+
+.top-card{
+  display:flex; align-items:center; gap:10px; min-height:74px;
+  background:var(--card);
+  border:2px solid #fff;
+  border-radius:25px; padding:10px 12px 12px;
+  box-shadow:0 0 12px rgba(255,255,255,.8), 0 0 32px rgba(0,191,255,.6);
+  transition:transform .15s ease;
+}
+.top-card:hover{ transform:translateY(-2px) }
+
+.medal{
+  width:38px; height:38px; border-radius:50%;
+  display:grid; place-items:center; font-weight:700; font-size:.95rem;
+  border:2px solid #fff; box-shadow:0 0 8px rgba(255,255,255,.8);
+}
+.m1{ background:gold; color:#000 }
+.m2{ background:silver; color:#000 }
+.m3{ background:#cd7f32; color:#fff }
+
+.user{ font-weight:600; font-size:.98rem; color:var(--ink); margin-bottom:8px }
+.meta{ color:var(--muted); font-size:.85rem; margin-top:0 }
+.score{ margin-left:auto; font-weight:700; font-size:1.05rem; color:var(--ink) }
+.prize{
+  font-size:.85rem;
+  color:#e6f6ff;
+  font-weight:700;
+  letter-spacing:.2px;
+  text-shadow:
+    0 0 6px rgba(0,191,255,.9),
+    0 0 16px rgba(0,191,255,.6),
+    0 0 28px rgba(0,191,255,.4);
+  animation: prizePulse 2.2s ease-in-out infinite, prizeFlicker 7s linear infinite;
+}
+
+/* ===== Lista ===== */
+.list{
+  background:var(--card);
+  border:2px solid #fff;
+  border-radius:30px;
+  overflow-y:auto;
+  max-height:calc(var(--rowH) * 7);
+  box-shadow:0 0 12px rgba(255,255,255,.8), 0 0 24px rgba(0,191,255,.5);
+}
+.row{
+  display:grid; grid-template-columns:48px 1fr 1fr; gap:3px;
+  align-items:center; padding:3px 12px; min-height:52px;
+  border-bottom:1px solid rgba(255,255,255,.5);
+  transition:background .15s ease;
+}
+.row:last-child{ border-bottom:none }
+.row:hover{ background:rgba(255,255,255,.12) }
+
+.rank{ color:var(--muted); font-weight:700; text-align:center; font-size:.95rem }
+.uname{ font-weight:600; font-size:.95rem; color:var(--ink) }
+.rscore{ font-weight:700; justify-self:end; font-size:1rem; color:var(--ink) }
+.badge{
+  display:inline-block; margin-left:8px;
+  padding:3px 10px;
+  border-radius:9999px;
+  border:2px solid #fff;
+  background:#00bfff;
+  color:#001521;
+  font-weight:800;
+  box-shadow:
+    0 0 8px rgba(255,255,255,.9),
+    0 0 18px rgba(0,191,255,.9),
+    inset 0 0 6px rgba(255,255,255,.6);
+  animation: badgePulse 1.8s ease-in-out infinite;
+}
+
+/* Scrollbar custom */
+.list::-webkit-scrollbar{ width:10px }
+.list::-webkit-scrollbar-track{ background:rgba(255,255,255,.1); border-radius:12px }
+.list::-webkit-scrollbar-thumb{
+  background:var(--accent);
+  border-radius:12px;
+  border:2px solid #fff;
+  box-shadow:0 0 6px rgba(0,191,255,.8);
+}
+
+/* ===== Animaciones ===== */
+@keyframes prizePulse{
+  0%,100%{ filter:drop-shadow(0 0 0 rgba(0,191,255,0)); opacity:.95 }
+  50%    { filter:drop-shadow(0 0 10px rgba(0,191,255,.85)); opacity:1 }
+}
+@keyframes prizeFlicker{
+  0%,97%,100%{ opacity:1 }
+  98%       { opacity:.75 }
+  99%       { opacity:.4 }
+}
+@keyframes badgePulse{
+  0%,100%{
+    box-shadow:
+      0 0 8px rgba(255,255,255,.85),
+      0 0 18px rgba(0,191,255,.8),
+      inset 0 0 6px rgba(255,255,255,.55);
+    transform:scale(1);
+  }
+  50%{
+    box-shadow:
+      0 0 12px rgba(255,255,255,1),
+      0 0 26px rgba(0,191,255,1),
+      inset 0 0 10px rgba(255,255,255,.8);
+    transform:scale(1.04);
+  }
+}
+
+/* ===== Contador ===== */
+.rk-hero{
+  background:#0a1c35; border:2px solid #fff; border-radius:16px;
+  padding:14px 16px; box-shadow:0 0 12px rgba(255,255,255,.9), 0 0 24px rgba(0,191,255,.5);
+}
+.cd{ display:flex; align-items:center; gap:10px; margin-top:8px }
+.cd-label{ color:#e6f6ff; font-weight:700; text-shadow:0 0 8px rgba(0,191,255,.8) }
+.cd-wrap{ display:flex; align-items:stretch; gap:8px }
+.cd-box{
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  min-width:64px; padding:6px 10px; background:#0d2547; color:#fff;
+  border:2px solid #fff; border-radius:14px;
+  box-shadow:0 0 10px rgba(255,255,255,.9), 0 0 16px rgba(0,191,255,.6);
+}
+.cd-num{ font:800 24px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing:.5px }
+.cd-unit{ font-size:12px; color:#cfe9ff; letter-spacing:.4px }
+.cd-colon{
+  align-self:stretch; display:flex; align-items:center; justify-content:center;
+  font:800 22px/1 ui-monospace, monospace; color:#e6f6ff;
+  text-shadow:0 0 8px rgba(0,191,255,.7);
+}
+
+/* Compacto en móvil */
+@media(max-width:500px){
+  .row{ grid-template-columns:40px 1.4fr .8fr }
+}
+@media(max-width:420px){
+  :root{ --rowH:54px }
+  .top-card{ min-height:70px }
+  .medal{ width:36px; height:36px; font-size:.9rem }
+  .user{ font-size:.92rem }
+  .meta{ font-size:.8rem }
+  .score{ font-size:1rem }
+  .cd-wrap{ gap:6px }
+  .cd-box{ min-width:56px; padding:6px 8px; border-radius:12px }
+  .cd-num{ font-size:20px }
+}
+
+/* ====== COUNTDOWN DENTRO DE MODAL ====== */
+
+/* Asegura que el modal no corte contenido horizontal */
+.modal{ overflow: hidden }              /* por si tienes sombras internas muy gordas */
+
+/* Contenedor del countdown: ocupa 100% y nunca desborda */
+.modal .cd{
+  width: 100%;
+  max-width: 100%;
+  margin-top: 8px;
+}
+
+/* Cambiamos flex por GRID para que se auto-ajuste */
+.modal .cd-wrap{
+  display: grid;
+  grid-template-columns: repeat(4, minmax(66px, 1fr)); /* 4 columnas si cabe */
+  gap: 8px;
+  width: 100%;
+}
+
+/* Las cajas ya no exigen ancho mínimo gigante */
+.modal .cd-box{
+  min-width: 0;              /* clave para que no empuje el grid */
+  padding: 6px 8px;          /* un poco más compacto */
+  border-radius: 12px;
+}
+
+/* Tipografías que escalan y no rompen */
+.modal .cd-num{
+  font: 800 clamp(16px, 5vw, 20px)/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  letter-spacing: .3px;
+}
+.modal .cd-unit{
+  font-size: clamp(10px, 3.2vw, 12px);
+}
+
+/* Ajustes ultra-compactos por viewport pequeño del modal */
+@media (max-width: 400px){
+  .modal .cd-wrap{
+    grid-template-columns: repeat(2, minmax(66px, 1fr)); /* 2 columnas apiladas */
+    gap: 6px;
+  }
+  .modal .cd-box{ padding: 6px 6px; border-radius: 10px }
+}
+
+/* Si tu modal es más angosto aún (teléfonos liliput) */
+@media (max-width: 320px){
+  .modal .cd-wrap{
+    grid-template-columns: repeat(2, minmax(60px, 1fr));
+    gap: 5px;
+  }
+  .modal .cd-box{ padding: 5px 6px }
+}
+
+/* Por si te gusta que el contenido se encoja mejor que tu paciencia */
+.modal .cd-wrap,
+.modal .cd-box{ box-sizing: border-box }

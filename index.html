@@ -5,23 +5,28 @@
     <meta content="width=device-width,initial-scale=1" name="viewport" />
     <title>GummyBank</title>
     <link href="css/styles.css" rel="stylesheet" />
+    <!-- Desaign Ranking-->
+    <link href="css/ranking.css" rel="stylesheet" />
+    <!-- Desaign Fondo-->
+    <link rel="stylesheet" href="css/Fx.css">
+    <!-- Desaign RESEÑAS -->
+    <link rel="stylesheet" href="css/review.css?v=1">
+    <!-- Fuente -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Desaign MEGA 5X5-->
+    <link rel="stylesheet" href="css/mini6x6.css">
+    <!-- Desaign MEGA 5X5-->
+    <link rel="stylesheet" href="css/mega5x5.css?v=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
     <style>
 /* ====== Marca/Imágenes ====== */
 #logo-gummy-bank{width:90vw;max-width:1000px;height:auto;display:block;margin:20px auto}
 .imagen-recompensa{width:90vw;max-width:1000px;height:auto;display:block;margin:20px auto;margin-left:-5px}
 .imagen-madera-ajustada{transform:scale(1.04);margin-left:-15px}
-
-/* ====== Bóvedas ====== */
-.vault.cristal{box-shadow:0 0 20px rgba(0,255,255,.5);border:2px solid rgba(0,255,255,.4)}
-.vault.plateada{box-shadow:0 0 20px rgba(200,200,200,.5);border:2px solid rgba(180,180,180,.4)}
-.vault.dorada{box-shadow:0 0 20px rgba(255,215,0,.5);border:2px solid rgba(255,215,0,.4)}
-.vault.cristal button{background:linear-gradient(90deg,#00eaff,#00bfff)}
-.vault.plateada button{background:linear-gradient(90deg,#aaa,#ddd);color:#000}
-.vault.dorada button{background:linear-gradient(90deg,gold,#f90)}
-.vault.madera{box-shadow:0 0 20px rgba(139,69,19,.6);border:2px solid rgba(160,82,45,.5);background:linear-gradient(135deg,#8b5a2b,#deb887);color:#fff}
-.vault.madera button{background:linear-gradient(90deg,#8b4513,#d2b48c);color:#fff}
 
 /* ====== Lluvia: SIEMPRE al fondo ====== */
 #lluvia-container{position:fixed;inset:0;z-index:-1;pointer-events:none}
@@ -31,200 +36,290 @@ main,header,section.rewards,#mini-juego,.vault{position:relative;z-index:1}
 .modal-overlay{position:fixed;inset:0;display:none;z-index:10040;background:rgba(0,0,0,.55);backdrop-filter:blur(2px)}
 .custom-modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:10050}
 
-/* ====== Modal de registro ====== */
-#modal-registro.custom-modal{width:min(420px,92vw);padding:18px 16px}
-#modal-registro{max-width:420px;width:92vw;box-sizing:border-box}
-#modal-registro h2{margin:0 0 12px;font-size:20px;color:#e7ecf3;text-align:center}
-#modal-registro form{margin:0;display:grid;gap:10px}
-#modal-registro input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid #2b3b55;background:#0f172a;color:#e7ecf3;outline:none;box-sizing:border-box}
-#modal-registro input::placeholder{color:#8aa0c2}
-#modal-registro input:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.25)}
-#modal-registro .acciones{display:grid;gap:8px;margin-top:4px}
-#modal-registro button{width:100%;padding:12px 14px;border-radius:12px;border:1px solid transparent;font-weight:600;cursor:pointer;transition:transform .12s ease,box-shadow .12s ease,filter .12s ease;box-sizing:border-box}
-#modal-registro button[type="submit"]{background:linear-gradient(90deg,#22c55e,#84cc16);color:#0b1220}
-#modal-registro button[type="button"]{background:#111827;color:#e5e7eb;border-color:#263042}
-#modal-registro button:active{transform:translateY(1px)}
-body.modal-open{overflow:hidden}
-#modal-registro input,#modal-registro button{pointer-events:auto}
+/* 1) Guardarraíles globales (adiós scroll lateral) */
+*,
+*::before,
+*::after { box-sizing: border-box; }
 
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip; /* mejor que hidden, no deja hacer scroll ni con momentum */
+}
+
+/* 2) Nada debe medir más que el viewport por culpa de 100vw */
+img, video, canvas, svg { max-width: 100%; height: auto; display: block; }
+
+/* 3) Contenedores principales: nunca más anchos que la pantalla */
+#MG-juego, #mini-juego, .mini-section, #MG-head, .header-canvas, #MG-shell, #MG-board-box, #MG-board {
+  max-width: 100%;
+}
+
+/* 4) Si usaste 100vw en algún lado, neutralízalo sin romper layout */
+[class*="full"], [class*="vw"], .header-img, #MG-title {
+  width: 100% !important;  /* reemplaza 100vw */
+}
+
+/* 5) Fondos/adorno ABS que a veces rebasan (billetes, rayos, etc.) */
+.bg-floating, .bill, .money, .decor, .particles {
+  max-width: 100%;
+  overflow: clip;
+  /* y que su contenedor NO derrame */
+}
+body, #app, #page, .page-wrap { overflow-x: clip; }
     </style>
   </head>
 
+  <style>
+  /* ===== GummyBank: Topbar negra, sin bordes, glow blanco pulsante ===== */
+
+header .gb-topbar{
+  display:flex; align-items:center; justify-content:space-between; gap:14px;
+  width:100%;
+  padding:10px 14px;
+  background:#000 !important;          /* negro real */
+  color:#fff !important;
+  border-radius:0 !important;           /* sin esquinas */
+  border:none !important;
+  position:relative; isolation:isolate; z-index:50;
+
+  /* pulso de luz */
+  box-shadow:
+    0 0 10px rgba(255,255,255,.22),
+    0 10px 26px rgba(255,255,255,.10);
+  animation: gbTopbarGlow 1.6s ease-in-out infinite;
+}
+
+/* mata cualquier overlay previo que la ensucie */
+header .gb-topbar::before,
+header .gb-topbar::after{
+  content:none !important;
+}
+
+/* marca izquierda */
+header .gb-left .gb-brand{
+  display:inline-flex; align-items:center; gap:8px;
+  color:#ffffff !important;
+  text-decoration:none !important;
+  font-weight:600;
+}
+header .gb-left .gb-brand:visited{ color:#ffffff !important; }
+
+/* icono IG y textos */
+header .gb-left .bi{ font-size:22px; color:#ffffff !important; text-shadow:0 0 10px rgba(255,255,255,.65); }
+header .gb-brand-text{ color:#ffffff; }
+
+/* acciones derechas */
+header .gb-actions{ display:flex; align-items:center; gap:12px; }
+header .gb-actions .bi{
+  font-size:20px; color:#ffffff !important;
+  text-shadow:0 0 10px rgba(255,255,255,.65);
+  transition:transform .15s ease, text-shadow .15s ease;
+}
+header .gb-actions .bi:hover{ transform:translateY(-1px); text-shadow:0 0 14px rgba(255,255,255,.85); }
+
+/* candado/persona */
+#lock-icon.gb-lock{
+  font-size:20px; color:#ffffff !important;
+  text-shadow:0 0 10px rgba(255,255,255,.65);
+}
+
+/* animaciones del glow */
+@keyframes gbTopbarGlow{
+  0%,100%{
+    box-shadow:
+      0 0 10px rgba(255,255,255,.22),
+      0 10px 26px rgba(255,255,255,.10);
+  }
+  50%{
+    box-shadow:
+      0 0 28px rgba(255,255,255,.70),
+      0 0 40px rgba(255,255,255,.28);
+  }
+}
+
+/* responsive suave */
+@media (max-width:420px){
+  header .gb-topbar{ padding:8px 12px; }
+  header .gb-left .bi{ font-size:20px; }
+}
+  </style>
+
   <body>
+    <canvas id="fx"></canvas>
     <div id="lluvia-container" aria-hidden="true"></div>
-    <header>
-      <div class="top-bar">
-        <div class="left-group">
-          <a href="https://www.instagram.com/gummybank?igsh=MW82Z3hvN2VjbWYxZw%3D%3D&utm_source=qr" target="_blank" style="text-decoration:none">
-            <i class="bi bi-instagram"><span> gummybank</span></i>
-          </a>
-        </div>
-        <div class="icon-question" style="display:flex;align-items:center;gap:10px">
-          <i class="bi bi-info-circle" aria-label="Información"></i>
-          <span id="lock-icon" style="cursor:pointer;font-size:20px" aria-label="Administrador">🔒</span>
-        </div>
-      </div>
-    </header>
+     <header>
+  <div class="gb-topbar">
+    <!-- Lado izquierdo con Instagram botón -->
+     
+    <div class="gb-left">
+      <a class="gb-instagram-btn"
+         href="https://www.instagram.com/gummybank?igsh=MW82Z3hvN2VjbWYxZw%3D%3D&utm_source=qr"
+         target="_blank" rel="noopener noreferrer">
+       <!-- Icono IG correcto -->
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" 
+     viewBox="0 0 448 512" fill="white" style="margin-right:6px;">
+  <path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9S160.5 370.8 
+           224.1 370.8 339 319.5 339 255.9 287.7 141 224.1 
+           141zm0 189.6c-41.2 0-74.7-33.4-74.7-74.7s33.4-74.7 
+           74.7-74.7 74.7 33.4 74.7 74.7-33.5 74.7-74.7 
+           74.7zm146.4-194.3c0 14.9-12 26.8-26.8 
+           26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 
+           26.8-26.8 26.8 12 26.8 26.8zm76.1 
+           27.2c-1.7-35.7-9.9-67.3-36.2-93.5s-57.8-34.5-93.5-36.2C293.3 
+           32 280.6 32 224 32s-69.3 0-92.8 1.7c-35.7 
+           1.7-67.3 9.9-93.5 36.2s-34.5 57.8-36.2 
+           93.5C0 178.7 0 191.4 0 248s0 69.3 1.7 
+           92.8c1.7 35.7 9.9 67.3 36.2 93.5 26.2 
+           26.2 57.8 34.5 93.5 36.2 23.6 1.7 36.3 
+           1.7 92.8 1.7s69.3 0 92.8-1.7c35.7-1.7 
+           67.3-9.9 93.5-36.2 26.2-26.2 34.5-57.8 
+           36.2-93.5 1.7-23.6 1.7-36.3 1.7-92.8s0-69.3-1.7-92.8zM398.8 
+           388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 
+           11.7-99.5 9-132.2 9s-102.7 2.6-132.2-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.2s-2.6-102.7 
+           9-132.2c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 
+           99.5-9 132.2-9s102.7-2.6 132.2 9c19.6 
+           7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 
+           99.5 9 132.2s2.7 102.7-9 132.2z"/>
+</svg>
+        Follow on Instagram
+      </a>
+    </div>
+
+     <!-- Texto desplazándose -->
+    <div class="gb-marquee">
+      <span>GummyBank x Twenty Five | Sigue nuestras redes.</span>
+    </div>
+    <style>
+.gb-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  background: #111;
+  color: #fff;
+  overflow: hidden;
+}
+
+/* Marquee */
+.gb-marquee {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  height: 24px;
+  margin: 0 12px;
+}
+
+.gb-marquee span {
+  position: absolute;
+  white-space: nowrap;
+  will-change: transform;
+  animation: marquee 12s linear infinite;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  color: #fff;
+  opacity: 0.85;
+}
+
+@keyframes marquee {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(-100%); }
+}
+</style>
+
+    <!-- Lado derecho con íconos -->
+    <div class="gb-actions">
+      <i class="bi bi-info-circle" aria-label="Información"></i>
+      <i id="lock-icon" class="bi bi-person-circle gb-lock" aria-label="Administrador"></i>
+    </div>
+  </div>
+</header>
+
+<style>
+  .gb-instagram-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  background: #000; /* negro sólido */
+  color: #fff;
+  text-decoration: none;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 30px;
+  border: 2px solid rgba(255,255,255,0.2); /* contorno transparente */
+  box-shadow: 0 0 10px rgba(255,255,255,0.3); /* brillo difuso */
+  transition: all 0.3s ease;
+}
+
+.gb-instagram-btn svg {
+  flex-shrink: 0;
+}
+
+.gb-instagram-btn:hover {
+  box-shadow: 0 0 18px rgba(255,255,255,0.6), 
+              0 0 28px rgba(255,255,255,0.3);
+  transform: translateY(-2px); /* pequeño levantón */
+  border-color: rgba(255,255,255,0.4);
+}
+
+</style>
+
 
     <main>
       <div id="lluvia-container"></div>
+      <style>
+        /* ===== Header image full-width + fade vertical (solo top/bottom) ===== */
+.animated-bag{
+  width: 100%;
+  margin: 12px auto;
+  overflow: visible;          /* nada recortado a los lados */
+}
 
+#logo-gummy-bank{
+  display: block;
+  width: 100%;                /* ocupa el 100% del ancho del contenedor/pantalla */
+  height: auto;
+  max-width: none;
+  border-radius: 0;
+
+  /* Ajusta cuánto se difumina arriba/abajo */
+  --fade: 15%;                /* 10–18% suele verse bien */
+
+  /* Máscara vertical: transparente en los bordes, opaco en el centro */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0) 0%,
+    #000 var(--fade),
+    #000 calc(100% - var(--fade)),
+    rgba(0,0,0,0) 100%
+  );
+          mask-image: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0) 0%,
+    #000 var(--fade),
+    #000 calc(100% - var(--fade)),
+    rgba(0,0,0,0) 100%
+  );
+
+  /* por si algún navegador decide ponerse creativo */
+  -webkit-mask-size: 100% 100%;
+          mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+          mask-repeat: no-repeat;
+
+  /* ligera sombra para separarlo del fondo */
+  filter: drop-shadow(0 14px 40px rgba(0,0,0,.35));
+}
+      </style>
       <div class="animated-bag">
         <img alt="Gummy Bank" src="img/titulo.jpg" id="logo-gummy-bank" />
       </div>
 
-      <!-- ================== TEASER: NUEVO JUEGO PRÓXIMAMENTE ================== 
-<section id="teaser-nuevo-juego" style="width:92%;max-width:920px;margin:28px auto 48px;isolation:isolate">
-  <style>
-    /* Scope para evitar choques de estilos */
-    #teaser-nuevo-juego{
-      --bg:#0b1220; --panel:#0f172a; --line:#2b3750; --ink:#e7ecf3; --muted:#9fb0c9;
-      --accent1:#22d3ee; --accent2:#a78bfa; --accent3:#34d399; --glow:rgba(34,211,238,.25);
-      position:relative;
-    }
-    #teaser-nuevo-juego .wrap{
-      position:relative;border-radius:20px;border:1px solid var(--line);
-      padding:18px; background:
-        radial-gradient(900px 400px at 10% -10%, rgba(167,139,250,.16), transparent 60%),
-        radial-gradient(900px 400px at 110% 110%, rgba(52,211,153,.14), transparent 60%),
-        linear-gradient(180deg, rgba(31,41,55,.35), transparent 40%),
-        var(--panel);
-      box-shadow:0 24px 80px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.02);
-      overflow:hidden;
-    }
-    /* Glow orbes de fondo */
-    #teaser-nuevo-juego .orb{
-      position:absolute; border-radius:999px; filter:blur(32px); opacity:.6; mix-blend-mode:screen;
-      animation: floaty 9s ease-in-out infinite;
-    }
-    #teaser-nuevo-juego .orb.a{ width:220px; height:220px; background:radial-gradient(circle at 30% 30%, var(--accent1), transparent 60%); top:-40px; left:-40px; }
-    #teaser-nuevo-juego .orb.b{ width:260px; height:260px; background:radial-gradient(circle at 70% 70%, var(--accent2), transparent 60%); bottom:-60px; right:-60px; animation-delay: -2s; }
-    @keyframes floaty{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
 
-    /* Header */
-    #teaser-nuevo-juego .header{
-      text-align:center; color:var(--ink); margin:6px 8px 10px;
-    }
-    #teaser-nuevo-juego .kicker{
-      display:inline-block; padding:6px 10px; border:1px solid var(--line); border-radius:999px;
-      font-size:12px; letter-spacing:.35px; text-transform:uppercase; color:var(--muted);
-      background:rgba(2,6,23,.5);
-    }
-    #teaser-nuevo-juego .title{
-      margin:6px 0 0; line-height:1.02; font-weight:900;
-      font-size:clamp(28px, 6.5vw, 56px);
-      letter-spacing:.2px;
-      background:linear-gradient(90deg, var(--accent1), var(--accent2));
-      -webkit-background-clip:text; background-clip:text; color:transparent;
-      text-shadow:0 10px 36px var(--glow);
-    }
-    #teaser-nuevo-juego .subtitle{
-      margin:6px auto 0; color:#cbd5e1; font-size:clamp(14px,2.7vw,18px); max-width:60ch;
-    }
 
-    /* Countdown */
-    #teaser-nuevo-juego .countdown{
-      margin:16px auto 8px; width:min(760px, 96%); display:grid; gap:10px;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-    #teaser-nuevo-juego .slot{
-      position:relative; background:linear-gradient(135deg, #0e1420, #0b0f18);
-      border:1px solid var(--line); border-radius:16px; padding:14px 10px;
-      text-align:center; color:var(--ink); box-shadow:0 10px 28px rgba(0,0,0,.35);
-    }
-    #teaser-nuevo-juego .num{
-      font-weight:900; line-height:1; letter-spacing:.5px;
-      font-size:clamp(26px, 7.2vw, 42px);
-      text-shadow:0 8px 26px rgba(0,0,0,.35);
-    }
-    #teaser-nuevo-juego .label{
-      display:block; margin-top:4px; color:var(--muted); font-size:clamp(11px,2.7vw,13px); letter-spacing:.3px;
-      text-transform:uppercase;
-    }
 
-    /* Footer con fecha y CTA fantasma */
-    #teaser-nuevo-juego .footer{
-      margin:14px auto 6px; text-align:center; color:var(--muted);
-      font-size:clamp(12px,2.5vw,14px);
-    }
-
-    /* Responsive tweaks */
-    @media (max-width:560px){
-      #teaser-nuevo-juego .wrap{ padding:14px }
-      #teaser-nuevo-juego .countdown{ gap:8px }
-      #teaser-nuevo-juego .slot{ padding:12px 8px; border-radius:14px }
-    }
-  </style>
-
-  <div class="wrap">
-    <div class="orb a"></div>
-    
-
-    <header class="header">
-      <span class="kicker">NUEVO JUEGO</span>
-      <h2 class="title">PRÓXIMAMENTE</h2>
-      <p class="subtitle">Cuenta regresiva para el lanzamiento del nuevo juego. Prueba tu suerte.</p>
-    </header>
-
-    <div class="countdown" aria-live="polite">
-      <div class="slot"><div id="cd-days" class="num">--</div><span class="label">Días</span></div>
-      <div class="slot"><div id="cd-hours" class="num">--</div><span class="label">Horas</span></div>
-      <div class="slot"><div id="cd-mins" class="num">--</div><span class="label">Min</span></div>
-      <div class="slot"><div id="cd-secs" class="num">--</div><span class="label">Seg</span></div>
-    </div>
-
-    <p id="cd-footer" class="footer">Lunes 1 de septiembre</p>
-  </div>
-
-  <script>
-    // Objetivo: Lunes 1 septiembre 2025 07:00 AM (hora local del visitante)
-    // Mes 0-indexado: 8 = septiembre
-    const TARGET = new Date(2025, 8, 1, 7, 0, 0, 0);
-
-    const elDays = document.getElementById('cd-days');
-    const elHours = document.getElementById('cd-hours');
-    const elMins = document.getElementById('cd-mins');
-    const elSecs = document.getElementById('cd-secs');
-    const elFooter = document.getElementById('cd-footer');
-
-    function pad(n){ return n < 10 ? '0' + n : '' + n; }
-
-    function render(){
-      const now = new Date();
-      let diff = TARGET - now;
-
-      if (diff <= 0){
-        // Si ya es la hora, congelamos a 00 y cambiamos leyenda
-        elDays.textContent = '00';
-        elHours.textContent = '00';
-        elMins.textContent = '00';
-        elSecs.textContent = '00';
-        elFooter.textContent = '¡ES HOY! 7:00 AM';
-        return;
-      }
-
-      const sec = Math.floor(diff / 1000);
-      const days = Math.floor(sec / 86400);
-      const hrs  = Math.floor((sec % 86400) / 3600);
-      const mins = Math.floor((sec % 3600) / 60);
-      const secs = sec % 60;
-
-      elDays.textContent  = pad(days);
-      elHours.textContent = pad(hrs);
-      elMins.textContent  = pad(mins);
-      elSecs.textContent  = pad(secs);
-    }
-
-    render();
-    const _cdTimer = setInterval(()=>{
-      render();
-      if (new Date() >= TARGET) clearInterval(_cdTimer);
-    }, 1000);
-  </script>
-</section>
-================== FIN TEASER ================== -->
-
-<!-- ====== BARRA PROMO 40px CON COUNTDOWN A LAS 5:00 PM ====== -->
+<!-- ====== BARRA PROMO 40px CON COUNTDOWN A LAS 5:00 PM ====== 
 
 <div id="MG-promo-bar" role="status" aria-live="polite">
   <center>
@@ -307,27 +402,27 @@ body.modal-open{overflow:hidden}
     setInterval(tick, 1000);
   })();
 </script>
-<!-- Bloque compacto · GummyBank · pega tal cual -->
-<!-- ====== CARD: Deja tu reseña · GummyBank ====== -->
-<!-- ====== CARD: Deja tu reseña · GummyBank (no modal) ====== -->
+-->
+
+<!-- RESEÑAS  
 <section class="gb-review-card" aria-labelledby="grc-title">
   <center>
-  <h3 id="grc-title">Tu opinión cuenta</h3>
-  <p class="grc-sub">
-    <center>
-    Déjanos tu reseña y participa por
-    <strong class="grc-badge">5 paquetes de gomitas y $100 pesos</strong>
-    <span class="grc-meta">Entrega: <strong>Lunes</strong></span>
-    </center>
-  </p>
+    <h3 id="grc-title">Tu opinión cuenta</h3>
+    <p class="grc-sub">
+      <center>
+        Déjanos tu reseña y participa por
+        <strong class="grc-badge">5 paquetes de gomitas y $100 pesos</strong>
+        <span class="grc-meta">Entrega: <strong>Lunes</strong></span>
+      </center>
+    </p>
   </center>
 
   <form id="grc-form" novalidate>
     <label class="grc-lab" for="grc-tel">Número de teléfono (Tu boleto)</label>
     <input id="grc-tel" name="telefono" inputmode="numeric" autocomplete="tel"
-           placeholder="10 dígitos" class="grc-inp" required minlength="8" maxlength="15" />
+    placeholder="10 dígitos" class="grc-inp" required minlength="8" maxlength="15" />
 
-    <label class="grc-lab" for="grc-txt">Tu reseña (Confirmacion de participación)</label>
+    <label class="grc-lab" for="grc-txt">Tu reseña (Confirmación de participación)</label>
     <textarea id="grc-txt" name="resena" class="grc-ta" rows="4"
               placeholder="¿Qué te parece GummyBank?" required minlength="5" maxlength="600"></textarea>
 
@@ -340,1744 +435,695 @@ body.modal-open{overflow:hidden}
     <p id="grc-msg" class="grc-msg" aria-live="polite"></p>
   </form>
 </section>
-
-<style>
-  :root{
-  --bg:#0f1115; --panel:#11151d; --line:#243041; --ink:#e7ecf3;
-  --muted:#9fb0c9; --accent:#1f6feb; --accent-2:#00bfff;
-  --ok:#22c55e; --warn:#f59e0b; --err:#ef4444;
-}
-
-/* ===== Card base ===== */
-.gb-review-card{
-  /* que NO tape la lluvia */
-  position: relative;      /* la card queda sobre la lluvia */
-  z-index: 1;
-
-  max-width: min(92vw, 560px);
-  width: 100%;
-  margin: 18px auto;
-  padding: 14px;
-  border-radius: 16px;
-
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Poppins, sans-serif;
-  color: var(--ink);
-  background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.16));
-  border: 1px solid color-mix(in srgb, var(--line), transparent 35%);
-  box-shadow: 0 8px 24px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.04);
-
-  box-sizing: border-box;
-  overflow: hidden;  /* solo corta cosas DENTRO de la card, no la lluvia global */
-  /* contain: inline-size;  ← si tu lluvia está dentro del mismo árbol, puede dar lata. Mejor quítalo. */
-}
-.gb-review-card *, .gb-review-card *::before, .gb-review-card *::after{
-  box-sizing: inherit;
-  -webkit-tap-highlight-color: transparent;
-  min-width: 0;
-}
-
-/* ===== Tipografía y subtítulo ===== */
-.gb-review-card h3{
-  margin: 0 0 6px;
-  font-size: clamp(16px, 2.4vw, 20px);
-}
-.grc-sub{
-  margin: 0 0 12px;
-  font-size: clamp(12px, 2vw, 14px);
-  color: var(--muted);
-  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
-  overflow-wrap: anywhere;
-}
-.grc-badge{
-  display: inline-block; padding: 2px 8px; border-radius: 999px;
-  background: radial-gradient(120% 120% at 20% 20%, #ffe9b0, #f4b400 55%, #b87b00 100%);
-  color:#1a1200; font-weight:700; white-space:nowrap;
-  box-shadow: 0 2px 10px rgba(248,191,63,.35), inset 0 1px 2px rgba(255,255,255,.35);
-}
-.grc-meta{ margin-left: auto }
-
-/* ===== Inputs ===== */
-.grc-lab{ display:block; margin:8px 2px 6px; font-size:13px; color:var(--muted) }
-.grc-inp, .grc-ta{
-  width: 100%;
-  border-radius: 12px;
-  border: 1px solid color-mix(in srgb, var(--line), transparent 35%);
-  background:#121722; color: var(--ink);
-  padding: 10px 12px;
-  font-size: 16px; /* evita auto-zoom en iOS */
-  outline: none;
-}
-.grc-inp:focus, .grc-ta:focus{
-  border-color: var(--accent-2);
-  box-shadow: 0 0 0 3px rgba(0,191,255,.18);
-}
-
-/* ===== Row botón/contador ===== */
-.grc-row{
-  display: flex; gap: 8px; align-items: center; margin-top: 8px;
-  flex-wrap: wrap;
-}
-.grc-row > *{ min-width: 0; }
-.grc-spacer{ flex: 1 }
-.grc-muted{ color: var(--muted); font-size: 12px }
-.grc-msg{ margin: 8px 2px 0; font-size: 13px }
-
-/* ===== Botón ===== */
-.gb-cta{
-  padding: 10px 14px;
-  border: 0; border-radius: 12px; cursor: pointer;
-  background: radial-gradient(140% 140% at 20% 20%, #68d7e1, #22bdc5 60%, #19868c 100%);
-  color:#0a120a; font-weight:700;
-  box-shadow: 0 6px 18px rgba(0, 237, 249, 0.763), inset 0 1px 2px rgba(255,255,255,.35);
-}
-.gb-cta:disabled{ filter: grayscale(.4) brightness(.85); cursor: not-allowed; opacity:.85 }
-
-/* ===== Responsive ===== */
-@media (max-width: 900px){
-  .gb-review-card{ margin:16px auto; padding:14px; border-radius:16px }
-  .grc-row{ gap:10px }
-}
-@media (max-width: 600px){
-  .gb-review-card{ margin:14px 12px; padding:12px; border-radius:14px }
-  .grc-sub{ flex-direction: column; align-items: flex-start; gap: 6px }
-  .grc-meta{ margin-left: 0 }
-  .grc-inp, .grc-ta{ padding:10px 12px }
-  .grc-row{ flex-direction: column; align-items: stretch; gap: 8px }
-  .gb-cta{ width: 100%; text-align: center }
-}
-@media (max-width: 360px){
-  .gb-review-card{ padding:10px; border-radius:12px }
-  .gb-review-card h3{ font-size:16px }
-  .grc-sub{ font-size:12px }
-}
-@media (prefers-reduced-motion: reduce){
-  .gb-review-card *{ transition: none !important; }
-}
-
-/* ===== Lluvia sugerida (asegúrate de tener este contenedor FUERA de la card) ===== */
-#lluvia-container{
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;        /* por debajo del contenido */
-}
-body{ background: var(--bg); position: relative; }
-
-</style>
-
-<script type="module">
-  import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-  import { getFirestore, addDoc, collection, serverTimestamp }
-    from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
-
-  // ===== NOMBRES ÚNICOS PARA EVITAR COLISIONES =====
-  const gbFirebaseConfig = {
-    apiKey: "AIzaSyAJJgDg5SUPvvHgPtDNhIy1f1fiGpBHBw",
-    authDomain: "registro-gomitas.firebaseapp.com",
-    projectId: "registro-gomitas",
-    storageBucket: "registro-gomitas.appspot.com",
-    messagingSenderId: "435485731864",
-    appId: "1:435485731864:web:43dff09753a4c9d507e76d"
-  };
-
-  const gbApp = getApps().length ? getApps()[0] : initializeApp(gbFirebaseConfig);
-  const gbDb  = getFirestore(gbApp);
-
-  // UI refs
-  const $form = document.getElementById('grc-form');
-  const $tel  = document.getElementById('grc-tel');
-  const $txt  = document.getElementById('grc-txt');
-  const $send = document.getElementById('grc-send');
-  const $msg  = document.getElementById('grc-msg');
-  const $count= document.getElementById('grc-count');
-
-  // Helpers
-  const onlyDigits = s => s.replace(/\D+/g,'');
-  const isPhoneOk  = v => /^\d{8,15}$/.test(v);
-
-  // Validación en vivo
-  $tel.addEventListener('input', ()=>{
-    const clean = onlyDigits($tel.value);
-    if (clean !== $tel.value) $tel.value = clean;
-    toggleSubmit();
-  });
-  $txt.addEventListener('input', ()=>{
-    $count.textContent = `${$txt.value.length}/600`;
-    toggleSubmit();
-  });
-  function toggleSubmit(){
-    const ok = isPhoneOk($tel.value) && $txt.value.trim().length >= 5;
-    $send.disabled = !ok;
-  }
-  function resetMsg(){ $msg.textContent = ""; $msg.style.color = ""; }
-
-  // Submit
-  $form.addEventListener('submit', async (e)=>{
-    e.preventDefault();
-    if ($send.disabled) return;
-
-    $send.disabled = true; resetMsg();
-
-    const payload = {
-      telefono: $tel.value.trim(),
-      resena: $txt.value.trim(),
-      createdAt: serverTimestamp(),
-      estado: "pendiente"
-    };
-
-    try{
-      await addDoc(collection(gbDb, "resenas"), payload);
-      $msg.textContent = "¡Gracias! Tu reseña fue registrada. Estás participando.";
-      $msg.style.color = "var(--ok)";
-      $form.reset(); $count.textContent = "0/600"; toggleSubmit();
-    }catch(err){
-      console.error(err);
-      $msg.textContent = "No se pudo enviar. Intenta de nuevo.";
-      $msg.style.color = "var(--err)";
-    }finally{
-      $send.disabled = false;
-    }
-  });
-</script>
-
-
-
-
-<!-- ================== MEGA JUEGO 7x7 (aislado con prefijo MG_) ================== -->
-<section id="MG-juego" style="width:92%;max-width:960px;margin:24px auto;padding:12px;border-radius:18px;background:transparent;color:#eef3fb;font-family:'Poppins',system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;box-sizing:border-box;overflow:visible;position:relative;z-index:0;">
-
+<!-- END RESEÑAS  -->
+<!-- ================== MEGA JUEGO ================== -->
+<section id="MG-juego">
   <style>
-/* =================== MEGA 5x5 — CSS limpio, centrado y responsive =================== */
-:root { --MG-gap: 10px; }
-
-#MG-juego{
-  --W: min(680px, 94vw);         /* ancho maestro */
-  --gap: var(--MG-gap);
-  color:#e7ecf3;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
-  display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
-  min-height:100vh; margin:0 auto; text-align:center; padding:10px 0 22px;
+    :root{
+  /* AJUSTA SOLO ESTAS DOS COSAS */
+  --ancho: clamp(320px, 92vw, 560px); /* ancho conjunto */
+  --gap: -12px;                       /* separacion (negativo = pegados) */
 }
 
-/* ---------- Header / Canvas ---------- */
+/* mismo ancho para head y shell */
+#MG-head, #MG-shell{
+  width: var(--ancho);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* mata el hueco entre la imagen y el tablero */
 #MG-head{
-  position:relative; width:var(--W); margin:0 auto 10px; line-height:0; isolation:isolate; overflow:hidden;
+  margin-bottom: var(--gap);  /* juega con -6px, -10px, -16px, etc. */
+  line-height: 0;             /* elimina espacio fantasma bajo el <img> */
 }
+
+/* el <img> no debe imponer altura fija */
 #MG-title{
-  display:block; width:100%; height:auto; border-radius:14px; box-shadow:0 12px 44px rgba(0,0,0,.35);
-}
-#MG-canvas{ position:absolute; inset:0; width:100%; height:22%; pointer-events:none; display:block; }
-
-/* ---------- Tablero (5 columnas reales, centrado) ---------- */
-#MG-board{
-  width:var(--W);
-  margin:4px auto 12px;                 /* centra horizontal */
-  display:grid;
-  grid-template-columns:repeat(5, minmax(0, 1fr));
-  gap:var(--gap);
-  align-items:stretch; justify-items:stretch;
-  user-select:none;
-}
-#MG-board button{
-  width:100%;
-  aspect-ratio:1/1;                      /* cuadradas de verdad */
-  display:grid; place-items:center;
-  border-radius:14px; border:1px solid #2b3b58;
-  background:
-    radial-gradient(520px 260px at -10% -20%, rgba(56,189,248,.06), transparent 50%),
-    radial-gradient(520px 260px at 110% 120%, rgba(147,51,234,.06), transparent 50%),
-    linear-gradient(135deg,#0b0f18,#0f172a);
-  color:#e7ecf3; font-weight:900; letter-spacing:.2px;
-  font-size:clamp(12px, 2.2vw, 16px);
-  cursor:pointer; transition:transform .18s ease,background .15s ease,border-color .15s ease,box-shadow .15s ease;
-  transform-style:preserve-3d; padding:6px;
-  box-shadow:0 0 0 1px rgba(40,54,82,.45), inset 0 0 24px rgba(255,255,255,.02);
-  overflow:hidden;
-}
-#MG-board button:hover{ transform:translateY(-2px); box-shadow:0 10px 26px rgba(0,0,0,.35); }
-#MG-board button:disabled{ opacity:.92; cursor:not-allowed; transform:none; box-shadow:none; }
-
-.MG-cell-img{ width:86%; height:86%; object-fit:contain; display:block; pointer-events:none; transition:transform .15s ease; }
-#MG-board button.MG-1500 .MG-cell-img{ transform:scale(1.16); }  /* reutilizado por $1000 */
-#MG-board button.MG-500  .MG-cell-img{ transform:scale(1.12); }
-#MG-board button.MG-200  .MG-cell-img{ transform:scale(1.10); }
-#MG-board button.MG-50   .MG-cell-img{ transform:scale(1.08); }
-
-/* Animaciones */
-@keyframes MG-flip{0%{transform:rotateY(0)}50%{transform:rotateY(90deg)}100%{transform:rotateY(0)}}
-@keyframes MG-shuffle{0%{transform:translate(0,0) rotate(0)}25%{transform:translate(1px,-1px) rotate(-1deg)}50%{transform:translate(-1px,1px) rotate(1deg)}75%{transform:translate(1px,1px) rotate(0)}100%{transform:translate(0,0) rotate(0)}}
-.MG-is-flipping{ animation:MG-flip .5s both; }
-.MG-is-shuffling{ animation:MG-shuffle .6s ease-in-out; }
-@keyframes MG-pop{0%{transform:scale(.92)}100%{transform:scale(1)}}
-.MG-pop{ animation:MG-pop .25s ease; }
-
-/* ---------- Looks al revelar ---------- */
-.MG-looks-1500{ background:linear-gradient(145deg,#064e3b,#0b6b52)!important; border-color:#18c38a!important; box-shadow:0 10px 36px rgba(14,159,110,.28); }
-.MG-looks-500 { background:linear-gradient(145deg,#14532d,#1b7a3e)!important; border-color:#34d399!important; box-shadow:0 10px 34px rgba(16,185,129,.25); }
-.MG-looks-200 { background:linear-gradient(145deg,#0b3a54,#0f5d8c)!important; border-color:#38bdf8!important; box-shadow:0 10px 34px rgba(56,189,248,.24); }
-
-/* ===== $50 con look propio (plateado-azulado) ===== */
-.MG-looks-50{
-  background:
-    radial-gradient(400px 220px at 20% 10%, rgba(226,232,240,.20), transparent 55%),
-    linear-gradient(145deg,#334155,#1f2937) !important;   /* slate oscuro */
-  border:2px solid #cbd5e1 !important;                    /* slate-200 */
-  box-shadow:
-    0 0 0 1px rgba(203,213,225,.35),
-    0 10px 26px rgba(148,163,184,.28),
-    inset 0 0 28px rgba(226,232,240,.10);
-}
-.MG-50{ animation:pulse50 1.35s infinite alternate; }
-@keyframes pulse50{
-  0%   { box-shadow:0 0 8px rgba(203,213,225,.55), inset 0 0 18px rgba(255,255,255,.06); }
-  100% { box-shadow:0 0 18px rgba(226,232,240,.95), inset 0 0 26px rgba(255,255,255,.10); }
+  display: block;             /* quita el espacio inline */
+  width: 100%;
+  height: auto !important;    /* ignora height="70px" del HTML */
 }
 
-.MG-looks-gomita{
-  background:linear-gradient(145deg,#3b0764,#5b0aa0)!important;
-  border-color:#9b5cf7!important; box-shadow:0 10px 34px rgba(124,58,237,.25);
-}
-.MG-looks-nada{ background:linear-gradient(145deg,#191c24,#1b1f2a)!important; border-color:#2d3547!important; }
-
-.MG-kicker{ font-size:12px; letter-spacing:.45px; text-transform:uppercase; color:#9fb0c9; text-align:center; margin:4px 0 8px; }
-
-/* ---------- Tarjeta de códigos ---------- */
-#MG-card{
-  width:var(--W);
-  max-width:360px;
-  margin:8px auto 0;
-  padding:10px 12px;
-  border-radius:12px;
-  background:rgba(12,18,34,.70);
-  border:1px solid #233046;
-  box-shadow:0 6px 18px rgba(0,0,0,.18);
-  overflow:hidden;
-  box-sizing:border-box;
-}
-#MG-card .MG-row{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:center; }
-#MG-card .MG-inputs{ width:100%; display:flex; flex-direction:column; gap:8px; align-items:center; }
-.MG-input-wrap{ position:relative; width:100%; max-width:320px; margin:0 auto; }
-.MG-input{
-  width:100%; height:38px;
-  padding:6px 36px; border-radius:10px; border:1px solid #2f3c55;
-  background:#0f172a; color:#e7ecf3; outline:none;
-  font-weight:800; letter-spacing:.8px; text-align:center; font-size:13px; box-sizing:border-box;
-}
-.MG-label{ position:absolute; left:10px; top:50%; transform:translateY(-50%); font-size:11px; color:#8aa0c0; pointer-events:none; }
-.MG-icon{ position:absolute; right:10px; top:50%; transform:translateY(-50%); width:16px; height:16px; opacity:.7; pointer-events:none; }
-
-#MG-validar{
-  width:100%; height:38px; margin:6px 0 0; border-radius:10px;
-  border:1px solid #2b3750;
-  background:linear-gradient(135deg,#6d28d9,#2563eb);
-  color:#fff; font-weight:900; letter-spacing:.2px; cursor:pointer;
-  box-shadow:0 4px 12px rgba(37,99,235,.22);
-}
-#MG-validar:hover{ transform:translateY(-1px); }
-
-#MG-status{ font-size:12px; opacity:.92; margin-top:6px; text-align:center; }
-
-/* ---------- Modal ---------- */
-#MG-modal{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(4,6,12,.58); backdrop-filter:blur(1.5px); z-index:100000; }
-#MG-card-modal{
-  width:min(300px,92vw);
-  border:1px solid #2b3750; border-radius:16px;
-  box-shadow:0 18px 60px rgba(0,0,0,.45); padding:18px;
-  background:
-    radial-gradient(520px 220px at 20% 0%,rgba(99,102,241,.12),transparent 60%),
-    radial-gradient(520px 220px at 80% 100%,rgba(34,197,94,.12),transparent 60%),
-    #0b1220;
-}
-#MG-card-modal.success{ border-color:#16a34a; background:radial-gradient(520px 220px at 20% 0%,rgba(34,197,94,.12),transparent 60%),#071c12; }
-#MG-card-modal.warn{    border-color:#7c3aed; background:radial-gradient(520px 220px at 20% 0%,rgba(124,58,237,.14),transparent 60%),#13072b; }
-#MG-card-modal.neutral{ border-color:#475569; background:radial-gradient(520px 220px at 20% 0%,rgba(100,116,139,.10),transparent 60%),#0b1220; }
-#MG-figure{ display:flex; align-items:center; justify-content:center; margin:6px 0 10px; }
-#MG-figure img{ width:min(190px,56%); height:auto; filter:drop-shadow(0 10px 28px rgba(0,0,0,.35)); }
-.MG-headline{ display:block; text-align:center; line-height:1.1; margin:0 0 6px; letter-spacing:.2px; font-weight:900; }
-.MG-headline .xl{ display:inline-block; font-size:clamp(26px,5.6vw,36px); }
-.MG-headline .md{ display:inline-block; font-size:clamp(17px,3.4vw,21px); font-weight:800; opacity:.95; }
-.MG-accent{ background:linear-gradient(90deg,#22c55e,#86efac); -webkit-background-clip:text; background-clip:text; color:transparent; }
-.MG-accent-purple{ background:linear-gradient(90deg,#a78bfa,#22d3ee); -webkit-background-clip:text; background-clip:text; color:transparent; }
-#MG-actions{ display:flex; justify-content:center; gap:8px; margin-top:6px; flex-wrap:wrap; }
-.MG-cta{ display:inline-flex; gap:8px; align-items:center; border-radius:999px; padding:8px 14px; border:1px solid #2b3750; background:#121c2e; color:#e7ecf3; font-weight:800; }
-#MG-ok{ padding:8px 14px; border-radius:12px; border:1px solid #1f2937; background:#1f6feb; color:#fff; cursor:pointer; font-weight:900; min-width:110px; text-align:center; }
-
-/* ---------- Mobile ---------- */
-@media (max-width:560px){
-  #MG-juego{ --W: 92vw; --gap: 8px; }
-  #MG-board{ gap:var(--gap)!important; }
-  #MG-board button{ border-radius:12px!important; }
-  #MG-card{ width:var(--W); max-width:none; }
-  #MG-validar{ height:40px; }
+/* por si tu tablero añade aire extra arriba */
+#MG-board-box{
+  margin-top: 0 !important;
+  padding-top: 12px;          /* bájalo si aún ves hueco */
 }
 
-/* ---------- Tablet ---------- */
-@media (min-width:600px) and (max-width:1024px){
-  #MG-juego{ --W: min(640px, 92vw); --gap: 10px; }
-  #MG-head{ width:var(--W); margin:0 auto 12px; }
-  #MG-canvas{ height:24%; }
-  #MG-board{ width:var(--W); gap:var(--gap); }
-  #MG-board button{
-    padding:8px; border-radius:14px;
-    font-size:clamp(13px, 1.8vw, 18px);
+/* opcional: mobile un pelín más compacto */
+@media (max-width: 460px){
+  :root{
+    --ancho: 94vw;
+    --gap: -10px;
   }
-  .MG-kicker{ font-size:13px; }
-  #MG-card{
-    width:var(--W);
-    max-width:520px;
-    padding:14px 16px; border-radius:14px;
-  }
-  .MG-input-wrap{ max-width:480px; }
-  .MG-input{ height:44px; font-size:14px; letter-spacing:.7px; padding:8px 36px; border-radius:12px; }
-  .MG-label{ left:12px; font-size:12px; }
-  #MG-validar{ width:100%; height:46px; border-radius:12px; margin-top:8px; }
-  #MG-card-modal{ width:min(520px, 88vw); padding:22px; border-radius:18px; }
-  #MG-figure img{ width:min(240px, 48%); }
-  .MG-headline .xl{ font-size:clamp(28px, 4.2vw, 34px); }
-  .MG-headline .md{ font-size:clamp(18px, 2.6vw, 22px); }
-  #MG-actions{ gap:10px; }
-  #MG-ok{ min-width:128px; padding:10px 16px; }
 }
-</style>
 
-<center>
+  </style>
   <div id="MG-head">
-    <img id="MG-title" src="img/gan201.png" alt="Mega Título">
+    <img id="MG-title" src="img/gan201.png" alt="" height="70px">
     <canvas id="MG-canvas"></canvas>
   </div>
 
-  <p class="MG-kicker">Te GARANTIZAMOS un premio con 5 tiros</p>
-
-  <div id="MG-board"></div>
-
-    <div class="MG-row MG-inputs">
-      <div class="MG-input-wrap">
-        <span class="MG-label">Código #1</span>
-        <input id="MG-code1" class="MG-input" type="text" placeholder="SUERTE!! :)">
-        <svg class="MG-icon" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#9fb0c9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div>
-      <div class="MG-input-wrap">
-        <span class="MG-label">Código #2</span>
-        <input id="MG-code2" class="MG-input" type="text" placeholder="LO DE ARRIBA X2">
-        <svg class="MG-icon" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#9fb0c9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div>
+  <!-- Shell 90% -->
+  <section id="MG-shell">
+    <!-- Caja del tablero 80% dentro del shell -->
+    <div id="MG-board-box">
+      <div id="MG-board"></div>
     </div>
-    <center>
-    <div class="MG-row MG-actions"><button id="MG-validar">Validar y jugar</button></div>
-    <div id="MG-status"></div>
-  </div>
+
+    <!-- Tarjeta con códigos y botón -->
+    <div id="MG-card">
+      <div class="MG-row MG-inputs">
+        <div class="MG-input-wrap">
+          <span class="MG-label">Código #1</span>
+          <input id="MG-code1" class="MG-input" type="text" placeholder="XXXXXXXXX">
+        </div>
+        <div class="MG-input-wrap">
+          <span class="MG-label">Código #2</span>
+          <input id="MG-code2" class="MG-input" type="text" placeholder="XXXXXXXXX">
+        </div>
+      </div>
+      <div class="MG-row MG-actions">
+        <button id="MG-validar">Validar y jugar</button>
+      </div>
+      <div id="MG-status"></div>
+    </div>
+  </section>
 </section>
-
-<!-- ==== MODALES FUERA DEL SECTION para evitar recortes por overflow/filters ==== -->
-<div id="MG-modal" role="dialog" aria-modal="true">
-  <div id="MG-card-modal" class="neutral">
-    <div id="MG-figure" aria-hidden="true"></div>
-    <h3 id="MG-title-modal" style="margin:0"></h3>
-    <p id="MG-msg" style="margin:0"></p>
-    <div id="MG-actions">
-      <a id="MG-cta" class="MG-cta" href="https://www.instagram.com/gummybank?igsh=MW82Z3hvN2VjbWYxZw%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" style="display:none">Abrir Instagram</a>
-      <button id="MG-ok">Cerrar</button>
-    </div>
-  </div>
-</div>
-
-<div id="MG-phone" role="dialog" aria-modal="true" style="position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.55);backdrop-filter:blur(1px);z-index:100001">
-  <div class="MG-phone-card" style="width:min(340px,92vw);background:#0b1220;border:1px solid #334155;border-radius:14px;box-shadow:0 16px 50px rgba(0,0,0,.42);padding:12px">
-    <h3 class="MG-phone-title" style="margin:0 0 4px;font-size:18px;text-align:center">Confirma tu teléfono</h3>
-    <p class="MG-phone-sub" style="margin:0 0 10px;opacity:.9;text-align:center;font-size:14px">Para registrar tu participación, ingresa tu número.</p>
-    <div class="MG-phone-row" style="display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap">
-      <input id="MG-phone-input" class="MG-phone-input" inputmode="tel" autocomplete="tel" maxlength="15" placeholder="8 a 15 dígitos"
-             style="flex:1;min-width:180px;max-width:220px;height:40px;padding:10px 12px;border-radius:10px;border:1px solid #334155;background:#0f172a;color:#eee;outline:none;text-align:center;font-weight:700;letter-spacing:.8px">
-      <button id="MG-phone-ok" class="MG-phone-btn" style="height:40px;padding:10px 12px;border-radius:10px;border:1px solid #1f2937;background:#1f6feb;color:#fff;cursor:pointer;font-weight:800;min-width:110px">Continuar</button>
-      <button id="MG-phone-cancel" class="MG-phone-btn secondary" style="height:40px;padding:10px 12px;border-radius:10px;border:1px solid #475569;background:#1f2937;color:#e5e7eb;min-width:110px">Cancelar</button>
-    </div>
-    <div id="MG-phone-error" class="MG-phone-err" style="min-height:18px;margin-top:6px;font-size:12px;color:#fca5a5;text-align:center"></div>
-  </div>
-</div>
-
-<script type="module">
-/* ========= MEGA 5x5 - LÓGICA (solo JS, diseño intacto) ========= */
-import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-import {
-  getFirestore, doc, getDoc, setDoc, collection,
-  runTransaction, serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
-
-/* ---------------- Config Firebase ---------------- */
-const MG_IG_URL = (window.IG_URL || "https://instagram.com/tu_pagina");
-const MG_firebaseConfig = window.firebaseConfig || {
-  apiKey: "AIzaSyAJJgDg5SUPvvHgPtDNhIy1f1fiGpBHBw",
-  authDomain: "registro-gomitas.firebaseapp.com",
-  projectId: "registro-gomitas",
-  storageBucket: "registro-gomitas.appspot.com",
-  messagingSenderId: "435485731864",
-  appId: "1:435485731864:web:43dff09753a4c9d507e76d",
-  measurementId: "G-20KEW71X9G"
-};
-const MG_app = getApps().length ? getApp() : initializeApp(MG_firebaseConfig);
-const MG_db  = getFirestore(MG_app);
-
-/* ---------------- Parámetros del juego ----------------
-   Si cambias el tamaño del tablero:
-   - MG_TOTAL = número de casillas
-   - En CSS: #MG-board -> grid-template-columns:repeat(N,...)
-------------------------------------------------------- */
-const MG_TOTAL = 25; // 5x5
-const MG_COUNTS = { p1000: 1, p500: 1, p200: 2, p50: 4, gomita: 9 };
-/* Umbrales: los NUEVOS aparecen después de 100 tiros:
-   - p1000 y p50 son nuevos -> 100
-   Los existentes se quedan igual que estaban. */
-const MG_THRESH = { p1000: 100000, p500: 100000, p200: 10000, p50: 5, gomita: 3 };
-
-/* ----------------- Referencias en DB ----------------- */
-const MG_controlRef = doc(MG_db, "mega7x7_meta", "control"); // contadores globales
-const MG_playsCol   = collection(MG_db, "mega7x7_plays");    // jugadas
-
-/* ---------------- Utilidades ---------------- */
-const MG_toId = s => (s||"").trim().toUpperCase().replace(/[^A-Z0-9]/g,"");
-const MG_svg  = s => 'data:image/svg+xml;utf8,' + encodeURIComponent(s.trim());
-const MG_IMG = {
-  HIDDEN: MG_svg(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="18" fill="#111827"/><text x="50%" y="56%" text-anchor="middle" dominant-baseline="middle" font-family="system-ui,Segoe UI,Roboto" font-size="68" fill="#9fb0c9">?</text></svg>`),
-  NADA  : MG_svg(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="18" fill="#1b2332"/><path d="M30 30 L90 90 M90 30 L30 90" stroke="#d1d5db" stroke-width="14" stroke-linecap="round"/></svg>`),
-  GOMITA: "img/gomita.png",
-  P200  : MG_svg(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="18" fill="#0b3a54"/><circle cx="60" cy="60" r="38" fill="#0ea5e9"/><text x="50%" y="56%" text-anchor="middle" dominant-baseline="middle" font-family="system-ui,Segoe UI,Roboto" font-size="42" fill="#e6fffa">$200</text></svg>`),
-  P500  : MG_svg(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="18" fill="#14532d"/><circle cx="60" cy="60" r="40" fill="#22c55e"/><text x="50%" y="56%" text-anchor="middle" dominant-baseline="middle" font-family="system-ui,Segoe UI,Roboto" font-size="44" fill="#e6fffa">$500</text></svg>`),
-  P1000 : MG_svg(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="18" fill="#064e3b"/><circle cx="60" cy="60" r="40" fill="#0e9f6e"/><text x="50%" y="56%" text-anchor="middle" dominant-baseline="middle" font-family="system-ui,Segoe UI,Roboto" font-size="40" fill="#e6fffa">$1000</text></svg>`),
-  P50   : MG_svg(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="18" fill="#1e293b"/><circle cx="60" cy="60" r="36" fill="#94a3b8"/><text x="50%" y="56%" text-anchor="middle" dominant-baseline="middle" font-family="system-ui,Segoe UI,Roboto" font-size="46" fill="#0b1220">$50</text></svg>`)
-};
-/* ← IMPORTANTE: ahora manejamos 'HIDDEN' para que muestre el '?' */
-const MG_icon = (k) => {
-  switch (k) {
-    case 'HIDDEN': return MG_IMG.HIDDEN;
-    case 'p1000' : return MG_IMG.P1000;
-    case 'p500'  : return MG_IMG.P500;
-    case 'p200'  : return MG_IMG.P200;
-    case 'p50'   : return MG_IMG.P50;
-    case 'gomita': return MG_IMG.GOMITA;
-    default      : return MG_IMG.NADA;
-  }
-};
-
-/* ---------------- DOM ---------------- */
-const MG_board = document.getElementById("MG-board");
-const MG_status= document.getElementById("MG-status");
-const MG_code1 = document.getElementById("MG-code1");
-const MG_code2 = document.getElementById("MG-code2");
-const MG_goBtn = document.getElementById("MG-validar");
-
-const MG_modal = document.getElementById("MG-modal");
-const MG_cardM = document.getElementById("MG-card-modal");
-const MG_tModal= document.getElementById("MG-title-modal");
-const MG_msg   = document.getElementById("MG-msg");
-const MG_cta   = document.getElementById("MG-cta");
-const MG_ok    = document.getElementById("MG-ok");
-const MG_figure= document.getElementById("MG-figure");
-
-const MG_pModal= document.getElementById("MG-phone");
-const MG_pIn   = document.getElementById("MG-phone-input");
-const MG_pOk   = document.getElementById("MG-phone-ok");
-const MG_pCancel=document.getElementById("MG-phone-cancel");
-const MG_pErr  = document.getElementById("MG-phone-error");
-const MG_canvas= document.getElementById("MG-canvas");
-
-/* ---------------- Estado ---------------- */
-let MG_ready=false, MG_codes=null, MG_tel=null, MG_picked=false;
-
-/* ---------------- Helpers UI ---------------- */
-function MG_setIcon(btn, kind){
-  let alt = 'Sin premio';
-  if (kind === 'HIDDEN') alt = 'Oculto';
-  else if (kind === 'p1000') alt = '$1000';
-  else if (kind === 'p500')  alt = '$500';
-  else if (kind === 'p200')  alt = '$200';
-  else if (kind === 'p50')   alt = '$50';
-  else if (kind === 'gomita')alt = 'Gomitas';
-
-  btn.innerHTML = `<img class="MG-cell-img" alt="${alt}" src="${MG_icon(kind)}">`;
-  btn.setAttribute('aria-label', alt);
-}
-function MG_setLooks(btn, kind){
-  btn.classList.remove('MG-looks-1500','MG-looks-500','MG-looks-200','MG-looks-gomita','MG-looks-nada','MG-1500','MG-500','MG-200');
-  if(kind==='p1000') btn.classList.add('MG-looks-1500','MG-1500'); // reutiliza estilos del antiguo 1500
-  else if(kind==='p500') btn.classList.add('MG-looks-500','MG-500');
-  else if(kind==='p200' || kind==='p50') btn.classList.add('MG-looks-200','MG-200'); // 50 hereda look de 200
-  else if(kind==='gomita') btn.classList.add('MG-looks-gomita');
-  else btn.classList.add('MG-looks-nada');
-}
-function MG_paint(msg,color){ MG_status.textContent=msg; MG_status.style.color=color||"#9fb0c9"; }
-
-/* badges opcionales, si no existen no hace nada */
-function MG_badges(ok1, ok2){
-  const b1 = document.getElementById('MG-b1');
-  const b2 = document.getElementById('MG-b2');
-  if (!b1 || !b2) return;
-  b1.classList.remove('ok','err'); b2.classList.remove('ok','err');
-  if (ok1 !== undefined) b1.classList.add(ok1 ? 'ok' : 'err');
-  if (ok2 !== undefined) b2.classList.add(ok2 ? 'ok' : 'err');
-  b1.textContent = ok1 ? 'Código #1 ✓' : 'Código #1';
-  b2.textContent = ok2 ? 'Código #2 ✓' : 'Código #2';
-}
-
-/* ---------------- Vitrina inicial ---------------- */
-MG_makeVitrine();
-function MG_makeVitrine(){
-  const pool=['p1000','p500'];
-  for(let i=0;i<MG_COUNTS.p200;i++)   pool.push('p200');
-  for(let i=0;i<MG_COUNTS.p50;i++)    pool.push('p50');
-  for(let i=0;i<MG_COUNTS.gomita;i++) pool.push('gomita');
-  for(let i=pool.length;i<MG_TOTAL;i++) pool.push('nada');
-  for(let i=pool.length-1;i>0;i--){ const j=(Math.random()*(i+1))|0; [pool[i],pool[j]]=[pool[j],pool[i]]; }
-  MG_board.innerHTML='';
-  pool.forEach(k=>{ const b=document.createElement('button'); MG_setIcon(b,k); MG_setLooks(b,k); b.disabled=true; MG_board.appendChild(b); });
-  MG_paint("Necesitas 2 códigos válidos para jugar.", "#9fb0c9");
-}
-
-/* ---------------- Click “Validar y jugar” ---------------- */
-MG_goBtn.addEventListener("click", async ()=>{
-  const c1 = MG_toId(MG_code1.value), c2 = MG_toId(MG_code2.value);
-  if(!c1 || !c2){ MG_paint("Ingresa los 2 códigos.","#ff6b6b"); MG_lock(); return; }
-  if(c1===c2){ MG_paint("Los códigos deben ser distintos.","#ff6b6b"); MG_lock(); return; }
-
-  try{
-    const ok1 = await MG_checkCode(c1);
-    const ok2 = await MG_checkCode(c2);
-    if(!ok1 || !ok2){ MG_badges(false,false); MG_paint("Código inválido o ya usado.","#ff6b6b"); MG_lock(); return; }
-    MG_badges(true,true);
-
-    try{ MG_tel = await MG_phoneAsk(); }
-    catch(_){ MG_paint("Participación cancelada.","#fca5a5"); return; }
-
-    MG_codes = { c1, c2 };
-    MG_paint("Tienes 1 intento. Mezclando...","#3fb950");
-    await MG_flipShuffle();
-  }catch(e){ console.error(e); MG_paint("Error al validar.","#ff6b6b"); }
-});
-
-/* ---------------- Preparar tablero real ---------------- */
-function MG_lock(){ [...MG_board.children].forEach(b=>b.disabled=true); MG_ready=false; }
-function MG_unlock(){ [...MG_board.children].forEach(b=>b.disabled=false); MG_ready=true; }
-
-async function MG_flipShuffle(){
-  const bs=[...MG_board.children];
-  await Promise.all(bs.map((b,i)=>new Promise(res=>{
-    setTimeout(()=>{
-      MG_setIcon(b,'HIDDEN'); // ← muestra "?"
-      b.classList.remove('MG-looks-1500','MG-looks-500','MG-looks-200','MG-looks-gomita','MG-looks-nada','MG-1500','MG-500','MG-200');
-      b.style.background="linear-gradient(135deg,#0b0f18,#0f172a)"; b.style.borderColor="#2b3b58";
-      res();
-    }, i*20);
-  })));
-  await MG_realPool();
-  bs.forEach((b,i)=>{ setTimeout(()=>{ b.classList.add("MG-is-shuffling"); setTimeout(()=>b.classList.remove("MG-is-shuffling"),650); }, i*10); });
-  MG_unlock(); MG_ready=true; MG_picked=false;
-  MG_paint("Códigos validados. Elige una casilla.","#3fb950");
-}
-
-/* ---------------- Control en Firestore ---------------- */
-async function MG_getControl(){                             // Función asíncrona que garantiza y lee el documento de control global.
-
- /* ---------------- Control en Firestore (safe init) ---------------- */
-async function MG_getControl(){
-  // 1) Leer primero
-  const snap = await getDoc(MG_controlRef);
-
-  // 2) Si NO existe, inicializa una sola vez
-  if (!snap.exists()) {
-    await setDoc(MG_controlRef, {
-      since1000: 0, since500: 0, since200: 0, since50: 0, sinceGomita: 0,
-      wins1000: 0,  wins500: 0,  wins200: 0,  wins50: 0,  winsGomita: 0,
-      totalPlays: 0,
-      updatedAt: serverTimestamp()
-    });
-    return {
-      since1000:0, since500:0, since200:0, since50:0, sinceGomita:0,
-      wins1000:0, wins500:0, wins200:0, wins50:0, winsGomita:0,
-      totalPlays:0
-    };
-  }
-
-  // 3) Si SÍ existe, NO resetees. Solo normaliza y, si faltara algo, complétalo sin pisar valores.
-  const d = snap.data() || {};
-  const patch = {};
-  if (d.since1000 == null)  patch.since1000 = 0;
-  if (d.since500  == null)  patch.since500  = 0;
-  if (d.since200  == null)  patch.since200  = 0;
-  if (d.since50   == null)  patch.since50   = 0;
-  if (d.sinceGomita == null)patch.sinceGomita = 0;
-
-  if (d.wins1000  == null)  patch.wins1000  = 0;
-  if (d.wins500   == null)  patch.wins500   = 0;
-  if (d.wins200   == null)  patch.wins200   = 0;
-  if (d.wins50    == null)  patch.wins50    = 0;
-  if (d.winsGomita== null)  patch.winsGomita= 0;
-
-  if (d.totalPlays== null)  patch.totalPlays= 0;
-
-  // Escribe SOLO lo faltante y el updatedAt
-  await setDoc(MG_controlRef, { ...patch, updatedAt: serverTimestamp() }, { merge:true });
-
-  // 4) Devuelve contadores normalizados (números)
-  return {
-    since1000:+(d.since1000 ?? 0),
-    since500:+(d.since500 ?? 0),
-    since200:+(d.since200 ?? 0),
-    since50:+(d.since50 ?? 0),
-    sinceGomita:+(d.sinceGomita ?? 0),
-    wins1000:+(d.wins1000 ?? 0),
-    wins500:+(d.wins500 ?? 0),
-    wins200:+(d.wins200 ?? 0),
-    wins50:+(d.wins50 ?? 0),
-    winsGomita:+(d.winsGomita ?? 0),
-    totalPlays:+(d.totalPlays ?? 0)
-  };
-}                                    // merge:true asegura que solo completa campos faltantes y no borra existentes.
-
-  const s = await getDoc(MG_controlRef);                    // Lee el snapshot actual del documento de control.
-  const d = s.exists() ? (s.data() || {}) : {};             // Si existe, extrae sus datos; si no, usa objeto vacío para evitar undefined.
-
-  return {                                                  // Devuelve un objeto “normalizado” solo con números (usa + para convertir).
-    since1000:+(d.since1000||0),                            // Asegura número: si la propiedad no existe, usa 0.
-    since500:+(d.since500||0),
-    since200:+(d.since200||0),
-    since50:+(d.since50||0),
-    sinceGomita:+(d.sinceGomita||0),
-
-    wins1000:+(d.wins1000||0),                              // Totales de premios otorgados, también normalizados.
-    wins500:+(d.wins500||0),
-    wins200:+(d.wins200||0),
-    wins50:+(d.wins50||0),
-    winsGomita:+(d.winsGomita||0),
-
-    totalPlays:+(d.totalPlays||0)                           // Total de jugadas registradas.
-  };
-}
-
-async function MG_realPool(){                               // Construye el “pool” de premios real para este tablero.
-  const c = await MG_getControl();                          // Obtiene contadores/estadísticas actuales desde Firestore.
-
-  const en = {                                              // Flags de habilitación por umbral (true si ya se alcanzó el mínimo).
-    p1000 : c.since1000  >= MG_THRESH.p1000,                // Habilita $1000 si los tiros desde el último >= umbral.
-    p500  : c.since500   >= MG_THRESH.p500,                 // Habilita $500 según su umbral.
-    p200  : c.since200   >= MG_THRESH.p200,                 // Habilita $200 según su umbral.
-    p50   : c.since50    >= MG_THRESH.p50,                  // Habilita $50 según su umbral.
-    gomita: c.sinceGomita>= MG_THRESH.gomita                // Habilita gomitas según su umbral.
-  };
-
-  const pool=[];                                            // Arreglo final con el contenido de cada casilla (tamaño = MG_TOTAL).
-
-  if(en.p1000) pool.push('p1000');                          // Inserta 1 premio $1000 si está habilitado.
-  if(en.p500)  pool.push('p500');                           // Inserta 1 premio $500 si está habilitado.
-
-  for(let i=0;i<(en.p200?MG_COUNTS.p200:0);i++)             // Inserta N premios $200 si están habilitados…
-    pool.push('p200');                                      // …N proviene de MG_COUNTS.p200.
-
-  for(let i=0;i<(en.p50?MG_COUNTS.p50:0);i++)               // Inserta N premios $50 si están habilitados…
-    pool.push('p50');                                       // …N proviene de MG_COUNTS.p50.
-
-  for(let i=0;i<(en.gomita?MG_COUNTS.gomita:0);i++)         // Inserta N “gomita” si están habilitadas…
-    pool.push('gomita');                                    // …N proviene de MG_COUNTS.gomita.
-
-  for(let i=pool.length;i<MG_TOTAL;i++) pool.push('nada');  // Completa hasta MG_TOTAL con “nada” para llenar el tablero.
-
-  for(let i=pool.length-1;i>0;i--){                         // Barajado Fisher–Yates para distribuir premios aleatoriamente.
-    const j=(Math.random()*(i+1))|0;                        // Índice aleatorio entero entre 0 e i.
-    [pool[i],pool[j]]=[pool[j],pool[i]];                    // Intercambia posiciones i y j.
-  }
-
-  [...MG_board.children].forEach((b,idx)=>{                 // Asigna el contenido a cada botón/casilla del tablero.
-    b.dataset.MGprize = pool[idx];                          // Guarda el premio real en data-attribute (para usar al revelar).
-    MG_setIcon(b,'HIDDEN');                                 // Muestra el ícono de “oculto” (el signo ?), no el premio real.
-    b.disabled=false;                                       // Habilita la casilla para que pueda clicarse.
-    b.onclick=()=>MG_onPick(b);                             // Asocia el handler de click que gestiona la selección.
-    b.style.background="linear-gradient(135deg,#0b0f18,#0f172a)"; // Resetea background base visual.
-    b.style.borderColor="#2b3b58";                          // Resetea color de borde base.
-  });
-
-  MG_board.dataset.fake1000  = String(!en.p1000);           // Flags para el “reveal” visual: si NO estaba habilitado…
-  MG_board.dataset.fake500   = String(!en.p500);            // …queda “true” y el reveal puede mostrar premios “falsos”
-  MG_board.dataset.fake200   = String(!en.p200);            // …solo de forma visual para completar la vitrina objetivo.
-  MG_board.dataset.fake50    = String(!en.p50);             // Estas flags no afectan el resultado final, solo la animación.
-  MG_board.dataset.fakeGomita= String(!en.gomita);
-}                                                           // Fin de MG_realPool
-
-
-/* ---------------- Click en casilla ---------------- */
-async function MG_onPick(btn){
-  if(!MG_ready || !MG_codes || MG_picked) return;
-  MG_picked=true; MG_lock();
-
-  const cand = btn.dataset.MGprize;
-  await MG_reveal(btn, cand);
-
-  try{
-    await MG_persist(MG_codes.c1, MG_codes.c2, MG_tel, cand);
-  }catch(e){
-    console.error(e);
-    MG_paint("No se pudo registrar la jugada.","#fca5a5");
-  }
-
-  await MG_revealRest(btn);
-
-  if(cand==='p1000'){ MG_confetti('gold');  MG_open('success','p1000'); }
-  else if(cand==='p500'){ MG_confetti('gold'); MG_open('success','p500'); }
-  else if(cand==='p200'){ MG_confetti('gold'); MG_open('success','p200'); }
-  else if(cand==='p50'){ MG_confetti('gold'); MG_open('success','p50'); }
-  else if(cand==='gomita'){ MG_confetti('purple'); MG_open('warn','gomita'); }
-  else MG_open('neutral','nada');
-}
-
-function MG_reveal(btn,kind){
-  return new Promise(res=>{
-    btn.classList.add('MG-is-flipping');
-    setTimeout(()=>{
-      MG_setIcon(btn,kind); MG_setLooks(btn,kind);
-      btn.classList.remove('MG-is-flipping'); btn.classList.add('MG-pop');
-      setTimeout(()=>{ btn.classList.remove('MG-pop'); res(); },160);
-    },160);
-  });
-}
-
-/* Revelado del resto: asegura 1×$1000, 1×$500, 2×$200, 3×$50 y 7×gomita cuando no estén habilitados */
-function MG_revealRest(chosen){
-  const bs=[...MG_board.children];
-  const avail = bs.filter(b => b !== chosen);
-
-  const countReal = k => bs.filter(b => b.dataset.MGprize === k).length;
-  const take = (n) => { const out=[]; for(let i=0;i<n && avail.length;i++){ const j=(Math.random()*avail.length)|0; out.push(avail.splice(j,1)[0]); } return out; };
-
-  const fakes = [];
-  if (MG_board.dataset.fake1000 === "true" && countReal('p1000') === 0) fakes.push({k:'p1000', bs: take(1)});
-  if (MG_board.dataset.fake500  === "true" && countReal('p500')  === 0) fakes.push({k:'p500',  bs: take(1)});
-
-  if (MG_board.dataset.fake200  === "true"){
-    const need200 = Math.max(0, MG_COUNTS.p200 - countReal('p200'));
-    if (need200 > 0) fakes.push({k:'p200',  bs: take(need200)});
-  }
-  if (MG_board.dataset.fake50 === "true"){
-    const need50 = Math.max(0, MG_COUNTS.p50 - countReal('p50'));
-    if (need50 > 0) fakes.push({k:'p50',  bs: take(need50)});
-  }
-  if (MG_board.dataset.fakeGomita === "true"){
-    const needG = Math.max(0, MG_COUNTS.gomita - countReal('gomita'));
-    if (needG > 0) fakes.push({k:'gomita', bs: take(needG)});
-  }
-
-  let t=110;
-  const ps=[];
-  for(const b of bs){
-    if(b===chosen) continue;
-    ps.push(new Promise(r=>{
-      setTimeout(()=>{
-        const fk = fakes.find(x => x.bs.includes(b));
-        if (fk){ MG_setIcon(b,fk.k); MG_setLooks(b,fk.k); }
-        else { const k=b.dataset.MGprize; MG_setIcon(b,k); MG_setLooks(b,k); }
-        r();
-      }, t);
-      t += 45;
-    }));
-  }
-  return Promise.all(ps);
-}
-
-/* ---------------- Validación de códigos ---------------- */
-async function MG_checkCode(codeRaw){
-  const code = MG_toId(codeRaw);
-  const ref  = doc(MG_db,"codigos",code);
-  const s    = await getDoc(ref);
-  if(!s.exists()) return false;
-  const d = s.data()||{};
-  if((d.estado||"").toLowerCase()==="usado") return false;
-  return true;
-}
-
-/* ---------------- Persistencia + contadores ---------------- */
-async function MG_persist(c1,c2,phone,rawPrize){
-  const r1   = doc(MG_db,"codigos",MG_toId(c1));
-  const r2   = doc(MG_db,"codigos",MG_toId(c2));
-  const play = doc(MG_playsCol);
-
-  const cascade=(cand,elig)=>{
-    switch(cand){
-      case 'p1000': return elig.p1000 ? 'p1000' : elig.p500 ? 'p500' : elig.p200 ? 'p200' : elig.p50 ? 'p50' : elig.gomita ? 'gomita' : 'nada';
-      case 'p500' : return elig.p500  ? 'p500'  : elig.p200 ? 'p200' : elig.p50 ? 'p50' : elig.gomita ? 'gomita' : 'nada';
-      case 'p200' : return elig.p200  ? 'p200'  : elig.p50 ? 'p50' : elig.gomita ? 'gomita' : 'nada';
-      case 'p50'  : return elig.p50   ? 'p50'   : elig.gomita ? 'gomita' : 'nada';
-      case 'gomita':return elig.gomita? 'gomita': 'nada';
-      default:      return 'nada';
-    }
-  };
-
-  await runTransaction(MG_db, async (tx)=>{
-    const cSnap = await tx.get(MG_controlRef);
-    const cData = cSnap.exists() ? (cSnap.data()||{}) : {
-      since1000:0, since500:0, since200:0, since50:0, sinceGomita:0,
-      wins1000:0, wins500:0, wins200:0, wins50:0, winsGomita:0, totalPlays:0
-    };
-
-    const s1 = await tx.get(r1), s2 = await tx.get(r2);
-    if(!s1.exists() || !s2.exists()) throw new Error("Código no existe");
-    const d1=s1.data()||{}, d2=s2.data()||{};
-    if((d1.estado||"").toLowerCase()==="usado" || (d2.estado||"").toLowerCase()==="usado")
-      throw new Error("Código ya usado");
-
-    const elig = {
-      p1000:+(cData.since1000||0)>=MG_THRESH.p1000,
-      p500 :+(cData.since500 ||0)>=MG_THRESH.p500,
-      p200 :+(cData.since200 ||0)>=MG_THRESH.p200,
-      p50  :+(cData.since50  ||0)>=MG_THRESH.p50,
-      gomita:+(cData.sinceGomita||0)>=MG_THRESH.gomita
-    };
-
-    const final = cascade(rawPrize, elig);
-
-    tx.set(play,{
-      codigo1:MG_toId(c1), codigo2:MG_toId(c2), telefono:phone,
-      rawPrize, finalPrize:final, createdAt:serverTimestamp()
-    });
-
-    tx.set(r1,{ estado:"usado", usadoEn:"MegaJuego5x5", usadoAt:serverTimestamp(), telefono:phone, resultado:final },{ merge:true });
-    tx.set(r2,{ estado:"usado", usadoEn:"MegaJuego5x5", usadoAt:serverTimestamp(), telefono:phone, resultado:final },{ merge:true });
-
-    const next = {
-      since1000:   final==='p1000' ? 0 : +(cData.since1000||0)+1,
-      since500 :   final==='p500'  ? 0 : +(cData.since500 ||0)+1,
-      since200 :   final==='p200'  ? 0 : +(cData.since200 ||0)+1,
-      since50  :   final==='p50'   ? 0 : +(cData.since50  ||0)+1,
-      sinceGomita: final==='gomita'? 0 : +(cData.sinceGomita||0)+1,
-
-      wins1000:   (cData.wins1000  ||0) + (final==='p1000'?1:0),
-      wins500 :   (cData.wins500   ||0) + (final==='p500' ?1:0),
-      wins200 :   (cData.wins200   ||0) + (final==='p200' ?1:0),
-      wins50  :   (cData.wins50    ||0) + (final==='p50'  ?1:0),
-      winsGomita: (cData.winsGomita||0) + (final==='gomita'?1:0),
-
-      totalPlays: (cData.totalPlays||0) + 1,
-      updatedAt: serverTimestamp()
-    };
-
-    tx.set(MG_controlRef, next, { merge:true });
-  });
-}
-
-/* ---------------- Modal resultado ---------------- */
-function MG_open(variant,kind){
-  MG_figure.innerHTML=""; MG_cardM.classList.remove('success','warn','neutral'); if(variant) MG_cardM.classList.add(variant);
-  const im=document.createElement('img'); im.src=MG_icon(kind); im.alt=kind; MG_figure.appendChild(im);
-
-  if(kind==='p1000'){
-    MG_tModal.innerHTML=`<div class="MG-headline"><span class="md">¡PREMIO MAYOR!</span><br><span class="xl MG-accent">$1000</span></div>`;
-    MG_msg.innerHTML = `<div style="text-align:center"><span style="color:#fde68a;font-weight:800">TOMA CAPTURA DE PANTALLA</span><br><span>Envíala por DM en Instagram.</span></div>`;
-    MG_cta.style.display='inline-flex'; MG_cta.href=MG_IG_URL; MG_cta.textContent='Abrir Instagram';
-  } else if(kind==='p500'){
-    MG_tModal.innerHTML=`<div class="MG-headline"><span class="md">¡GANASTE</span> <span class="md MG-accent">$500!</span></div>`;
-    MG_msg.innerHTML = `<div style="text-align:center"><span style="color:#fde68a;font-weight:800">TOMA CAPTURA DE PANTALLA</span><br><span>DM para reclamar.</span></div>`;
-    MG_cta.style.display='inline-flex'; MG_cta.href=MG_IG_URL;
-  } else if(kind==='p200'){
-    MG_tModal.innerHTML=`<div class="MG-headline"><span class="md">¡GANASTE</span> <span class="md MG-accent">$200!</span></div>`;
-    MG_msg.innerHTML = `<div style="text-align:center"><span style="color:#fde68a;font-weight:800">TOMA CAPTURA DE PANTALLA</span><br><span>DM para reclamar.</span></div>`;
-    MG_cta.style.display='inline-flex'; MG_cta.href=MG_IG_URL;
-  } else if(kind==='p50'){
-    MG_tModal.innerHTML=`<div class="MG-headline"><span class="md">¡GANASTE</span> <span class="md MG-accent">$50!</span></div>`;
-    MG_msg.innerHTML = `<div style="text-align:center"><span>Presenta la captura para canjear.</span></div>`;
-    MG_cta.style.display='inline-flex'; MG_cta.href=MG_IG_URL;
-  } else if(kind==='gomita'){
-    MG_tModal.innerHTML=`<div class="MG-headline"><span class="md">¡GOMITAS</span> <span class="md MG-accent-purple">GANADAS!</span></div>`;
-    MG_msg.innerHTML = `<div style="text-align:center"><span style="color:#fde68a;font-weight:800">TOMA CAPTURA DE PANTALLA</span><br><span>DM para canjear.</span></div>`;
-    MG_cta.style.display='inline-flex'; MG_cta.href=MG_IG_URL;
-  } else {
-    MG_tModal.innerHTML=`<div class="MG-headline"><span class="md">SIN PREMIO</span><br><span class="xl">ESTA VEZ</span></div>`;
-    MG_msg.innerHTML = `<div style="text-align:center"><span>Sigue participando con más códigos.</span></div>`;
-    MG_cta.style.display='none';
-  }
-
-  MG_modal.style.display='flex'; MG_ok.focus();
-}
-function MG_close(){
-  MG_modal.style.display='none';
-  MG_code1.value=''; MG_code2.value='';
-  MG_codes=null; MG_tel=null; MG_ready=false;
-  MG_badges(); MG_paint('Ingresa 2 códigos para jugar.','#9fb0c9');
-}
-MG_ok.addEventListener('click',MG_close);
-MG_modal.addEventListener('click',e=>{ if(e.target===MG_modal) MG_close(); });
-window.addEventListener('keydown',e=>{ if(MG_modal.style.display==='flex'&&(e.key==='Escape'||e.key==='Enter')) MG_close(); });
-
-/* ---------------- Teléfono (modal pequeño) ---------------- */
-function MG_validPhone(v){ const d=(v||'').replace(/\D/g,''); return d.length>=8 && d.length<=15 ? d : null; }
-function MG_phoneOpen(){ MG_pErr.textContent=''; MG_pIn.value=''; MG_pModal.style.display='flex'; setTimeout(()=>MG_pIn.focus(),0); }
-function MG_phoneClose(){ MG_pModal.style.display='none'; }
-function MG_phoneAsk(){
-  return new Promise((res,rej)=>{
-    MG_phoneOpen();
-    const ok=()=>{ const v=MG_validPhone(MG_pIn.value); if(!v){MG_pErr.textContent='Ingresa un teléfono válido (8 a 15 dígitos).'; return;} MG_phoneClose(); res(v); };
-    const cancel=()=>{ MG_phoneClose(); rej(new Error('cancelado')); };
-    MG_pOk.onclick=ok; MG_pCancel.onclick=cancel;
-    MG_pModal.onclick=e=>{ if(e.target===MG_pModal) cancel(); };
-    const h=e=>{ if(MG_pModal.style.display==='flex'&&e.key==='Enter') ok(); if(MG_pModal.style.display==='flex'&&e.key==='Escape') cancel(); };
-    window.addEventListener('keydown',h,{once:true});
-  });
-}
-
-/* ---------------- Confeti (sobre el header) ---------------- */
-function MG_confetti(pal='gold'){
-  const ctx = MG_canvas.getContext('2d');
-  const r   = MG_canvas.getBoundingClientRect();
-  MG_canvas.width  = r.width * devicePixelRatio;
-  MG_canvas.height = r.height * devicePixelRatio;
-  ctx.scale(devicePixelRatio,devicePixelRatio);
-
-  const cols = pal==='gold' ? ["#ffd700","#ffb300","#ff7a00","#fff2a8"]
-                            : ["#9b5cf7","#7c3aed","#c084fc","#e9d5ff"];
-
-  const pcs = Array.from({length:120},()=>({
-    x:Math.random()*r.width, y:-20-Math.random()*60,
-    w:6+Math.random()*6, h:8+Math.random()*10,
-    vx:-1+Math.random()*2, vy:2+Math.random()*2.5,
-    rot:Math.random()*Math.PI, vr:-0.22+Math.random()*0.44,
-    color:cols[(Math.random()*cols.length)|0]
-  }));
-
-  let run=true; const start=performance.now();
-  function tick(t){
-    if(!run) return;
-    const el=t-start;
-    ctx.clearRect(0,0,r.width,r.height);
-    for(const p of pcs){
-      p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr; p.vy+=0.02;
-      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot);
-      ctx.fillStyle=p.color; ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore();
-    }
-    if(el<2400) requestAnimationFrame(tick);
-    else { run=false; ctx.clearRect(0,0,r.width,r.height); }
-  }
-  requestAnimationFrame(tick);
-}
-</script>
-
-
 <!-- ================== FIN MEGA JUEGO ================== -->
 
+<!-- Modal resultado -->
+<div id="MG-modal" style="display:none">
+  <div id="MG-card-modal">
+    <div id="MG-figure"></div>
+    <h3 id="MG-title-modal"></h3>
+    <p id="MG-msg"></p>
+    <a id="MG-cta" href="#" style="display:none">Abrir Instagram</a>
+    <button id="MG-ok" type="button">Cerrar</button>
+  </div>
+</div>
 
-<!-- ================== MINI JUEGO 36 CASILLAS (6x6) ================== -->
-<section id="mini-juego" style="width:90%;max-width:800px;margin:24px auto;padding:16px;border-radius:15px;background:transparent;color:#eee;font-family:'Poppins',system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;box-sizing:border-box;overflow:hidden;min-height:520px;position:relative;z-index:0;">
-  <style>
-    @media (max-width:460px){
-      #mini-juego{padding:6px!important}
-      #mini-juego #board{gap:6px!important}
-      #mini-juego #board button{font-size:clamp(13px,4.2vw,16px)!important;border-radius:12px!important}
-    }
-    @media (max-width:360px){
-      #mini-juego{padding:6px!important}
-      #mini-juego #board{gap:5px!important}
-      #mini-juego #board button{font-size:clamp(12px,4.6vw,15px)!important}
-    }
+<!-- Modal teléfono -->
+ <style>
+  :root{
+    --bg:#0f1115; --panel:#11151d; --card:#151a23; --line:#243041;
+    --ink:#e7ecf3; --muted:#9fb0c9; --accent:#00bfff; --accent2:#1f6feb;
+    --ok:#22c55e; --warn:#f59e0b; --err:#ef4444;
+  }
 
-    /* Tablero */
-    #mini-juego #board{
-      --cell:clamp(50px,13.5vw,90px);
-      width:92%;
-      margin:0 auto 10px;
-      display:grid;
-      grid-template-columns:repeat(6,minmax(0,var(--cell)));
-      gap:8px;
-      user-select:none
-    }
-    #mini-juego #board button{
-      display:grid;
-      place-items:center;
-      aspect-ratio:1/1;
-      border-radius:14px;
-      border:1px solid #243041;
-      background:linear-gradient(135deg,#0e1420,#0b0f18);
-      color:#e7ecf3;
-      font-weight:800;
-      letter-spacing:.2px;
-      font-size:clamp(14px,2.5vw,18px);
-      cursor:pointer;
-      transition:transform .18s ease,background .15s ease,border-color .15s ease,box-shadow .15s ease;
-      transform-style:preserve-3d;
-      padding:6px
-    }
-    #mini-juego #board button:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(0,0,0,.35)}
-    #mini-juego #board button:disabled{opacity:.9;cursor:not-allowed;transform:none;box-shadow:none}
+  /* Ventana modal */
+  #MG-phone{
+    position: fixed;
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: min(90vw, 520px); max-height: 90vh;
+    padding: 54px 18px 18px; /* espacio arriba para la barra */
+    background:
+      radial-gradient(120% 120% at 50% 10%, rgba(0,191,255,.10), transparent 60%),
+      linear-gradient(180deg, rgba(21,26,35,.96), rgba(17,21,29,.92));
+    color: var(--ink);
+    border: 1px solid color-mix(in srgb, var(--line), transparent 35%);
+    border-radius: 20px;
+    box-shadow: 0 16px 50px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.05);
+    backdrop-filter: blur(6px);
+    display: none; /* tu JS lo muestra */
+    z-index: 9999;
+    overflow: hidden;
 
-    #mini-juego .cell-img{width:82%;height:82%;object-fit:contain;display:block;pointer-events:none}
+    /* Grid vertical: input → error → botones */
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
 
-    /* Animaciones */
-    @keyframes flip{0%{transform:rotateY(0)}50%{transform:rotateY(90deg)}100%{transform:rotateY(0)}}
-    @keyframes shuffle{0%{transform:translate(0,0) rotate(0)}25%{transform:translate(1px,-1px) rotate(-1deg)}50%{transform:translate(-1px,1px) rotate(1deg)}75%{transform:translate(1px,1px) rotate(0)}100%{transform:translate(0,0) rotate(0)}}
-    .is-flipping{animation:flip .5s both}
-    .is-shuffling{animation:shuffle .6s ease-in-out}
-    .pop{animation:pop .25s ease}
-    @keyframes pop{0%{transform:scale(.92)}100%{transform:scale(1)}}
+  /* Glow de borde animado */
+  #MG-phone::after{
+    content:"";
+    position:absolute; inset:-2px;
+    border-radius: 22px;
+    background: conic-gradient(from 0deg, #00f7ff, #ff5bf7, #9dfcfe, #5bffb0, #00f7ff);
+    filter: blur(10px) saturate(120%);
+    opacity:.25;
+    animation: mgSpin 10s linear infinite;
+    z-index: -1;
+  }
+  @keyframes mgSpin{ to{ transform: rotate(360deg); } }
 
-    /* Estados revelados */
-    .prize-200{background:linear-gradient(145deg,#064e3b,#0b6b52)!important;border-color:#18c38a!important;box-shadow:0 8px 30px rgba(14,159,110,.25)}
-    .prize-gomita{background:linear-gradient(145deg,#3b0764,#5b0aa0)!important;border-color:#9b5cf7!important;box-shadow:0 8px 30px rgba(124,58,237,.25)}
-    .prize-nada{background:linear-gradient(145deg,#191c24,#1b1f2a)!important;border-color:#2d3547!important}
+  /* Barra superior con el título */
+  #MG-phone::before{
+    content:"INGRESA TU NÚMERO PARA JUGAR";
+    position:absolute; left:0; right:0; top:0;
+    height: 34px; display:flex; align-items:center; justify-content:center;
+    background: linear-gradient(90deg, rgba(0,191,255,.22), rgba(255,91,247,.22));
+    color: var(--ink);
+    font-size: 12px; letter-spacing:.16em; text-transform: uppercase;
+    border-bottom: 1px solid color-mix(in srgb, var(--line), transparent 40%);
+    animation: mgBlink 1.6s steps(2,end) infinite;
+    z-index: 2;
+  }
+  @keyframes mgBlink{ 50% { opacity:.55 } }
 
-    /* Modal */
-    #mini-modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(4,6,12,.66);backdrop-filter:blur(2px);z-index:9999}
-    #mini-modal-card{width:min(540px,92vw);border:1px solid #2b3750;border-radius:20px;box-shadow:0 24px 80px rgba(0,0,0,.45);padding:22px;background:
-      radial-gradient(500px 220px at 20% 0%,rgba(99,102,241,.12),transparent 60%),
-      radial-gradient(500px 220px at 80% 100%,rgba(34,197,94,.12),transparent 60%),
-      #0b1220}
-    #mini-modal-card.success{border-color:#16a34a;background:
-      radial-gradient(600px 240px at 20% 0%,rgba(34,197,94,.12),transparent 60%),
-      #071c12}
-    #mini-modal-card.warn{border-color:#7c3aed;background:
-      radial-gradient(600px 240px at 20% 0%,rgba(124,58,237,.14),transparent 60%),
-      #13072b}
-    #mini-modal-card.neutral{border-color:#475569;background:
-      radial-gradient(600px 240px at 20% 0%,rgba(100,116,139,.10),transparent 60%),
-      #0b1220}
+  /* Input ocupa todo el ancho */
+  #MG-phone-input{
+    width: 100%;
+    background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+    color: var(--ink);
+    border: 1px solid color-mix(in srgb, var(--line), transparent 35%);
+    border-radius: 14px;
+    padding: 12px 14px;
+    font-size: 16px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.045);
+    outline: none;
+    transition: box-shadow .2s ease, border-color .2s ease;
+  }
+  #MG-phone-input:focus{
+    border-color: color-mix(in srgb, var(--accent), white 10%);
+    box-shadow: 0 0 0 3px rgba(0,191,255,.14);
+  }
 
-    /* Headline y copy */
-    #mini-modal-card .headline{
-      display:block; text-align:center; line-height:1.1; margin:2px 0 8px;
-      letter-spacing:.2px; font-weight:900;
-    }
-    #mini-modal-card .headline .xl{display:inline-block; font-size:clamp(26px,5.6vw,36px);}
-    #mini-modal-card .headline .md{display:inline-block; font-size:clamp(18px,3.6vw,22px); font-weight:800; opacity:.95;}
-    #mini-modal-card .headline .accent{
-      background:linear-gradient(90deg,#22c55e,#86efac);
-      -webkit-background-clip:text; background-clip:text; color:transparent;
-      text-shadow:0 8px 30px rgba(34,197,94,.25);
-    }
-    #mini-modal-card .headline .accent-purple{
-      background:linear-gradient(90deg,#a78bfa,#22d3ee);
-      -webkit-background-clip:text; background-clip:text; color:transparent;
-      text-shadow:0 8px 30px rgba(124,58,237,.28);
-    }
-    #mini-modal-title{margin:0}
-    #mini-modal-msg{margin:0}
+  /* Error debajo del input */
+  #MG-phone-error{
+    min-height: 18px;
+    font-size: 13px;
+    color: var(--err);
+    text-align: center;
+  }
 
-    #mini-modal-card .msg{text-align:center; margin:6px auto 10px; max-width:36ch;}
-    #mini-modal-card .msg .big{display:block; font-size:clamp(16px,3.6vw,20px); font-weight:800; margin-bottom:4px;}
-    #mini-modal-card .msg .note{display:block; font-size:clamp(13px,3vw,15px); opacity:.95;}
-    #mini-modal-card .msg .warn{color:#fde68a; font-weight:800;}
+  /* Contenedor botones */
+  .mg-buttons{
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+  }
 
-    #mini-modal-figure{display:flex;align-items:center;justify-content:center;margin:6px 0 12px}
-    #mini-modal-figure img{width:min(180px,52%);height:auto;filter:drop-shadow(0 10px 28px rgba(0,0,0,.35))}
-    .cta{margin:10px auto 0;display:inline-flex;gap:8px;align-items:center;border-radius:999px;padding:10px 16px;border:1px solid #2b3750;background:#121c2e;color:#e7ecf3;font-weight:700}
-    .cta:hover{transform:translateY(-1px)}
-    #mini-modal-actions{display:flex;justify-content:center;gap:10px;margin-top:8px;flex-wrap:wrap}
-    #mini-modal-ok{padding:10px 16px;border-radius:12px;border:1px solid #1f2937;background:#1f6feb;color:#fff;cursor:pointer;font-weight:700;min-width:120px;text-align:center}
+  /* Botones */
+  #MG-phone-ok, #MG-phone-cancel{
+    flex: 1;
+    appearance: none; border: 0; border-radius: 12px;
+    padding: 12px 14px; font-size: 15px; font-weight: 700; cursor: pointer;
+    transition: transform .05s ease, filter .2s ease, box-shadow .2s ease;
+  }
+  #MG-phone-ok{
+    background: linear-gradient(180deg, var(--accent), var(--accent2));
+    color: #061018;
+    box-shadow: 0 10px 26px rgba(0,191,255,.25);
+  }
+  #MG-phone-ok:hover{ filter: brightness(1.05) }
+  #MG-phone-ok:active{ transform: translateY(1px) }
 
-    /* Etiquetas */
-    .kicker{font-size:12px;letter-spacing:.4px;text-transform:uppercase;color:#9fb0c9;text-align:center;margin:0 0 6px}
-    .subtitle{font-size:clamp(14px,2vw,16px);text-align:center;color:#cbd5e1;margin:0 0 8px}
+  #MG-phone-cancel{
+    background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.06));
+    color: var(--ink);
+    border: 1px solid color-mix(in srgb, var(--line), transparent 35%);
+  }
+  #MG-phone-cancel:hover{ filter: brightness(1.04) }
+  #MG-phone-cancel:active{ transform: translateY(1px) }
 
-    /* Phone modal */
-    #phone-modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.6);z-index:10000}
-    .phone-card{
-      width:min(440px,92vw);background:#0b1220;border:1px solid #334155;border-radius:16px;
-      box-shadow:0 20px 60px rgba(0,0,0,.4);padding:16px 14px
-    }
-    .phone-title{margin:0 0 6px;font-size:clamp(18px,4.8vw,20px);text-align:center}
-    .phone-sub{margin:0 0 12px;opacity:.9;text-align:center}
-    .phone-row{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap}
-    .phone-input{
-      flex:1;min-width:180px;max-width:260px;padding:12px 14px;border-radius:14px;border:1px solid #334155;background:#0f172a;color:#eee;outline:none;text-align:center;font-weight:700;letter-spacing:.8px
-    }
-    .phone-btn{padding:12px 14px;border-radius:14px;border:1px solid #1f2937;background:#1f6feb;color:#fff;cursor:pointer;font-weight:800;min-width:120px}
-    .phone-btn.secondary{border:1px solid #475569;background:#1f2937;color:#e5e7eb}
-    .phone-err{min-height:18px;margin-top:8px;font-size:13px;color:#fca5a5;text-align:center}
-  </style>
+  /* Responsive: apila botones en móvil */
+  @media (max-width: 460px){
+    .mg-buttons{ flex-direction: column; }
+  }
+</style>
 
-  <!-- Header con overlay de canvas para confeti -->
-  <div style="position:relative;width:100%;max-width:520px;margin:0 auto 8px;line-height:0;isolation:isolate;">
-    <img src="img/gan200.png" alt="Título" style="display:block;width:100%;height:auto;border-radius:12px">
-    <canvas id="miniCanvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:block;"></canvas>
+<div id="MG-phone" style="display:none">
+  <!-- Input arriba -->
+  <input id="MG-phone-input" />
+
+  <!-- Mensaje de error debajo del input -->
+  <div id="MG-phone-error"></div>
+
+  <!-- Botones agrupados abajo -->
+  <div class="mg-buttons">
+    <button id="MG-phone-ok">Continuar</button>
+    <button id="MG-phone-cancel">Cancelar</button>
+  </div>
+</div>
+
+<!-- END CODE MEGA 5X5 -->
+<!-- ================= JUEGO 3x1 · TRIPLE 3 ================= -->
+<section id="TRI-wrap">
+  <header class="tri-head">
+    <h2 class="tri-title">TRIPLE 3 · Evento relámpago</h2>
+  </header>
+
+  <!-- Tablero 3x1 -->
+  <div id="TRI-board" class="tri-board" aria-label="Tablero 3x1">
+    <!-- El JS inyecta 3 celdas .tri-cell -->
   </div>
 
-  <p class="kicker">Tienes 1 oportunidad por código</p>
-  <div id="board"></div>
+  <!-- Tarjeta de códigos -->
+  <!-- ====== FORM TRIPLE3 (listo) ====== -->
+<div class="tri-card">
+  <p class="tri-sub" style="text-align:center">Usa 3 códigos para jugar. 1 premio por tirada.</p>
 
-  <center>
-    <div style="display:flex;width:92%;gap:8px;align-items:center;margin:10px 0 14px;flex-wrap:wrap;justify-content:center">
-      <input id="codigo-input" type="text" placeholder="Ingresa tu código" style="flex:1;min-width:220px;padding:12px 14px;border-radius:14px;border:1px solid #2b3750;background:#0f172a;color:#e7ecf3;outline:none;font-weight:600;text-align:center">
-      <button id="validar-btn" style="padding:12px 16px;border-radius:14px;border:1px solid #2b3750;background:linear-gradient(135deg,#2563eb,#1f6feb);color:#fff;cursor:pointer;font-weight:800;letter-spacing:.2px">Validar y jugar</button>
+  <div class="tri-inlined">
+    <input id="tri-code1" class="tri-input big" type="text" placeholder="XXXXXXXXXX" autocomplete="off" inputmode="text">
+    <span class="tri-tag">Código #1</span>
+  </div>
+
+  <div class="tri-inlined">
+    <input id="tri-code2" class="tri-input big" type="text" placeholder="XXXXXXXXXX" autocomplete="off" inputmode="text">
+    <span class="tri-tag">Código #2</span>
+  </div>
+
+  <div class="tri-inlined">
+    <input id="tri-code3" class="tri-input big" type="text" placeholder="XXXXXXXXXX" autocomplete="off" inputmode="text">
+    <span class="tri-tag">Código #3</span>
+  </div>
+
+  <button id="tri-play" class="tri-btn">Validar y jugar</button>
+</div>
+
+<section id="TRI-scope">
+<!-- Modal resultado (igual que antes) -->
+<dialog id="tri-modal">
+  <div class="tri-card" id="tri-card">
+    <div class="tri-hd">
+      <div id="tri-modal-title" class="tri-title err">
+        <span class="tri-ic">⚠️</span>
+        <span>No se pudo jugar</span>
+      </div>
+      <button id="tri-close" class="tri-x" aria-label="Cerrar">✕</button>
     </div>
-    <div id="codigo-status" class="subtitle" style="min-height:22px;margin-bottom:6px;"></div>
-  </center>
+    <div class="tri-sep"></div>
+    <div class="tri-bd">
+      <p id="tri-result">Ingresa los 3 códigos.</p>
+    </div>
+    <div class="tri-actions">
+      <button id="tri-ok" class="tri-btn err">OK</button>
+    </div>
+  </div>
+</dialog>
 
-  <!-- Modal de resultado -->
-  <div id="mini-modal">
-    <div id="mini-modal-card" class="neutral">
-      <div id="mini-modal-figure" aria-hidden="true"></div>
-      <h3 id="mini-modal-title" style="margin:0"></h3>
-      <p id="mini-modal-msg" style="margin:0"></p>
-      <div id="mini-modal-actions">
-        <a id="modal-cta" class="cta" href="https://www.instagram.com/gummybank?igsh=MW82Z3hvN2VjbWYxZw%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" style="display:none">Abrir Instagram</a>
-        <button id="mini-modal-ok">Cerrar</button>
+<!-- Modal TEL estilo mega 5x5 -->
+ <dialog id="tri-phone" class="tri-modal">
+  <div class="tri-modal-card tri-phone-card">
+    <div class="tri-phone-head">
+      <span class="tri-phone-title">INGRESA TU NÚMERO PARA JUGAR</span>
+    </div>
+
+    <div class="tri-phone-body">
+      <div class="tri-phone-field">
+        <input id="tri-phone-input"
+               class="tri-phone-input"
+               type="tel"
+               inputmode="numeric"
+               placeholder=""
+               autocomplete="off">
       </div>
     </div>
-  </div>
 
-  <!-- Modal teléfono -->
-  <div id="phone-modal">
-    <div class="phone-card">
-      <h3 class="phone-title">Confirma tu teléfono</h3>
-      <p class="phone-sub">Para registrar tu participación, ingresa tu número.</p>
-      <div class="phone-row">
-        <input id="phone-input" class="phone-input" inputmode="tel" autocomplete="tel" maxlength="15" placeholder="8 a 15 dígitos">
-        <button id="phone-ok" class="phone-btn">Continuar</button>
-        <button id="phone-cancel" class="phone-btn secondary">Cancelar</button>
-      </div>
-      <div id="phone-error" class="phone-err"></div>
+    <div class="tri-phone-actions">
+      <button id="tri-phone-ok" class="tri-phone-btn primary">Continuar</button>
+      <button id="tri-phone-close" class="tri-phone-btn ghost">Cancelar</button>
     </div>
   </div>
-</section>
-
-<!-- ========= LÓGICA (UN SOLO MÓDULO) ========= -->
-<script type="module">
-  import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-  import {
-    getFirestore, doc, getDoc, serverTimestamp, setDoc,
-    writeBatch, collection, runTransaction
-  } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
-
-  // ====== CONFIG ======
-  const IG_URL = window.IG_URL || "https://instagram.com/tu_pagina";
-
-  const firebaseConfig = window.firebaseConfig || {
-    apiKey: "AIzaSyAJJgDg5SUPvvHgPtDNhIy1f1fiGpBHBw",
-    authDomain: "registro-gomitas.firebaseapp.com",
-    projectId: "registro-gomitas",
-    storageBucket: "registro-gomitas.appspot.com",
-    messagingSenderId: "435485731864",
-    appId: "1:435485731864:web:43dff09753a4c9d507e76d",
-    measurementId: "G-20KEW71X9G"
-  };
-  const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  const toId = s => (s || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
-
-  const TOTAL_CASILLAS=36, PREMIO_GOMITA=6, PREMIO_DINERO=2, PREMIO_NADA=TOTAL_CASILLAS-PREMIO_GOMITA-PREMIO_DINERO;
-
-  // Jackpot control
-  const JACKPOT_MIN_ATTEMPTS = 200; 
+</dialog>
 
 
-  let jackpotEnabled = false;      // se setea por consulta a Firestore
-  const jackpotRef = doc(db, "minijuego_meta", "jackpot");
+<link rel="stylesheet" href="css/triple3.css">
+<script type="module" src="js/triple3.js"></script>
 
-  async function ensureJackpotDoc() {
-    await setDoc(jackpotRef, { sinceLastWin: 0 }, { merge: true });
-  }
-  async function readJackpotMeta() {
-    const snap = await getDoc(jackpotRef);
-    const d = snap.exists() ? (snap.data() || {}) : {};
-    return { sinceLastWin: Number(d.sinceLastWin || 0) };
-  }
-  async function canEnableJackpot() {
-    await ensureJackpotDoc();
-    const { sinceLastWin } = await readJackpotMeta();
-    return sinceLastWin >= JACKPOT_MIN_ATTEMPTS;
-  }
+<!-- ================== MINI JUEGO 36 CASILLAS (6x6) ================== 
+    <div class="header-canvas">
+      <img src="img/gan200.png" alt="Título" class="header-img">
+      <canvas id="miniCanvas" class="header-canvas-overlay"></canvas>
+    </div>
 
-  const $board=document.getElementById("board"),
-        $status=document.getElementById("codigo-status"),
-        $codigoInput=document.getElementById("codigo-input"),
-        $validarBtn=document.getElementById("validar-btn"),
-        $modal=document.getElementById("mini-modal"),
-        $modalCard=document.getElementById("mini-modal-card"),
-        $modalTitle=document.getElementById("mini-modal-title"),
-        $modalMsg=document.getElementById("mini-modal-msg"),
-        $modalOk=document.getElementById("mini-modal-ok"),
-        $modalFigure=document.getElementById("mini-modal-figure"),
-        $modalCta=document.getElementById("modal-cta"),
-        $phoneModal=document.getElementById("phone-modal"),
-        $phoneInput=document.getElementById("phone-input"),
-        $phoneOk=document.getElementById("phone-ok"),
-        $phoneCancel=document.getElementById("phone-cancel"),
-        $phoneError=document.getElementById("phone-error"),
-        $canvas=document.getElementById("miniCanvas");
+    <p class="kicker">Tienes 1 oportunidad por código</p>
+    <div id="board"></div>
 
-  let codigoValido=null, telefonoValido=null, juegoHabilitado=false, yaJugo=false;
+    <center>
+      <div class="controls">
+        <input id="codigo-input" type="text" placeholder="Ingresa tu código" class="codigo-input">
+        <button id="validar-btn" class="validar-btn">Validar y jugar</button>
+      </div>
+      <div id="codigo-status" class="subtitle status"></div>
+    </center>
 
-  const svgURI = s => 'data:image/svg+xml;utf8,' + encodeURIComponent(s.trim());
-  const IMG = {
-    HIDDEN: svgURI(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="18" fill="#111827"/><text x="50%" y="56%" text-anchor="middle" dominant-baseline="middle" font-family="system-ui,Segoe UI,Roboto" font-size="64" fill="#9fb0c9">?</text></svg>`),
-    X: svgURI(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="18" fill="#1b2332"/><path d="M30 30 L90 90 M90 30 L30 90" stroke="#d1d5db" stroke-width="14" stroke-linecap="round"/></svg>`),
-    GOMITA: 'img/gomita.png',
-    P200: svgURI(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="18" fill="#064e3b"/><circle cx="60" cy="60" r="36" fill="#0e9f6e"/><text x="50%" y="56%" text-anchor="middle" dominant-baseline="middle" font-family="system-ui,Segoe UI,Roboto" font-size="38" fill="#e6fffa">$200</text></svg>`)
-  };
-
-  function setIcon(btn, kind){
-    const alt = kind==='P200' ? '$200' : kind==='GOMITA' ? 'Gomitas' : kind==='X' ? 'Sin premio' : 'Oculto';
-    btn.innerHTML = `<img class="cell-img" alt="${alt}" src="${IMG[kind]}">`;
-    btn.setAttribute('aria-label', alt);
-  }
-  function setRevealStyles(btn, premio){
-    btn.classList.remove('prize-200','prize-gomita','prize-nada');
-    if(premio==='200') btn.classList.add('prize-200');
-    else if(premio==='gomita') btn.classList.add('prize-gomita');
-    else btn.classList.add('prize-nada');
-  }
-
-  // Estado inicial: vitrina (puede mostrar $200 de utilería)
-  mostrarPremiosIniciales();
-
-  $validarBtn.addEventListener("click",async()=>{
-    const code=toId($codigoInput.value);
-    if(!code){pintarStatus("Ingresa un código válido.","#ff6b6b");bloquearTablero();return;}
-    try{
-      const esValido=await validarCodigoDisponible(code);
-      if(!esValido){pintarStatus("Código inválido o ya usado.","#ff6b6b");bloquearTablero();return;}
-      codigoValido=code; juegoHabilitado=true; yaJugo=false;
-      try{ telefonoValido=await pedirTelefono(); }
-      catch(_){ pintarStatus("Participación cancelada.","#fca5a5"); return; }
-
-      // Checar si ya se habilita el $200 real
-      jackpotEnabled = await canEnableJackpot();
-
-      pintarStatus("Tienes un intento. Mezclando...","#3fb950");
-      await animarVolteoYMezcla();
-    }catch(e){console.error(e);pintarStatus("Error al validar.","#ff6b6b");}
-  });
-
-  // Vitrina inicial
-  function mostrarPremiosIniciales(){
-    const fakeShowJackpot = Math.random() < 0.7; // 70% mostrar $200 visual
-    const pool = [];
-    if (fakeShowJackpot) pool.push("200");
-    for (let i=0;i<PREMIO_GOMITA;i++) pool.push("gomita");
-    for (let i=pool.length;i<TOTAL_CASILLAS;i++) pool.push("nada");
-    for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
-
-    $board.innerHTML="";
-    pool.forEach(p=>{
-      const btn=document.createElement("button");
-      if(p==="200"){ setIcon(btn,'P200'); setRevealStyles(btn,'200'); }
-      else if(p==="gomita"){ setIcon(btn,'GOMITA'); setRevealStyles(btn,'gomita'); }
-      else{ setIcon(btn,'X'); setRevealStyles(btn,'nada'); }
-      btn.disabled=true;
-      $board.appendChild(btn);
-    });
-  }
-
-  async function animarVolteoYMezcla(){
-    const buttons=Array.from($board.children);
-    await Promise.all(buttons.map((btn,i)=>new Promise(res=>{
-      setTimeout(()=>{
-        setIcon(btn,'HIDDEN');
-        btn.classList.remove("prize-200","prize-gomita","prize-nada");
-        btn.style.background="linear-gradient(135deg,#0e1420,#0b0f18)";
-        btn.style.borderColor="#243041";
-        res();
-      },i*30);
-    })));
-    configurarPremiosRandom();
-    buttons.forEach((btn,i)=>{setTimeout(()=>{btn.classList.add("is-shuffling");setTimeout(()=>btn.classList.remove("is-shuffling"),650);},i*12);});
-    habilitarTablero();
-    pintarStatus("Código validado. Elige una casilla.","#3fb950");
-  }
-
-  function bloquearTablero(){Array.from($board.children).forEach(btn=>btn.disabled=true);juegoHabilitado=false;}
-  function habilitarTablero(){Array.from($board.children).forEach(btn=>btn.disabled=false);juegoHabilitado=true;}
-
-  // Pool REAL: solo incluye $200 si el jackpot está habilitado
-  function configurarPremiosRandom(){
-    const pool = [];
-    const realDinero = jackpotEnabled ? PREMIO_DINERO : 0;
-    for (let i=0;i<realDinero;i++) pool.push("200");
-    for (let i=0;i<PREMIO_GOMITA;i++) pool.push("gomita");
-    for (let i=pool.length;i<TOTAL_CASILLAS;i++) pool.push("nada");
-
-    for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
-
-    Array.from($board.children).forEach((btn,idx)=>{
-      btn.dataset.premio=pool[idx];
-      setIcon(btn,'HIDDEN');
-      btn.disabled=false;
-      btn.onclick=()=>onClickCasilla(btn);
-      btn.style.background="linear-gradient(135deg,#0e1420,#0b0f18)";
-      btn.style.borderColor="#243041";
-    });
-  }
-
-  async function onClickCasilla(btn){
-    if(!juegoHabilitado||!codigoValido||yaJugo)return;
-    yaJugo=true;
-    bloquearTablero();
-
-    let premio=btn.dataset.premio;
-
-    await revelarCasilla(btn, premio);
-
-    try{
-      await persistirResultado(codigoValido, telefonoValido, premio);
-    }catch(e){
-      console.error("No se pudo persistir el resultado:", e);
-    }
-
-    await revelarResto(btn);
-
-    if (premio === "200") {
-      lanzarConfeti("gold");
-      openResultModal(null, null, "success", { type: "200" });
-    } else if (premio === "gomita") {
-      lanzarConfeti("purple");
-      openResultModal(null, null, "warn", { type: "gomita" });
-    } else {
-      openResultModal(null, null, "neutral", { type: "nada" });
-    }
-  }
-
-  function revelarCasilla(btn,premio){
-    return new Promise(res=>{
-      btn.classList.add("is-flipping");
-      setTimeout(()=>{
-        if(premio==="200"){ setIcon(btn,'P200'); setRevealStyles(btn,'200'); }
-        else if(premio==="gomita"){ setIcon(btn,'GOMITA'); setRevealStyles(btn,'gomita'); }
-        else { setIcon(btn,'X'); setRevealStyles(btn,'nada'); }
-        btn.classList.remove("is-flipping");
-        btn.classList.add("pop");
-        setTimeout(()=>{btn.classList.remove("pop");res();},180);
-      },180);
-    });
-  }
-
-  // Revelado del resto: si NO hay $200 real y jackpot está deshabilitado,
-  // inyecta un $200 SOLO VISUAL en una celda que NO fue elegida.
-  function revelarResto(chosenBtn){
-    const buttons=Array.from($board.children);
-    const hasReal200 = buttons.some(b=>b.dataset.premio==='200');
-    let fake200Btn = null;
-
-    if(!hasReal200 && !jackpotEnabled){
-      const others = buttons.filter(b=>b!==chosenBtn);
-      fake200Btn = others[(Math.random()*others.length)|0];
-    }
-
-    let delay=120;
-    const promises=[];
-    for(const b of buttons){
-      if(b===chosenBtn) continue;
-      const premio=b.dataset.premio;
-
-      promises.push(new Promise(r=>{
-        setTimeout(()=>{
-          if(fake200Btn && b===fake200Btn){
-            // Mostrar $200 visual sin tocar dataset
-            setIcon(b,'P200'); setRevealStyles(b,'200');
-          }else if(premio==="200"){
-            setIcon(b,'P200'); setRevealStyles(b,'200');
-          }else if(premio==="gomita"){
-            setIcon(b,'GOMITA'); setRevealStyles(b,'gomita');
-          }else{
-            setIcon(b,'X'); setRevealStyles(b,'nada');
-          }
-          r();
-        }, delay);
-        delay += 60;
-      }));
-    }
-    return Promise.all(promises);
-  }
-
-  function pintarStatus(msg,color){$status.textContent=msg;$status.style.color=color||"#9fb0c9";}
-
-  async function validarCodigoDisponible(rawCode){
-    const code = toId(rawCode);
-    const ref=doc(db,"codigos",code);
-    const snap=await getDoc(ref);
-    if(!snap.exists())return false;
-    const data=snap.data()||{};
-    if((data.estado||"").toLowerCase()==="usado")return false;
-    return true;
-  }
-
-  // Persistencia + contador de intentos del jackpot
-  async function persistirResultado(codeRaw, phone, premio){
-    const code = toId(codeRaw);
-    const playRef=doc(collection(db,"minijuego_plays"));
-    const codeRef=doc(db,"codigos",code);
-
-    await ensureJackpotDoc();
-
-    await runTransaction(db, async (tx) => {
-      const metaSnap = await tx.get(jackpotRef);
-      const meta = metaSnap.exists() ? (metaSnap.data()||{}) : { sinceLastWin: 0 };
-      const current = Number(meta.sinceLastWin||0);
-
-      // Blindaje extremo: si llegara "200" antes del umbral, degradar a "gomita"
-      let finalPremio = premio;
-      if (premio === "200" && current < JACKPOT_MIN_ATTEMPTS) {
-        finalPremio = "gomita";
-      }
-
-      // Escribe play
-      tx.set(playRef, {
-        codigo: code,
-        telefono: phone,
-        resultado: finalPremio,
-        createdAt: serverTimestamp()
-      });
-
-      // Marca código como usado
-      tx.set(codeRef, {
-        estado:"usado",
-        usadoEn:"MiniJuego",
-        usadoAt:serverTimestamp(),
-        telefono: phone,
-        resultado: finalPremio === '200' ? '200' : (finalPremio === 'gomita' ? 'gomitas' : 'sin premio')
-      }, { merge:true });
-
-      // Actualiza meta
-      if (finalPremio === "200") {
-        tx.set(jackpotRef, { sinceLastWin: 0 }, { merge: true });
-      } else {
-        tx.set(jackpotRef, { sinceLastWin: current + 1 }, { merge: true });
-      }
-    });
-  }
-
-  // Registro en Bóvedas (igual que antes)
-  window.handleRegistroCodigo = async ({codigo, telefono, boveda})=>{
-    const code = toId(codigo);
-    if(!/^[A-Z0-9]{8}$/.test(code)) { alert("Código inválido."); return false; }
-    if(!/^\d{10}$/.test(telefono||"")) { alert("Teléfono inválido (10 dígitos)."); return false; }
-    if(!["madera","cristal","plateada","dorada"].includes(boveda)){ alert("Bóveda inválida."); return false; }
-
-    const ref = doc(db,"codigos",code);
-    const snap = await getDoc(ref);
-    if(!snap.exists()){ alert("Este código no existe."); return false; }
-    const data = snap.data() || {};
-    if((data.estado||"").toLowerCase()==="usado"){ alert("Este código ya fue usado."); return false; }
-
-    const batch = writeBatch(db);
-    batch.set(ref, { estado:"usado", telefono, boveda, registradoAt: serverTimestamp() }, { merge:true });
-    const destinoRef = doc(collection(db, boveda), code);
-    batch.set(destinoRef, { codigo: code, telefono, boveda, registrado: serverTimestamp() });
-    await batch.commit();
-
-    try{
-      const cont = document.getElementById(`tarjetas-${boveda}`);
-      if(cont){
-        const card = document.createElement("div");
-        card.className = "card-codigo";
-        card.innerHTML = `<strong>Código:</strong> ${code}<br><strong>Teléfono:</strong> ${telefono}`;
-        cont.prepend(card);
-      }
-      const countEl = document.querySelector(`.vault.${boveda} .count`);
-      if(countEl){ countEl.textContent = String(Number(countEl.textContent||"0") + 1); }
-    }catch(_){}
-
-    const okM = document.getElementById("customModal"), ov = document.getElementById("overlay");
-    if(okM && ov){ okM.style.display="block"; ov.style.display="block"; }
-    return true;
-  };
-
-  // Modal resultado
-  function openResultModal(_title,_msg,variant,{type}={}){
-    $modalFigure.innerHTML = "";
-    $modalCard.classList.remove('success','warn','neutral');
-    if(variant) $modalCard.classList.add(variant);
-
-    if(type==="gomita"){
-      const im=document.createElement('img');
-      im.src=IMG.GOMITA; im.alt="Gomitas";
-      $modalFigure.appendChild(im);
-    }else if(type==="200"){
-      const im=document.createElement('img');
-      im.src=IMG.P200; im.alt="$200";
-      $modalFigure.appendChild(im);
-    }
-
-    if (type === "200") {
-      $modalTitle.innerHTML = `
-        <div class="headline">
-          <span class="md">¡PREMIO MAYOR!</span><br>
-          <span class="xl accent">$200</span>
+    <!-- Modal de resultado 
+    <div id="mini-modal" class="mini-modal">
+      <div id="mini-modal-card" class="mini-modal-card neutral">
+        <div id="mini-modal-figure" aria-hidden="true"></div>
+        <h3 id="mini-modal-title" class="mini-modal-title"></h3>
+        <p id="mini-modal-msg" class="mini-modal-msg"></p>
+        <div id="mini-modal-actions" class="mini-modal-actions">
+          <a id="modal-cta" class="cta" href="#" target="_blank" rel="noopener noreferrer" style="display:none">Abrir Instagram</a>
+          <button id="mini-modal-ok" class="mini-modal-ok">Cerrar</button>
         </div>
-      `;
-      $modalMsg.innerHTML = `
-        <div class="msg">
-          <span class="big">Te lo llevaste todo.</span>
-          <span class="note warn">TOMA CAPTURA DE PANTALLA</span>
-          <span class="note">Envíala por DM a nuestro Instagram para reclamar tu premio.</span>
+      </div>
+    </div>
+
+    <!-- Modal teléfono --
+    <div id="phone-modal" class="phone-modal">
+      <div class="phone-card">
+        <h3 class="phone-title">Confirma tu teléfono</h3>
+        <p class="phone-sub">Para registrar tu participación, ingresa tu número.</p>
+        <div class="phone-row">
+          <input id="phone-input" class="phone-input" inputmode="tel" autocomplete="tel" maxlength="15" placeholder="8 a 15 dígitos">
+          <button id="phone-ok" class="phone-btn">Continuar</button>
+          <button id="phone-cancel" class="phone-btn secondary">Cancelar</button>
         </div>
-      `;
-      $modalCta.style.display='inline-flex';
-      $modalCta.href = IG_URL;
-      $modalCta.textContent = 'Abrir Instagram';
-    } else if (type === "gomita") {
-      $modalTitle.innerHTML = `
-        <div class="headline">
-          <span class="md">¡GOMITAS</span> <span class="md accent-purple">GANADAS!</span>
-        </div>
-      `;
-      $modalMsg.innerHTML = `
-        <div class="msg">
-          <span class="big">Dulce victoria.</span>
-          <span class="note warn">TOMA CAPTURA DE PANTALLA</span>
-          <span class="note">Mándala por DM en Instagram y reclama tus gomitas.</span>
-        </div>
-      `;
-      $modalCta.style.display='inline-flex';
-      $modalCta.href = IG_URL;
-      $modalCta.textContent = 'Abrir Instagram';
-    } else {
-      $modalTitle.innerHTML = `
-        <div class="headline">
-          <span class="md">SIN PREMIO</span><br>
-          <span class="xl">ESTA VEZ</span>
-        </div>
-      `;
-      $modalMsg.innerHTML = `
-        <div class="msg">
-          <span class="big">Quizá la próxima tengas más suerte.</span>
-          <span class="note">Sigue participando con más códigos que la próxima puede ser tuya.</span>
-        </div>
-      `;
-      $modalCta.style.display='none';
+        <div id="phone-error" class="phone-err"></div>
+      </div>
+    </div>
+  </section>
+  <!-- ================== FIN MINI JUEGO ================== -->
+
+  <!-- ================== Ranking  ================== -->
+<header>
+  <div class="wrap rk-hero">
+    <center>
+    <h1>Mejor Cliente</h1>
+    </center>
+    <!-- Cuenta regresiva: ahora mismo 29 días desde este instante -->
+    <!-- Opción A: relativo -->
+    <div id="rk-countdown" class="cd" data-days="29"></div>
+
+    <!-- Opción B: fecha fija (ejemplo) -->
+    <!-- <div id="rk-countdown" class="cd" data-target="2025-09-03T17:00:00"></div> -->
+  </div>
+</header>
+
+  <main class="wrap">
+    <section class="top-grid" id="topPodio"></section>
+    <section class="list" id="listado"></section>
+  </main>
+  <script>
+(() => {
+  const mount = document.getElementById('rk-countdown');
+  if(!mount) return;
+
+  // Construcción del layout
+  mount.innerHTML = `
+    <span class="cd-label">FIN:   </span>
+    <div class="cd-wrap">
+      <div class="cd-box"><span class="cd-num" id="cd-d">00</span><span class="cd-unit">días</span></div>
+      <div class="cd-colon"></div>
+      <div class="cd-box"><span class="cd-num" id="cd-h">00</span><span class="cd-unit">horas</span></div>
+      <div class="cd-colon"></div>
+      <div class="cd-box"><span class="cd-num" id="cd-m">00</span><span class="cd-unit">min</span></div>
+      <div class="cd-colon"></div>
+      <div class="cd-box"><span class="cd-num" id="cd-s">00</span><span class="cd-unit">seg</span></div>
+    </div>
+  `;
+
+  const $d = document.getElementById('cd-d');
+  const $h = document.getElementById('cd-h');
+  const $m = document.getElementById('cd-m');
+  const $s = document.getElementById('cd-s');
+
+  // Config: usa data-target (fecha fija) o data-days (relativo)
+  let target;
+  if (mount.dataset.target) {
+    // Se interpreta en hora local del navegador
+    target = new Date(mount.dataset.target);
+  } else if (mount.dataset.days) {
+    const days = parseInt(mount.dataset.days, 10) || 0;
+    target = new Date(Date.now() + days * 86400000);
+  } else {
+    // Fallback: 3 de septiembre 17:00 hora local
+    const now = new Date();
+    const y = (now.getMonth() > 8 || (now.getMonth() === 8 && now.getDate() > 3)) ? now.getFullYear()+1 : now.getFullYear();
+    target = new Date(y, 8, 3, 17, 0, 0); // mes 8 = septiembre
+  }
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+
+  function tick(){
+    const diff = target.getTime() - Date.now();
+    if (diff <= 0) {
+      $d.textContent = '00'; $h.textContent = '00'; $m.textContent = '00'; $s.textContent = '00';
+      clearInterval(timer);
+      return;
     }
+    const totalSec = Math.floor(diff / 1000);
+    const days  = Math.floor(totalSec / 86400);
+    const hours = Math.floor((totalSec % 86400) / 3600);
+    const mins  = Math.floor((totalSec % 3600) / 60);
+    const secs  = totalSec % 60;
 
-    $modal.style.display='flex';
-    $modalOk.focus();
-  }
-  function closeResultModal(){
-    $modal.style.display='none';
-    $codigoInput.value='';
-    codigoValido=null; telefonoValido=null;
-    pintarStatus('Ingresa un código para jugar.','#9fb0c9');
-  }
-  $modalOk.addEventListener('click',closeResultModal);
-  $modal.addEventListener('click',(e)=>{if(e.target===$modal)closeResultModal();});
-  window.addEventListener('keydown',(e)=>{if($modal.style.display==='flex'&&(e.key==='Escape'||e.key==='Enter'))closeResultModal();});
-
-  // Teléfono
-  function validarTelefono(value){
-    const digits=(value||'').replace(/\D/g,'');
-    return digits.length>=8 && digits.length<=15 ? digits : null;
-  }
-  function abrirPhoneModal(){
-    $phoneError.textContent='';
-    $phoneInput.value='';
-    $phoneModal.style.display='flex';
-    setTimeout(()=>{$phoneInput.focus();},0);
-  }
-  function cerrarPhoneModal(){ $phoneModal.style.display='none'; }
-
-  function pedirTelefono(){
-    return new Promise((resolve,reject)=>{
-      abrirPhoneModal();
-
-      const onOk=()=>{
-        const v=validarTelefono($phoneInput.value);
-        if(!v){ $phoneError.textContent='Ingresa un teléfono válido (8 a 15 dígitos).'; return; }
-        cerrarPhoneModal(); resolve(v);
-      };
-      const onCancel=()=>{ cerrarPhoneModal(); reject(new Error('cancelado')); };
-
-      $phoneOk.onclick=onOk;
-      $phoneCancel.onclick=onCancel;
-      $phoneModal.onclick=(e)=>{ if(e.target===$phoneModal) onCancel(); };
-
-      const handler=(e)=>{
-        if($phoneModal.style.display==='flex'&&e.key==='Enter') onOk();
-        if($phoneModal.style.display==='flex'&&e.key==='Escape') onCancel();
-      };
-      window.addEventListener('keydown',handler,{once:true});
-    });
+    $d.textContent = pad(days);
+    $h.textContent = pad(hours);
+    $m.textContent = pad(mins);
+    $s.textContent = pad(secs);
   }
 
-  // Confeti
-  function lanzarConfeti(palette='gold'){
-    const ctx = $canvas.getContext('2d');
-    const rect = $canvas.getBoundingClientRect();
-    $canvas.width = rect.width * devicePixelRatio;
-    $canvas.height = rect.height * devicePixelRatio;
-    const scale = devicePixelRatio;
-    ctx.scale(scale, scale);
-
-    const colors = palette==='gold'
-      ? ["#ffd700","#ffb300","#ff7a00","#fff2a8"]
-      : ["#9b5cf7","#7c3aed","#c084fc","#e9d5ff"];
-    const pieces = Array.from({length: 110}, ()=>({
-      x: Math.random()*rect.width,
-      y: -20 - Math.random()*60,
-      w: 6+Math.random()*6,
-      h: 8+Math.random()*10,
-      vx: -1 + Math.random()*2,
-      vy: 2 + Math.random()*2.5,
-      rot: Math.random()*Math.PI,
-      vr: -0.2 + Math.random()*0.4,
-      color: colors[(Math.random()*colors.length)|0],
-      life: 220 + Math.random()*120
-    }));
-
-    let running = true;
-    const start = performance.now();
-    function tick(t){
-      if(!running) return;
-      const elapsed = t - start;
-      ctx.clearRect(0,0,rect.width,rect.height);
-      for(const p of pieces){
-        p.x += p.vx;
-        p.y += p.vy;
-        p.rot += p.vr;
-        p.vy += 0.02;
-        ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.rotate(p.rot);
-        ctx.fillStyle = p.color;
-        ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
-        ctx.restore();
-      }
-      if(elapsed < 2600) requestAnimationFrame(tick);
-      else { running=false; ctx.clearRect(0,0,rect.width,rect.height); }
-    }
-    requestAnimationFrame(tick);
-  }
+  tick();
+  const timer = setInterval(tick, 1000);
+})();
 </script>
-<!-- ================== FIN MINI JUEGO ================== -->
 
-<!-- Si tu main.obf.js pinta animaciones/lluvia, déjalo. NO incluimos funcionalidad.js para evitar choques. -->
-<script src="js/main.obf.js" type="module"></script>
+  <!-- Tu inicialización ya existente -->
+  <script type="module" src="js/firebaseClient.js"></script>
+  <!-- Lógica de esta página -->
+  <script type="module" src="js/ranking.js"></script>
+  <!-- ================== End Ranking  ================== -->
+
 
 <!-- Contenedor de la lluvia (si ya lo tienes, omite esta línea) -->
 <div id="lluvia-container" aria-hidden="true"></div>
-<!-- Acceso por candado -->
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const lock = document.getElementById('lock-icon');
-  if (!lock) {
-    console.warn('No se encontró #lock-icon en el DOM.');
-    return;
-  }
 
-  // Mapa de roles -> pass, token de sesión y página de destino
-  const routes = {
-    admin:   { pass: '1234',     token: 'auth',           page: 'admin.html' },
-    panel:   { pass: '12345',     token: 'ventas_auth',    page: 'ventas.html' },
-    vendedor:   { pass: '123456', token: 'vendedor_auth',  page: 'premios.html' },
-    registroven:{ pass: '12345678',     token: 'registro_auth',  page: 'registro-premios.html' },
-    resena:  { pass: '1',       token: 'resena_auth',    page: 'resenas.html' },
-    r:       { pass: '1',       token: 'resena_auth',    page: 'resenas.html' } // alias
+<!-- ====== TRIGGER: usa tu candado existente ====== -->
+<script>
+  // Abre el modal al hacer clic en #lock-icon
+  document.addEventListener('DOMContentLoaded', () => {
+    const lock = document.getElementById('lock-icon');
+    lock?.addEventListener('click', () => window.gbOpenLogin && window.gbOpenLogin());
+  });
+</script>
+<!-- ====== LOGIN MODAL NEÓN (aislado) ====== -->
+<div id="gb-login-overlay" class="gb-login-overlay" aria-hidden="true">
+  <div class="gb-login-backdrop"></div>
+
+  <div class="gb-login-dialog" role="dialog" aria-modal="true" aria-labelledby="gb-login-title">
+    <!-- Anillo neón -->
+    <div class="gb-login-ring" aria-hidden="true">
+      <svg viewBox="0 0 300 300" class="gb-login-ring-svg">
+        <defs>
+          <filter id="gb-glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="6" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <linearGradient id="gb-grad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0"  stop-color="#ff3caa"/>
+            <stop offset="0.5" stop-color="#ffe85a"/>
+            <stop offset="1"  stop-color="#00ff7b"/>
+          </linearGradient>
+        </defs>
+        <path d="M150,20 a130,110 0 1,0 1,0z" fill="none" stroke="url(#gb-grad)" stroke-width="4" filter="url(#gb-glow)"/>
+        <path d="M150,30 a120,120 0 1,0 1,0z" fill="none" stroke="url(#gb-grad)" stroke-width="3" filter="url(#gb-glow)" opacity=".7"/>
+        <path d="M150,10 a140,100 0 1,0 1,0z" fill="none" stroke="url(#gb-grad)" stroke-width="2" filter="url(#gb-glow)" opacity=".5"/>
+      </svg>
+    </div>
+
+    <!-- Tarjeta -->
+    <div class="gb-login-card">
+      <button class="gb-login-close" type="button" aria-label="Cerrar">✕</button>
+      <h2 id="gb-login-title" class="gb-login-title">Login</h2>
+
+      <form id="gb-login-form" autocomplete="off">
+        <label class="gb-login-field">
+          <span>Usuario</span>
+          <input id="gb-login-user" type="text" placeholder="usuario" required>
+        </label>
+
+        <label class="gb-login-field">
+          <span>Contraseña</span>
+          <input id="gb-login-pass" type="password" placeholder="••••••••" required>
+        </label>
+
+        <button class="gb-login-primary" type="submit">Sign in</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Login Js y css  -->
+<style>
+  /* ====== GB LOGIN (aislado) ====== */
+:root{
+  --gb-ink:#e7ecf3; --gb-muted:#9fb0c9; --gb-bg:#0b0e13;
+  --gb-card:#121723; --gb-line:#273041;
+  --gb-a1:#ff3caa; --gb-a2:#ffe85a; --gb-a3:#00ff7b;
+}
+
+/* Overlay y backdrop */
+.gb-login-overlay{position:fixed;inset:0;z-index:99999;display:none}
+.gb-login-overlay[aria-hidden="false"]{display:block}
+.gb-login-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px)}
+
+/* Contenedor centrado */
+.gb-login-dialog{
+  position:absolute;inset:0;display:grid;place-items:center;padding:24px;
+}
+
+/* Tarjeta */
+.gb-login-card{
+  position:relative;
+  width:min(92vw,420px);
+  padding:28px 22px 20px;
+  border-radius:22px;
+  color:var(--gb-ink);
+  /* Más opaco para que no se pierda */
+  background:
+    radial-gradient(120% 120% at 10% -10%, rgba(255,255,255,.15), transparent 40%),
+    linear-gradient(180deg, rgba(255,255,255,.25), rgba(0,0,0,.45));
+  background-color: rgba(18,23,35,0.85);
+  border:1px solid color-mix(in srgb,var(--gb-line),transparent 35%);
+  box-shadow:0 24px 60px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.05);
+  text-align:center;
+  backdrop-filter:blur(8px);
+  overflow:hidden;          /* nada se sale de la card */
+  box-sizing:border-box;
+}
+
+.gb-login-title{
+  margin:6px 0 14px;
+  font:700 26px/1.2 system-ui, Poppins, Segoe UI, Roboto, sans-serif;
+}
+
+/* Campos */
+.gb-login-field{display:grid;gap:8px;margin:12px 0;text-align:left}
+.gb-login-field span{
+  font:600 13px/1 system-ui, Poppins, Segoe UI, Roboto, sans-serif;
+  color:var(--gb-muted)
+}
+.gb-login-field input{
+  all:unset;                /* neutraliza estilos globales agresivos */
+  box-sizing:border-box;    /* evita desbordes por padding/borde */
+  display:block;
+  width:100%;
+  padding:14px 16px;
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,.18);
+  background:rgba(255,255,255,.06);
+  color:var(--gb-ink);
+  font:500 15px/1.2 system-ui, Poppins, Segoe UI, Roboto, sans-serif;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.05);
+}
+.gb-login-field input::placeholder{color:#9fb0c980}
+
+/* Botón principal: alineado y sin desbordes */
+.gb-login-primary{
+  all:unset;
+  box-sizing:border-box;
+  display:block;
+  width:100%;
+  text-align:center;
+  cursor:pointer;
+  margin:12px 0 8px;
+  padding:14px 18px;
+  border-radius:22px;
+  color:#0b0e13;
+  font:700 15px/1 system-ui, Poppins, Segoe UI, Roboto, sans-serif;
+  background:linear-gradient(90deg,var(--gb-a1),var(--gb-a2),var(--gb-a3));
+  box-shadow:0 10px 26px rgba(255,60,170,.28), 0 2px 0 rgba(0,0,0,.25) inset;
+  transition:transform .06s ease;
+}
+.gb-login-primary:active{transform:translateY(1px)}
+
+/* Links */
+.gb-login-links{
+  display:flex;justify-content:space-between;gap:8px;margin-top:4px
+}
+.gb-login-links a{
+  color:var(--gb-muted);
+  font:500 13px/1 system-ui, Poppins, Segoe UI, Roboto, sans-serif;
+  text-decoration:none
+}
+.gb-login-links a:hover{color:var(--gb-ink);text-decoration:underline}
+
+/* Botón cerrar */
+.gb-login-close{
+  all:unset;
+  position:absolute;top:8px;right:10px;cursor:pointer;
+  color:var(--gb-muted);font-size:20px;padding:6px;border-radius:10px
+}
+.gb-login-close:hover{color:var(--gb-ink);background:rgba(255,255,255,.06)}
+
+/* Anillo neón detrás de la card */
+.gb-login-ring{
+  position:absolute;top:50%;left:50%;
+  width:min(92vw,420px);height:min(92vw,420px);
+  transform:translate(-50%,-60%);
+  pointer-events:none;opacity:.95;
+  filter:drop-shadow(0 0 22px rgba(255,60,170,.25));
+  z-index:-1; /* queda DETRÁS para no tapar inputs/botón */
+}
+.gb-login-ring-svg{width:100%;height:100%;animation:gb-spin 18s linear infinite}
+@keyframes gb-spin{to{transform:rotate(360deg)}}
+
+/* Responsivo */
+@media (max-width:420px){
+  .gb-login-card{padding:22px 18px 18px}
+  .gb-login-ring{transform:translate(-50%,-62%)}
+}
+</style>
+
+<script>
+  // ====== RUTAS (ajusta tus contraseñas y destinos) ======
+  const GB_ROUTES = {
+    admin:       { pass: '1234',     token: 'auth',           page: 'admin.html' },
+    panel:       { pass: '12345',    token: 'ventas_auth',    page: 'ventas.html' },
+    vendedor:    { pass: '123456',   token: 'vendedor_auth',  page: 'premios.html' },
+    registroven: { pass: '12345678', token: 'registro_auth',  page: 'registro-premios.html' },
+    resena:      { pass: '1',        token: 'resena_auth',    page: 'resenas.html' },
+    r:           { pass: '1',        token: 'resena_auth',    page: 'resenas.html' },
+    ranking:     { pass: '9999',     token: 'ranking_auth',   page: 'ranking-admin.html' }
   };
 
-  lock.addEventListener('click', () => {
-    const u = prompt('Usuario:');      if (u == null) return;
-    const p = prompt('Contraseña:');   if (p == null) return;
+  (function(){
+    const overlay = document.getElementById('gb-login-overlay');
+    const form = document.getElementById('gb-login-form');
+    const userEl = document.getElementById('gb-login-user');
+    const passEl = document.getElementById('gb-login-pass');
 
-    const user = String(u).trim().toLowerCase();
-    const pass = String(p).trim();
-    const cfg  = routes[user];
-
-    if (cfg && pass === cfg.pass) {
-      sessionStorage.setItem(cfg.token, 'true');
-      window.location.href = cfg.page;
-    } else {
-      alert('Acceso denegado. Usuario o contraseña incorrectos.');
+    function open(){
+      overlay.setAttribute('aria-hidden','false');
+      document.body.style.overflow = 'hidden';
+      setTimeout(()=> userEl.focus(), 10);
     }
-  });
-});
+    function close(){
+      overlay.setAttribute('aria-hidden','true');
+      document.body.style.overflow = '';
+    }
+    // Exponer para el candado
+    window.gbOpenLogin = open;
+
+    // Cerrar con clic fuera y con X
+    overlay.addEventListener('click', e=>{
+      if(e.target === overlay || e.target.classList.contains('gb-login-backdrop') || e.target.classList.contains('gb-login-close')){
+        close();
+      }
+    });
+    // Cerrar con ESC
+    document.addEventListener('keydown', e=>{
+      if(e.key === 'Escape' && overlay.getAttribute('aria-hidden') === 'false') close();
+    });
+
+    // Submit
+    form.addEventListener('submit', e=>{
+      e.preventDefault();
+      const user = userEl.value.trim().toLowerCase();
+      const pass = passEl.value.trim();
+      const cfg = GB_ROUTES[user];
+      if(cfg && pass === cfg.pass){
+        sessionStorage.setItem(cfg.token, 'true');
+        close();
+        location.href = cfg.page;
+      }else{
+        // shake sutil
+        document.querySelector('.gb-login-card')?.animate(
+          [{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},
+           {transform:'translateX(-4px)'},{transform:'translateX(4px)'},{transform:'translateX(0)'}],
+          {duration:320,easing:'ease-in-out'}
+        );
+      }
+    });
+  })();
 </script>
+<!-- EWnd Login Js y css  -->
 
 <!-- Lluvia de gomitas: script independiente, SIN type="module" -->
 <script>
@@ -2123,6 +1169,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 })();
 </script>
+
+<!-- LLUVIA DE BILLETES  -->
 <style>
  /* Lluvia visible pero detrás del contenido */
 #lluvia-container{
@@ -2132,19 +1180,16 @@ document.addEventListener('DOMContentLoaded', () => {
   pointer-events: none; /* no bloquea clics */
   overflow: hidden;
 }
-
 /* Todo tu contenido normal por encima */
 header, main, section, footer, .vault, .gb-review-card{
   position: relative;
   z-index: 1;
 }
-
 /* Modales siguen dominando */
 .modal-overlay{ position:fixed; inset:0; z-index:10040; }
 .custom-modal{ position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); z-index:10050; }
-
 </style>
-
+<!-- END LLUVIA DE BILLETES  -->
 
 <!-- Modal de información -->
 <div class="modal-info" id="infoModal" style="display:none">
@@ -2181,12 +1226,95 @@ header, main, section, footer, .vault, .gb-review-card{
     <button onclick="cerrarInfoModal()">Cerrar</button>
   </div>
 </div>
+
 <div class="modal-overlay" id="overlay-info" style="display:none"></div>
 
-<footer style="text-align:center;margin-top:40px;padding:20px;color:#aaa;font-size:.9rem">
-  © 2025 Gummy Bank. All rights reserved<br/>Moy and Juan
+<!-- Botón Spotify -->
+<div class="spotify-btn">
+  <a href="https://open.spotify.com/artist/2LFKkntsvUU9Kvc9dgvj93?si=kYkK200ZSR654N3FctqttA" target="_blank" rel="noopener noreferrer">
+    <!-- Logo Spotify -->
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="white" viewBox="0 0 24 24" style="margin-right:8px;">
+      <path d="M12 0C5.371 0 0 5.373 0 12c0 6.627 5.371 12 12 12s12-5.373 
+      12-12c0-6.627-5.371-12-12-12zm5.489 17.289c-.213.348-.662.457-1.011.244-2.77-1.693-6.258-2.074-10.365-1.133-.398.091-.799-.159-.891-.557-.092-.398.159-.799.557-.891 
+      4.499-1.039 8.379-.602 11.414 1.305.349.213.459.662.246 1.032zm1.429-3.178c-.267.433-.826.57-1.259.303-3.174-1.956-8.019-2.528-11.777-1.377-.494.15-1.022-.129-1.171-.623-.15-.494.129-1.022.623-1.171 
+      4.265-1.289 9.577-.648 13.231 1.529.433.266.57.826.353 1.339zm.124-3.368c-3.74-2.226-9.938-2.428-13.523-1.325-.59.184-1.217-.14-1.401-.729-.184-.59.14-1.217.729-1.401 
+      4.117-1.276 11.066-1.044 15.357 1.537.529.316.697 1 .381 1.528-.317.529-1 .697-1.543.39z"/>
+    </svg>
+    Listen TwentyFive on Spotify
+  </a>
+</div>
+
+<style>
+  .gb-footer{
+    text-align:center;
+    margin-top:40px;
+    padding:20px;
+    font-size:.9rem;
+    color:#e7ecf3;               /* texto claro para que no se pierda */
+    background:#000;             /* fondo negro absoluto */
+    border:2px solid #fff;       /* borde blanco */
+    border-radius:12px;          /* esquinas suavizadas */
+    
+    /* Glow blanco alrededor */
+    box-shadow:0 0 10px #fff, 
+               0 0 20px #fff, 
+               0 0 30px #fff;
+  }
+</style>
+<footer class="gb-footer">
+  © 2025 Gummy Bank · Created by Moy & Juan · Music by TwentyFive
 </footer>
 
+<style>
+  .spotify-btn{
+    text-align:center;
+    margin:20px 0;
+  }
+  .spotify-btn a{
+    display:inline-flex;
+    align-items:center;
+    background:#1DB954;       /* verde oficial Spotify */
+    color:#fff;
+    font-weight:600;
+    text-decoration:none;
+    padding:12px 24px;
+    border-radius:30px;
+    box-shadow:0 0 10px #1DB954, 0 0 20px #1DB954;
+    transition:transform .2s, box-shadow .2s;
+  }
+  .spotify-btn a:hover{
+    transform:scale(1.05);
+    box-shadow:0 0 15px #1DB954, 0 0 30px #1DB954;
+  }
+</style>
+<!-- END FUTTER Y SPOTIFY -->
     </main>
+
+    <!-- JS RESEÑAS -->
+    <script type="module" src="js/review.js"></script>
+    <!-- JS MEGA 5X5 -->
+    <script type="module" src="js/mega5x5.js?v=3"></script>
+    <!-- JS MEGA 5X5 -->
+    <script type="module" src="js/mini6x6.js"></script>
+    <!-- JS FONDO -->
+    <script src="js/Fx.js"></script>
+
+<!-- Audio-->
+<audio id="bg-audio" autoplay loop muted>
+<source src="audio/colab.wav" type="audio/wav">
+</audio>
+
+<script>
+  const audio = document.getElementById('bg-audio');
+
+  // Apenas el usuario haga clic/tap en cualquier parte
+  document.addEventListener('click', () => {
+    if (audio.paused) {
+      audio.muted = false;
+      audio.play().catch(err => console.log("Autoplay bloqueado:", err));
+    }
+  }, { once: true }); // solo la primera vez
+</script>
+<!-- End Audio-->
   </body>
 </html>

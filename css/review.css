@@ -1,0 +1,115 @@
+:root{
+  --bg:#0f1115; --panel:#11151d; --line:#243041; --ink:#e7ecf3;
+  --muted:#9fb0c9; --accent:#1f6feb; --accent-2:#00bfff;
+  --ok:#22c55e; --warn:#f59e0b; --err:#ef4444;
+}
+
+/* ===== Card base ===== */
+.gb-review-card{
+  position: relative;
+  z-index: 1;
+  max-width: min(92vw, 560px);
+  width: 100%;
+  margin: 18px auto;
+  padding: 14px;
+  border-radius: 16px;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Poppins, sans-serif;
+  color: var(--ink);
+  background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.16));
+  border: 1px solid color-mix(in srgb, var(--line), transparent 35%);
+  box-shadow: 0 8px 24px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.04);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.gb-review-card *, .gb-review-card *::before, .gb-review-card *::after{
+  box-sizing: inherit;
+  -webkit-tap-highlight-color: transparent;
+  min-width: 0;
+}
+
+/* ===== Tipografía y subtítulo ===== */
+.gb-review-card h3{
+  margin: 0 0 6px;
+  font-size: clamp(16px, 2.4vw, 20px);
+}
+.grc-sub{
+  margin: 0 0 12px;
+  font-size: clamp(12px, 2vw, 14px);
+  color: var(--muted);
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  overflow-wrap: anywhere;
+}
+.grc-badge{
+  display: inline-block; padding: 2px 8px; border-radius: 999px;
+  background: radial-gradient(120% 120% at 20% 20%, #ffe9b0, #f4b400 55%, #b87b00 100%);
+  color:#1a1200; font-weight:700; white-space:nowrap;
+  box-shadow: 0 2px 10px rgba(248,191,63,.35), inset 0 1px 2px rgba(255,255,255,.35);
+}
+.grc-meta{ margin-left: auto }
+
+/* ===== Inputs ===== */
+.grc-lab{ display:block; margin:8px 2px 6px; font-size:13px; color:var(--muted) }
+.grc-inp, .grc-ta{
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--line), transparent 35%);
+  background:#121722; color: var(--ink);
+  padding: 10px 12px;
+  font-size: 16px;
+  outline: none;
+}
+.grc-inp:focus, .grc-ta:focus{
+  border-color: var(--accent-2);
+  box-shadow: 0 0 0 3px rgba(0,191,255,.18);
+}
+
+/* ===== Row botón/contador ===== */
+.grc-row{
+  display: flex; gap: 8px; align-items: center; margin-top: 8px;
+  flex-wrap: wrap;
+}
+.grc-row > *{ min-width: 0; }
+.grc-spacer{ flex: 1 }
+.grc-muted{ color: var(--muted); font-size: 12px }
+.grc-msg{ margin: 8px 2px 0; font-size: 13px }
+
+/* ===== Botón ===== */
+.gb-cta{
+  padding: 10px 14px;
+  border: 0; border-radius: 12px; cursor: pointer;
+  background: radial-gradient(140% 140% at 20% 20%, #68d7e1, #22bdc5 60%, #19868c 100%);
+  color:#0a120a; font-weight:700;
+  box-shadow: 0 6px 18px rgba(0, 237, 249, 0.763), inset 0 1px 2px rgba(255,255,255,.35);
+}
+.gb-cta:disabled{ filter: grayscale(.4) brightness(.85); cursor: not-allowed; opacity:.85 }
+
+/* ===== Responsive ===== */
+@media (max-width: 900px){
+  .gb-review-card{ margin:16px auto; padding:14px; border-radius:16px }
+  .grc-row{ gap:10px }
+}
+@media (max-width: 600px){
+  .gb-review-card{ margin:14px 12px; padding:12px; border-radius:14px }
+  .grc-sub{ flex-direction: column; align-items: flex-start; gap: 6px }
+  .grc-meta{ margin-left: 0 }
+  .grc-inp, .grc-ta{ padding:10px 12px }
+  .grc-row{ flex-direction: column; align-items: stretch; gap: 8px }
+  .gb-cta{ width: 100%; text-align: center }
+}
+@media (max-width: 360px){
+  .gb-review-card{ padding:10px; border-radius:12px }
+  .gb-review-card h3{ font-size:16px }
+  .grc-sub{ font-size:12px }
+}
+@media (prefers-reduced-motion: reduce){
+  .gb-review-card *{ transition: none !important; }
+}
+
+/* ===== Lluvia sugerida (si usas efecto de fondo) ===== */
+#lluvia-container{
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+body{ background: var(--bg); position: relative; }

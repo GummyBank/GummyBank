@@ -1,0 +1,522 @@
+/* ============================================================================
+   TRIPLE 3 · CSS LIMPIO (ENCAPSULADO)
+   - Tipografías y colores coherentes con el resto del sitio
+   - Inputs con etiqueta inline “Código #x” alineados y compactos
+   - Tablero 3x1 con cards metálicas, halo animado y preview llamativo
+   - Caras front/back para flip 3D + temas de revelado
+   - Modales compactos
+============================================================================ */
+
+/* ------------------ 1) SCOPE Y VARIABLES LOCALES ------------------ */
+#TRI-wrap{
+  width: min(980px, 90%);
+  margin: 18px auto;
+  isolation: isolate;
+
+  /* paleta local */
+  --tri-ink: #e7ecf3;
+  --tri-muted: #9fb0c9;
+  --tri-cyan: #00f7ff;
+  --tri-magenta: #ff5bf7;
+
+  /* superficies */
+  --tri-surface-1: #1b2431;
+  --tri-surface-2: #121923;
+  --tri-surface-3: #0e141c;
+
+  --tri-radius: 16px;
+  --tri-cell: clamp(84px, 24vw, 140px);
+
+  --tri-white-glow: 0 0 10px rgba(255,255,255,.35),
+                    0 0 22px rgba(255,255,255,.22),
+                    0 0 36px rgba(255,255,255,.14);
+
+  color: var(--tri-ink);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Poppins, sans-serif;
+
+  /* knobs de campos */
+  --tri-field-max: 440px;
+  --tri-field-pct: 86%;
+  --tri-tag-w: 112px;
+}
+
+/* ------------------ 2) CABECERA ------------------ */
+#TRI-wrap .tri-head{ text-align:center; margin-bottom:12px }
+#TRI-wrap .tri-title{
+  font-size: clamp(20px, 3.6vw, 28px);
+  letter-spacing: .5px;
+  text-shadow: 0 0 18px rgba(255,255,255,.18);
+  margin: 0 0 4px 0;
+}
+#TRI-wrap .tri-sub{ color: var(--tri-muted); margin: 0; font-size: 14px }
+
+/* ------------------ 3) TARJETA DE CÓDIGOS + INPUTS ------------------ */
+#TRI-wrap .tri-card{
+  margin: 10px auto 0;
+  max-width: 520px;
+  border-radius: var(--tri-radius);
+  padding: 14px;
+  background: linear-gradient(180deg, var(--tri-surface-1), var(--tri-surface-2));
+  border: 1px solid rgba(255,255,255,.22);
+  box-shadow: 0 8px 24px rgba(0,0,0,.28), var(--tri-white-glow);
+  position: relative;
+}
+#TRI-wrap .tri-card::after{
+  content:""; position:absolute; inset:-2px; border-radius: inherit;
+  background: conic-gradient(from 0deg, rgba(255,255,255,0) 0deg, rgba(255,255,255,.55) 60deg, rgba(255,255,255,0) 120deg 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  padding: 1px; animation: tri-border-scan 3s linear infinite; pointer-events:none;
+}
+
+/* Fila con etiqueta inline */
+#TRI-wrap .tri-card > .tri-inlined{
+  position: relative;
+  width: min(var(--tri-field-max), var(--tri-field-pct));
+  margin: 10px auto;
+}
+#TRI-wrap .tri-inlined .tri-tag{
+  position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+  width: var(--tri-tag-w); height: 28px; display:inline-flex; align-items:center; justify-content:center;
+  border-radius: 999px; pointer-events: none;
+  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.22);
+  color: #cfe5ff; font-weight: 800; font-size: 12px; letter-spacing: .2px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+}
+#TRI-wrap .tri-inlined:focus-within .tri-tag{
+  color: #eaf2ff; border-color: rgba(103,232,249,.45);
+  box-shadow: 0 0 0 2px rgba(103,232,249,.10), 0 8px 18px rgba(0,0,0,.25);
+}
+
+/* Campo */
+#TRI-wrap .tri-card .tri-input.big{
+  width: 100%; height: 48px;
+  padding-left: calc(var(--tri-tag-w) + 18px) !important; padding-right: 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.18);
+  background: linear-gradient(180deg, #121923, #0e141c);
+  color: #e7ecf3;
+  font: 600 15px/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  letter-spacing: .4px;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease, transform .08s ease;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+  caret-color: #67e8f9;
+}
+#TRI-wrap .tri-card .tri-input.big:focus{
+  border-color: rgba(103,232,249,.55);
+  box-shadow: 0 0 0 2px rgba(103,232,249,.12), 0 6px 18px rgba(0,0,0,.28);
+  transform: translateY(-1px);
+}
+
+/* Botón “Validar y jugar” */
+#TRI-wrap #tri-play.tri-btn{
+  width: min(var(--tri-field-max), var(--tri-field-pct));
+  margin: 14px auto 6px; display:block;
+  padding: 12px 14px; border-radius: 14px; border: none; cursor: pointer;
+  font-size: 18px; font-weight: 800; letter-spacing: .4px; color: #051016;
+  background: linear-gradient(90deg, var(--tri-cyan), var(--tri-magenta));
+  box-shadow: 0 10px 26px rgba(0,0,0,.35), 0 0 0 1px rgba(255,255,255,.08) inset;
+}
+
+/* ------------------ 4) TABLERO 3x1 ------------------ */
+#TRI-wrap .tri-board{
+  margin: 14px auto;
+  display: grid; grid-template-columns: repeat(3, var(--tri-cell));
+  gap: clamp(8px, 2.5vw, 16px);
+  justify-content: center; align-items: center;
+  padding: 10px; border-radius: var(--tri-radius);
+  background: linear-gradient(180deg, var(--tri-surface-1), var(--tri-surface-2));
+  border: 1px solid rgba(255,255,255,.22);
+  box-shadow: 0 8px 28px rgba(0,0,0,.35), var(--tri-white-glow);
+  position: relative;
+}
+#TRI-wrap .tri-board::after{
+  content:""; position:absolute; inset:-2px; border-radius: inherit;
+  background: conic-gradient(from 0deg, rgba(255,255,255,0) 0deg, rgba(255,255,255,.55) 50deg, rgba(255,255,255,0) 100deg 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  padding: 1px; animation: tri-border-scan 3.2s linear infinite; pointer-events:none;
+}
+
+/* ------------------ 5) CARD: BASE + FLIP ------------------ */
+#TRI-wrap .tri-cell{
+  width: var(--tri-cell); height: calc(var(--tri-cell) * .9);
+  border-radius: 14px; position: relative; perspective: 1000px; overflow: hidden;
+  cursor: pointer; user-select: none;
+  background: radial-gradient(140% 120% at 20% 0%, #243143 0%, #1b2431 45%, #141c27 100%);
+  border: 1px solid rgba(255,255,255,.22);
+  box-shadow: 0 2px 0 rgba(255,255,255,.06), 0 16px 24px rgba(0,0,0,.28);
+  transition: transform .12s ease, box-shadow .12s ease, border-color .2s ease;
+}
+#TRI-wrap .tri-cell:hover{ transform: translateY(-2px) }
+#TRI-wrap .tri-cell:active{ transform: translateY(0) scale(.98) }
+#TRI-wrap .tri-cell.is-disabled{ pointer-events:none; opacity:.6; filter:saturate(.8) }
+
+/* brillo perimetral animado */
+#TRI-wrap .tri-cell::before{
+  content:""; position:absolute; inset:-2px; border-radius:18px;
+  background: conic-gradient(from 0deg, rgba(255,255,255,0) 0deg, rgba(255,255,255,.55) 60deg, rgba(255,255,255,0) 120deg 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  padding: 1px; animation: tri-border-scan 3s linear infinite; pointer-events:none; opacity:.9;
+}
+
+/* “sheen” diagonal en la superficie */
+#TRI-wrap .tri-cell::after{
+  content:""; position:absolute; inset:-20% -60%;
+  background: linear-gradient(110deg, transparent 35%, rgba(255,255,255,.18) 50%, transparent 65%);
+  transform: translateX(-60%) rotate(8deg);
+  animation: tri-sheen 2.6s linear infinite;
+  pointer-events: none; filter: blur(.4px);
+}
+
+/* flip 3D */
+#TRI-wrap .tri-inner{
+  position: relative; width: 100%; height: 100%;
+  transform-style: preserve-3d; transition: transform .5s ease;
+}
+#TRI-wrap .tri-cell.flipped .tri-inner{ transform: rotateY(180deg) }
+#TRI-wrap .tri-face{ position:absolute; inset:0; backface-visibility:hidden; display:grid; place-items:center; }
+#TRI-wrap .tri-face.front{
+  border-radius: 14px;
+  background:
+    radial-gradient(120% 140% at 20% -10%, rgba(255,255,255,.08), transparent 55%),
+    linear-gradient(180deg, #1b2431, #111822 78%);
+  border: 1px solid rgba(255,255,255,.22);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), inset 0 -10px 18px rgba(0,0,0,.35), 0 10px 24px rgba(0,0,0,.35);
+}
+#TRI-wrap .tri-face.front::after{
+  content:""; position:absolute; inset:-30% -80%;
+  background: linear-gradient(110deg, transparent 45%, rgba(255,255,255,.20) 50%, transparent 55%);
+  transform: translateX(-60%) rotate(8deg);
+  animation: triFrontSheen 3.2s linear infinite; mix-blend-mode: screen; pointer-events:none;
+}
+#TRI-wrap .tri-face.back{ transform: rotateY(180deg) }
+
+/* ------------------ 6) PREVIEW LLAMATIVO ------------------ */
+/* halos por tipo (JS añade: tri-prev-gold/blue/purple) */
+#TRI-wrap .tri-prev-gold  .tri-face.front{ box-shadow: 0 0 0 1px rgba(255,255,255,.18) inset, 0 0 18px rgba(255,215,0,.18), 0 14px 30px rgba(0,0,0,.35); }
+#TRI-wrap .tri-prev-blue  .tri-face.front{ box-shadow: 0 0 0 1px rgba(255,255,255,.18) inset, 0 0 18px rgba(56,189,248,.18), 0 14px 30px rgba(0,0,0,.35); }
+#TRI-wrap .tri-prev-purple.tri-cell .tri-face.front{ box-shadow: 0 0 0 1px rgba(255,255,255,.18) inset, 0 0 20px rgba(168,85,247,.20), 0 14px 30px rgba(0,0,0,.35); }
+
+/* chips (dinero y puntos) */
+#TRI-wrap .tri-face.front .tri-chip{
+  height: clamp(30px, 24%, 44px);
+  font-size: clamp(14px, 5vw, 22px);
+  padding: 0 clamp(12px, 5vw, 22px);
+  max-width: 92%;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.85);
+  background: linear-gradient(180deg, #ffffff, #e9eef7 78%);
+  color:#0b1220; font-weight:900; letter-spacing:.2px; white-space:nowrap;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.95), inset 0 -2px 8px rgba(0,0,0,.20), 0 4px 14px rgba(0,0,0,.28);
+  animation: triPulse 2.6s ease-in-out infinite, triBlinkText 1.05s ease-in-out infinite;
+}
+#TRI-wrap .tri-face.front .tri-chip.blue{
+  background: linear-gradient(180deg, #67e8f9, #0284c7);
+  color:#041c2a; border-color: rgba(56,189,248,.85);
+}
+
+/* gomitas grandes y flotando */
+#TRI-wrap .tri-face.front img[alt="Gomitas"]{
+  width: 100%; height: 100%; object-fit: contain;
+  filter: drop-shadow(0 10px 24px rgba(0,0,0,.40)) drop-shadow(0 0 22px rgba(168,85,247,.20));
+  animation: gomiFloat 2.4s ease-in-out infinite;
+}
+
+/* ------------------ 7) TEMA DE REVELADO (DORSO) ------------------ */
+/* el JS añade .tri-theme-dark o .tri-theme-gomi al revelar */
+#TRI-wrap .tri-theme-dark .tri-face.back::before,
+#TRI-wrap .tri-theme-gomi .tri-face.back::before{
+  content:""; position:absolute; inset:0; border-radius:12px; z-index:1; opacity:1;
+  transition: opacity .28s ease, background .28s ease, box-shadow .28s ease;
+}
+#TRI-wrap .tri-theme-dark .tri-face.back::before{
+  background:#0b0f17; box-shadow: inset 0 0 0 1px rgba(255,255,255,.05), inset 0 -8px 24px rgba(0,0,0,.35);
+}
+#TRI-wrap .tri-theme-gomi .tri-face.back::before{
+  background:#3a1a6f; box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 0 22px rgba(168,85,247,.35);
+}
+
+/* ------------------ 8) MODALES ------------------ */
+:root{
+  --tri-line:#263040; --tri-ok:#22c55e; --tri-warn:#f59e0b; --tri-err:#ef4444;
+  --tri-glass: linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.25));
+}
+#tri-modal, #tri-phone{ border:none; padding:0; background:transparent; }
+#tri-modal::backdrop, #tri-phone::backdrop{ background: rgba(0,0,0,.55); backdrop-filter: blur(2px); }
+
+.tri-card{
+  width: min(92vw, 360px); margin: 12px; border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--tri-line), transparent 30%);
+  background: var(--tri-glass);
+  box-shadow: 0 14px 42px rgba(0,0,0,.45), 0 0 24px rgba(0,191,255,.18);
+  color: var(--tri-ink); overflow: hidden;
+}
+.tri-card.is-error{ box-shadow: 0 14px 42px rgba(0,0,0,.45), 0 0 28px color-mix(in srgb, var(--tri-err), transparent 60%); }
+.tri-card.is-warn { box-shadow: 0 14px 42px rgba(0,0,0,.45), 0 0 28px color-mix(in srgb, var(--tri-warn), transparent 60%); }
+.tri-card.is-ok   { box-shadow: 0 14px 42px rgba(0,0,0,.45), 0 0 28px color-mix(in srgb, var(--tri-ok), transparent 60%); }
+
+.tri-hd{ display:grid; grid-template-columns:1fr auto; align-items:center; gap:8px; padding:14px 16px 10px; }
+.tri-title{ display:flex; align-items:center; gap:8px; font-weight:700; letter-spacing:.2px; }
+.tri-x{ appearance:none; border:1px solid color-mix(in srgb, var(--tri-line), transparent 35%); background: rgba(255,255,255,.03);
+  color: var(--tri-muted); border-radius:12px; width:34px; height:30px; font-size:14px; display:grid; place-items:center; cursor:pointer;
+  transition: transform .12s ease, border-color .12s ease, color .12s ease; }
+.tri-x:hover{ transform: translateY(-1px); color: var(--tri-ink); }
+
+.tri-sep{ height:1px; background: color-mix(in srgb, var(--tri-line), transparent 35%); }
+.tri-bd{ padding:14px 16px 6px; color: var(--tri-muted); font-size:14px; }
+.tri-actions{ display:flex; gap:10px; padding: 12px 16px 16px; }
+.tri-btn{ flex:1; appearance:none; border:1px solid transparent; cursor:pointer; padding:12px 14px; border-radius:14px; font-weight:800;
+  color:#0b1220; background:#e7ecf3; box-shadow: 0 8px 24px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.15); transition: transform .12s ease, box-shadow .12s ease; }
+.tri-btn:hover{ transform: translateY(-1px); }
+
+/* ------------------ 9) ACCESIBILIDAD + UTILIDADES ------------------ */
+#TRI-wrap .tri-btn:focus,
+#TRI-wrap .tri-input:focus,
+#TRI-wrap .tri-cell:focus{ outline: 2px solid rgba(255,255,255,.6); outline-offset: 2px; }
+#TRI-wrap .tri-hint{ margin: 8px 0 0; font-size: 12px; color: var(--tri-muted) }
+#TRI-wrap .hidden{ display: none !important }
+
+/* ------------------ 10) ANIMACIONES ------------------ */
+@keyframes tri-border-scan{ to{ transform: rotate(360deg) } }
+@keyframes tri-sheen{ 0%{ transform: translateX(-60%) rotate(8deg) } 100%{ transform: translateX(60%) rotate(8deg) } }
+@keyframes triFrontSheen{ 0%{ transform: translateX(-60%) rotate(8deg) } 100%{ transform: translateX(60%) rotate(8deg) } }
+@keyframes triPulse{
+  0%,100%{ transform: scale(1); box-shadow: inset 0 1px 0 rgba(255,255,255,.95), inset 0 -2px 8px rgba(0,0,0,.20), 0 4px 14px rgba(0,0,0,.28); }
+  50%{ transform: scale(1.04); box-shadow: 0 0 24px rgba(255,255,255,.35), 0 8px 26px rgba(0,0,0,.34); }
+}
+@keyframes triBlinkText{ 0%,100%{ filter:brightness(1) } 50%{ filter:brightness(1.06) } }
+@keyframes gomiFloat{ 0%,100%{ transform: translateY(0) scale(1.02) } 50%{ transform: translateY(-6px) scale(1.06) } }
+
+/* ------------------ 11) RESPONSIVE FINO ------------------ */
+@media (max-width: 420px){
+  #TRI-wrap{
+    --tri-field-max: 380px;
+    --tri-field-pct: 92%;
+    --tri-tag-w: 104px;
+  }
+  #TRI-wrap .tri-card .tri-input.big{ height: 46px; font-size: 14px; }
+  #TRI-wrap .tri-inlined .tri-tag{ height: 26px; font-size: 11px; }
+}
+
+/* ===== CENTRADO ESTRICTO DEL CONTENIDO EN LAS CARAS ===== */
+#TRI-board .tri-face .content{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;      /* vertical */
+  justify-content: center;  /* horizontal */
+}
+
+/* El pill (dinero/puntos) queda centrado y con ancho respirable */
+#TRI-board .tri-face .tri-chip{
+  margin: 0 auto;                /* centrado real, no “a ojo” */
+  max-width: 80%;                /* evita recortes tipo "10 pt" */
+  padding: 0 clamp(0px, 5.4vw, 16px);  /* un poco más de aire */
+}
+
+/* ===== $300 DORADO CON DESTELLOS (usa la clase de preview tri-prev-gold) ===== */
+#TRI-board .tri-prev-gold .tri-face.front .tri-chip{
+  /* dorado decente, no amarillo triste */
+  background: linear-gradient(180deg, #ffe259 0%, #ffb628 50%, #ff8f00 100%);
+  color: #201200;
+  border-color: rgba(255,215,0,.9);
+  text-shadow: 0 1px 0 rgba(255,255,255,.55);
+  position: relative;                       /* para los destellos */
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.95),
+    inset 0 -2px 8px rgba(0,0,0,.22),
+    0 0 24px rgba(255,200,0,.28),           /* halo dorado */
+    0 6px 18px rgba(0,0,0,.30);
+}
+
+/* rayo de luz que cruza el pill */
+#TRI-board .tri-prev-gold .tri-face.front .tri-chip::before{
+  content: "";
+  position: absolute; inset: -22% -40%;
+  background: linear-gradient(105deg, transparent 46%, rgba(255,255,255,.55) 50%, transparent 54%);
+  transform: translateX(-60%) rotate(6deg);
+  animation: triGoldSheen 2.2s linear infinite;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* chispas suaves (twinkles) */
+#TRI-board .tri-prev-gold .tri-face.front .tri-chip::after{
+  content: "";
+  position: absolute; inset: -2px;
+  background:
+    radial-gradient(6px 6px at 22% 38%, rgba(255,255,255,.75), transparent 55%),
+    radial-gradient(5px 5px at 66% 32%, rgba(255,255,255,.65), transparent 55%),
+    radial-gradient(4px 4px at 42% 72%, rgba(255,255,255,.60), transparent 55%);
+  mix-blend-mode: screen;
+  animation: triGoldTwinkle 1.8s ease-in-out infinite alternate;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* un pelín más de foco al marco cuando es el de $300 */
+#TRI-board .tri-prev-gold .tri-face.front{
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.08),
+    inset 0 -10px 18px rgba(0,0,0,.35),
+    0 0 22px rgba(255,215,0,.26),
+    0 12px 24px rgba(0,0,0,.36);
+}
+
+/* ===== ANIMACIONES ===== */
+@keyframes triGoldSheen { to { transform: translateX(60%) rotate(6deg); } }
+@keyframes triGoldTwinkle { 0% { opacity:.35 } 100% { opacity:.9 } }
+
+/* ===== CENTRADO A PRUEBA DE BOMBA ===== */
+/* El contenedor de cada cara centra absolutamente todo */
+#TRI-board .tri-face .content{
+  display: grid !important;
+  place-items: center !important;   /* vertical + horizontal */
+  text-align: center !important;
+  width: 110% !important;
+  height: 110% !important;
+}
+
+/* Nada de “se me va a la izquierda”: pills e imágenes al centro sí o sí */
+#TRI-board .tri-face .tri-chip,
+#TRI-board .tri-face .content > img{
+  margin-left: 0% !important;
+  margin-right: auto !important;
+}
+#TRI-board .tri-face .tri-chip{
+  margin-left: -20% !important;
+  margin-right: auto !important;
+}
+
+/* Si escalas el $300, que escale desde el centro */
+#TRI-board .tri-prev-gold .tri-face .tri-chip{
+  transform-origin: center center !important;
+}
+
+/* Por si algún padding desigual te engaña la vista */
+#TRI-board .tri-btn .content{
+  padding: var(--tri-content-pad, 6%) !important;
+}
+
+/* Evita que algún display:inline te descuadre el baseline */
+#TRI-board .tri-face .tri-chip{
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  max-width: 96%;
+}
+
+/* ================== PHONE MODAL · LOOK IGUAL AL MOCK ================== */
+#tri-phone.tri-modal{ border:none; padding:0; background:transparent; }
+#tri-phone::backdrop{ background: rgba(0,0,0,.6); backdrop-filter: blur(3px); }
+
+/* Tarjeta base (vidrio oscuro) */
+.tri-phone-card{
+  width: min(440px, 92vw);
+  margin: 10vh auto 0;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.12);
+  background:
+    radial-gradient(140% 120% at 50% -10%, rgba(255,255,255,.06), transparent 58%),
+    linear-gradient(180deg, #151b25, #0f1520 78%);
+  box-shadow: 0 20px 50px rgba(0,0,0,.55), 0 0 24px rgba(0,191,255,.15);
+}
+
+/* Cabecera con gradiente y título en mayúsculas */
+.tri-phone-head{
+  padding: 14px 16px;
+  text-align: center;
+  background: linear-gradient(90deg, #00e0ff, #6b5bff 60%, #a855f7);
+  color: #eaf6ff;
+  letter-spacing: .16em;
+  font-weight: 800;
+  font-size: 13px;
+}
+
+/* Cuerpo */
+.tri-phone-body{ padding: 16px; }
+
+/* Campo grande con glow (wrapper) */
+.tri-phone-field{
+  position: relative;
+  border-radius: 16px;
+  padding: 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.18));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.06),
+    inset 0 -10px 18px rgba(0,0,0,.35);
+  border: 1px solid rgba(255,255,255,.10);
+}
+
+/* Input real */
+.tri-phone-input{
+  width: 100%;
+  height: 64px;
+  border-radius: 14px;
+  padding: 0 16px;
+  border: 1px solid rgba(103,232,249,.35);
+  background: linear-gradient(180deg, #0f1621, #0b1018);
+  color: #e8f2ff;
+  font: 700 18px/1.1 ui-monospace, SFMono-Regular, Menlo, Consolas, "Courier New", monospace;
+  letter-spacing: .6px;
+  outline: none;
+  box-shadow:
+    0 0 0 2px rgba(103,232,249,.10),
+    inset 0 1px 0 rgba(255,255,255,.06);
+  caret-color: #67e8f9;
+}
+.tri-phone-input::placeholder{ color: rgba(231,236,243,.35); }
+.tri-phone-input:focus{
+  border-color: rgba(103,232,249,.60);
+  box-shadow:
+    0 0 0 3px rgba(103,232,249,.14),
+    0 10px 24px rgba(0,0,0,.35),
+    inset 0 1px 0 rgba(255,255,255,.08);
+  transform: translateY(-1px);
+}
+
+/* Acciones: dos botones a la derecha como en el mock */
+.tri-phone-actions{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 12px 16px 16px;
+}
+
+/* Botones */
+.tri-phone-btn{
+  height: 48px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  font-weight: 800;
+  letter-spacing: .2px;
+  cursor: pointer;
+  transition: transform .08s ease, filter .2s ease, box-shadow .2s ease;
+}
+.tri-phone-btn:active{ transform: translateY(1px); }
+
+.tri-phone-btn.primary{
+  color: #061219;
+  background: linear-gradient(180deg, #00c6ff, #1f6feb);
+  box-shadow: 0 14px 28px rgba(0,117,255,.35), 0 0 20px rgba(0,153,255,.25);
+}
+.tri-phone-btn.primary:hover{ filter: brightness(1.06); }
+
+.tri-phone-btn.ghost{
+  color: #e7ecf3;
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.22));
+  border-color: rgba(255,255,255,.18);
+  box-shadow: 0 10px 22px rgba(0,0,0,.35) inset, 0 6px 16px rgba(0,0,0,.28);
+}
+.tri-phone-btn.ghost:hover{ filter: brightness(1.05); }
+
+/* Responsive peque */
+@media (max-width: 420px){
+  .tri-phone-input{ height: 56px; font-size: 16px; }
+  .tri-phone-actions{ gap: 10px; }
+}
+

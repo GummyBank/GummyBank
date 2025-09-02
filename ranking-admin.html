@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin · Ranking de Ventas</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      --bg:#0f1115; --panel:#11151d; --card:#151a23; --line:#243041;
+      --ink:#e7ecf3; --muted:#9fb0c9; --accent:#00bfff; --accent2:#1f6feb;
+      --warn:#f59e0b; --err:#ef4444; --ok:#22c55e;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Poppins,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+    header{position:sticky;top:0;background:rgba(15,17,21,.8);backdrop-filter:blur(8px);border-bottom:1px solid color-mix(in srgb, var(--line), transparent 40%);z-index:10}
+    .wrap{width:clamp(320px,94vw,1100px);margin:0 auto;padding:10px 12px}
+    h1{margin:8px 0 2px;font-weight:700}
+    .sub{margin:0 0 12px;color:var(--muted)}
+
+    .panel{display:grid;grid-template-columns:1fr;gap:14px;margin:16px 0}
+    @media(min-width:860px){.panel{grid-template-columns:1.05fr .95fr}}
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(0,0,0,.16));
+      border:1px solid color-mix(in srgb, var(--line), transparent 35%);
+      border-radius:16px;padding:14px;box-shadow:0 12px 32px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.04)
+    }
+    label{font-size:.92rem;color:var(--muted)}
+    input,select,button{
+      width:100%;padding:10px 12px;border-radius:12px;border:1px solid color-mix(in srgb,var(--line),transparent 35%);
+      background:#0f141c;color:var(--ink);font-family:inherit
+    }
+    input:focus,select:focus{outline:2px solid var(--accent)}
+    .row{display:grid;grid-template-columns:1fr;gap:10px}
+    @media(min-width:560px){.row2{grid-template-columns:1fr 1fr}}
+    @media(min-width:760px){.row3{grid-template-columns:1fr 1fr 1fr}}
+    .btn{cursor:pointer;font-weight:600}
+    .btn-primary{background:linear-gradient(90deg,var(--accent),var(--accent2));border-color:transparent;box-shadow:0 0 20px rgba(0,191,255,.25)}
+    .btn-ghost{background:transparent}
+    .right{display:flex;gap:8px;justify-content:flex-end}
+    .table{margin-top:10px;border-radius:16px;overflow:hidden;border:1px solid color-mix(in srgb, var(--line), transparent 35%)}
+    .thead,.trow{display:grid;grid-template-columns:120px 1.2fr 1fr 120px 120px;gap:10px}
+    .thead{background:#0e141c;color:var(--muted);font-weight:600;padding:10px}
+    .trow{padding:10px;border-top:1px solid color-mix(in srgb,var(--line),transparent 45%);align-items:center}
+    .trow input{height:38px}
+    .muted{color:var(--muted)}
+    .status{font-size:.9rem}
+    .pill{padding:4px 10px;border-radius:999px;border:1px solid color-mix(in srgb, var(--line), transparent 35%);color:var(--muted)}
+    .search{display:flex;gap:10px}
+    .hide{display:none}
+    @media(max-width:720px){
+      .thead,.trow{grid-template-columns:100px 1.2fr 1fr 100px 100px}
+    }
+    @media(max-width:560px){
+      .thead{display:none}
+      .trow{grid-template-columns:1fr 1fr;gap:8px}
+      .trow > div:nth-child(1){grid-column:1/3}
+      .trow > div:nth-child(2){grid-column:1/3}
+      .trow > div:nth-child(3){grid-column:1/3}
+      .trow > div:nth-child(4){grid-column:1/2}
+      .trow > div:nth-child(5){grid-column:2/3}
+    }
+    /* ===== Botón de cerrar sesión ===== */
+.btn-logout{
+  margin-left:auto;
+  padding:8px 14px;
+  background:linear-gradient(90deg, #ff416c, #ff4b2b);
+  border:2px solid #fff;
+  border-radius:9999px;
+  color:#fff;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow:0 0 10px rgba(255,80,80,.8);
+  transition:all .2s;
+}
+.btn-logout:hover{
+  filter:brightness(1.1);
+  box-shadow:0 0 14px rgba(255,100,100,1);
+}
+
+  </style>
+</head>
+<body>
+  <header>
+    
+    <div class="wrap">
+      <h1>Administración · Ranking de Ventas</h1>
+      <p class="sub">Inserta usuarios, busca por teléfono o usuario y actualiza puntajes.</p><button id="btn-logout" class="btn-logout">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="panel">
+      <!-- Alta / edición rápida -->
+      <div class="card">
+        <h2 style="margin:0 0 8px">Agregar participante</h2>
+        <div class="row row3">
+          <div>
+            <label>Teléfono</label>
+            <input id="f_phone" inputmode="numeric" placeholder="5551234567" />
+          </div>
+          <div>
+            <label>Usuario</label>
+            <input id="f_username" placeholder="Nombre de usuario" />
+          </div>
+          <div>
+            <label>Escuela</label>
+            <input id="f_escuela" placeholder="Escuela" />
+          </div>
+        </div>
+        <div class="row row2" style="margin-top:10px">
+          <div>
+            <label>Puntaje</label>
+            <input id="f_score" inputmode="numeric" placeholder="0" />
+          </div>
+          <div class="right" style="align-items:flex-end">
+            <button class="btn btn-primary" id="btnGuardar"><i class="bi bi-save2"></i> Guardar / Actualizar</button>
+          </div>
+        </div>
+        <p class="status muted" id="statusMsg"></p>
+      </div>
+
+      <!-- Búsqueda y tabla -->
+      <div class="card">
+        <h2 style="margin:0 0 8px">Listado</h2>
+        <div class="search">
+          <input id="q" placeholder="Buscar por teléfono o usuario..." />
+          <button class="btn" id="btnLimpiar"><i class="bi bi-eraser"></i> Limpiar</button>
+        </div>
+
+        <div class="table" id="tabla">
+          <div class="thead">
+            <div>Teléfono</div>
+            <div>Usuario</div>
+            <div>Escuela</div>
+            <div>Puntaje</div>
+            <div>Acciones</div>
+          </div>
+          <div id="tbody"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Firebase client -->
+  <script type="module">
+    // Gateo simple por tus llaves de sesión; ajusta según tus llaves reales
+    const allowed = sessionStorage.getItem("auth")==="true" ||
+                sessionStorage.getItem("ventas_auth")==="true" ||
+                sessionStorage.getItem("admin")==="true" ||
+                sessionStorage.getItem("ranking_auth")==="true";
+if(!allowed){
+  alert("Acceso restringido");
+  location.href = "index.html";
+}
+
+    if(!allowed){
+      alert("Acceso restringido");
+      location.href = "index.html";
+    }
+
+    import { db } from "./js/firebaseClient.js";
+    import {
+      collection, doc, setDoc, serverTimestamp,
+      onSnapshot, query, orderBy, getDoc, updateDoc
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    const col = collection(db, "rankingVentas");
+
+    // Elements
+    const f_phone = document.getElementById("f_phone");
+    const f_username = document.getElementById("f_username");
+    const f_escuela = document.getElementById("f_escuela");
+    const f_score = document.getElementById("f_score");
+    const btnGuardar = document.getElementById("btnGuardar");
+    const statusMsg = document.getElementById("statusMsg");
+
+    const qInput = document.getElementById("q");
+    const btnLimpiar = document.getElementById("btnLimpiar");
+    const tbody = document.getElementById("tbody");
+
+    let cache = [];   // snapshot cache para filtro local
+
+    function sanitizePhone(v){
+      return (v||"").replace(/\D/g,"").slice(0,15);
+    }
+    function sanitizeScore(v){
+      const n = parseInt(String(v||"").replace(/\D/g,""),10);
+      return isNaN(n) ? 0 : n;
+    }
+
+    async function upsert(){
+      const phone = sanitizePhone(f_phone.value);
+      const username = (f_username.value||"").trim();
+      const escuela = (f_escuela.value||"").trim();
+      const score = sanitizeScore(f_score.value);
+
+      if(phone.length < 8){return setStatus("Teléfono inválido", true)}
+      if(!username){return setStatus("Usuario requerido", true)}
+
+      const ref = doc(col, phone);
+      const exists = (await getDoc(ref)).exists();
+
+      const payload = {
+        phone, username, escuela, score,
+        updatedAt: serverTimestamp()
+      };
+      if(!exists){ payload.createdAt = serverTimestamp(); }
+
+      await setDoc(ref, payload, { merge:true });
+      setStatus(exists ? "Actualizado" : "Creado");
+      // limpiar ligero
+      f_phone.value = ""; f_username.value = ""; f_escuela.value=""; f_score.value="";
+    }
+
+    function setStatus(msg, err=false){
+      statusMsg.textContent = msg;
+      statusMsg.style.color = err ? "var(--err)" : "var(--ok)";
+      setTimeout(()=>{statusMsg.textContent="";}, 2000);
+    }
+
+    // Render tabla
+    function render(list){
+      tbody.innerHTML = "";
+      list.forEach(d => {
+        const row = document.createElement("div");
+        row.className = "trow";
+        row.innerHTML = `
+          <div><span class="muted">Tel:</span><br>${d.phone||"—"}</div>
+          <div><span class="muted">Usuario:</span><br>${d.username||"—"}</div>
+          <div><span class="muted">Escuela:</span><br>${d.escuela||"—"}</div>
+          <div>
+            <input data-phone="${d.phone}" class="inpScore" value="${Number(d.score||0)}" />
+          </div>
+          <div class="right">
+            <button class="btn btn-primary btnUpdate" data-phone="${d.phone}"><i class="bi bi-arrow-repeat"></i> Guardar</button>
+          </div>
+        `;
+        tbody.appendChild(row);
+      });
+
+      // wire botones
+      document.querySelectorAll(".btnUpdate").forEach(btn=>{
+        btn.addEventListener("click", async (e)=>{
+          const phone = e.currentTarget.getAttribute("data-phone");
+          const input = document.querySelector(`.inpScore[data-phone="${phone}"]`);
+          const score = sanitizeScore(input.value);
+          await updateDoc(doc(col, phone), { score, updatedAt: serverTimestamp() });
+          setStatus("Puntaje actualizado");
+        });
+      });
+    }
+
+    // Filtro local por texto
+    function applyFilter(){
+      const q = (qInput.value||"").toLowerCase().trim();
+      if(!q){ render(cache); return; }
+      const f = cache.filter(d =>
+        String(d.phone||"").includes(q) ||
+        String(d.username||"").toLowerCase().includes(q)
+      );
+      render(f);
+    }
+
+    qInput.addEventListener("input", applyFilter);
+    btnLimpiar.addEventListener("click", ()=>{ qInput.value=""; applyFilter(); });
+    btnGuardar.addEventListener("click", upsert);
+
+    // Live snapshot ordenado por score
+    const live = query(col, orderBy("score","desc"));
+    onSnapshot(live, snap=>{
+      cache = [];
+      snap.forEach(doc => cache.push(doc.data()));
+      applyFilter();
+    });
+  </script>
+  <script>
+  const logoutBtn = document.getElementById('btn-logout');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      // Limpia cualquier auth que uses
+      sessionStorage.clear();
+      localStorage.clear();
+
+      // Redirige al login
+      window.location.href = "index.html"; // cámbialo por la ruta real de tu login
+    });
+  }
+</script>
+
+
+</body>
+</html>
