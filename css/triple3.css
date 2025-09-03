@@ -387,7 +387,7 @@
   margin-right: auto !important;
 }
 #TRI-board .tri-face .tri-chip{
-  margin-left: 20% !important;
+  margin-left: 10% !important;
   margin-right: auto !important;
 }
 
@@ -527,4 +527,5 @@
     max-width: none;   /* quita el tope de 980px para que 80% se aplique limpio */
   }
 }
+
 
