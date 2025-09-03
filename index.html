@@ -16,6 +16,8 @@
     <!-- Desaign MEGA 5X5-->
     <link rel="stylesheet" href="css/mini6x6.css">
     <!-- Desaign MEGA 5X5-->
+    <link rel="stylesheet" href="css/mitico5x5.css">
+    <!-- Desaign MEGA 5X5-->
     <link rel="stylesheet" href="css/mega5x5.css?v=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -794,9 +796,106 @@ header .gb-actions .bi:hover{ transform:translateY(-1px); text-shadow:0 0 14px r
     </div>
   </section>
   <!-- ================== FIN MINI JUEGO ================== -->
+<br> <br> 
+   <main id="MT-juego">
+    <!-- HEADER / TÍTULO -->
+    <section id="MT-head">
+      <!-- Cambia la imagen si quieres -->
+      <!-- Canvas para confeti. Ocupa el header por encima -->
+      <canvas id="MT-canvas"></canvas>
+    </section>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <section id="MT-shell">
+      <!-- Caja del tablero -->
+      <div id="MT-board-box">
+        <div id="MT-board" aria-label="Tablero Mitico 5x5">
+          <!-- El JS inyecta 25 botones y los tornillos de las esquinas -->
+        </div>
+      </div>
+
+      <!-- Etiqueta chiquita opcional -->
+      <div class="MT-kicker">Ingresa de 1 a 7 códigos válidos. <br>Cada código = 1 casilla en el mismo juego.</div>
+
+      <!-- TARJETA DE CÓDIGOS -->
+      <div id="MT-card">
+  <!-- FILA: BOTÓN ARRIBA -->
+  <div class="MT-row MT-actions">
+    <button id="MT-validar" type="button" aria-label="Validar códigos">
+      Validar códigos y jugar
+    </button>
+  </div>
+
+  <!-- FILA: INPUTS ABAJO -->
+  <div class="MT-row MT-inputs">
+    <div class="MT-input-wrap">
+      <span class="MT-label">Código #1</span>
+      <input id="MT-code1" class="MT-input MT-code" type="text" placeholder="XXXXXXXXX">
+    </div>
+    <div class="MT-input-wrap">
+      <span class="MT-label">Código #2</span>
+      <input id="MT-code2" class="MT-input MT-code" type="text" placeholder="XXXXXXXXX">
+    </div>
+    <div class="MT-input-wrap">
+      <span class="MT-label">Código #3</span>
+      <input id="MT-code3" class="MT-input MT-code" type="text" placeholder="XXXXXXXXX">
+    </div>
+    <div class="MT-input-wrap">
+      <span class="MT-label">Código #4</span>
+      <input id="MT-code4" class="MT-input MT-code" type="text" placeholder="XXXXXXXXX">
+    </div>
+    <div class="MT-input-wrap">
+      <span class="MT-label">Código #5</span>
+      <input id="MT-code5" class="MT-input MT-code" type="text" placeholder="XXXXXXXXX">
+    </div>
+    <div class="MT-input-wrap">
+      <span class="MT-label">Código #6</span>
+      <input id="MT-code6" class="MT-input MT-code" type="text" placeholder="XXXXXXXXX">
+    </div>
+    <div class="MT-input-wrap">
+      <span class="MT-label">Código #7</span>
+      <input id="MT-code7" class="MT-input MT-code" type="text" placeholder="XXXXXXXXX">
+    </div>
+  </div>
+
+  <div id="MT-status" role="status" aria-live="polite"></div>
+</div>
+
+
+        <div id="MT-status" role="status" aria-live="polite">
+          <!-- El JS escribe mensajes aquí -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL DE PREMIO / RESULTADO -->
+  <div id="MT-modal" aria-hidden="true">
+    <div id="MT-card-modal" class="neutral" role="dialog" aria-labelledby="MT-title-modal" aria-describedby="MT-msg">
+      <div id="MT-figure"></div>
+      <div id="MT-title-modal"></div>
+      <div id="MT-msg"></div>
+      <a id="MT-cta" href="#" target="_blank" rel="noopener noreferrer">Abrir Instagram</a>
+      <button id="MT-ok" type="button">Entendido</button>
+    </div>
+  </div>
+
+  <!-- MODAL TELÉFONO -->
+  <div id="MT-phone" aria-hidden="true">
+    <div class="box" role="dialog" aria-label="Verificación de teléfono">
+      <h3 style="margin:0 0 6px">Teléfono para contacto</h3>
+      <p class="muted">Ingresa tu número (8 a 15 dígitos). Solo para validar y reclamar premios.</p>
+      <div class="row">
+        <input id="MT-phone-input" type="tel" inputmode="numeric" placeholder="5512345678" />
+        <button id="MT-phone-ok" type="button">Confirmar</button>
+        <button id="MT-phone-cancel" type="button" style="background:#222b3a;">Cancelar</button>
+      </div>
+      <div id="MT-phone-error" class="err"></div>
+    </div>
+  </div>
+
 
   <!-- ================== Ranking  ================== -->
-   <br> <br> <br> <br>
 <header>
   <div class="wrap rk-hero">
     <center>
@@ -1446,6 +1545,8 @@ header, main, section, footer, .vault, .gb-review-card{
     <script type="module" src="js/mega5x5.js?v=3"></script>
     <!-- JS MEGA 5X5 -->
     <script type="module" src="js/mini6x6.js"></script>
+     <!-- JS MEGA 5X5 -->
+    <script type="module" src="js/mitico5x5.js"></script>
     <!-- JS FONDO -->
     <script src="js/Fx.js"></script>
 

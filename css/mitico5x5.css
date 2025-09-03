@@ -1,0 +1,664 @@
+/* =================== MITICO 5x5 — CSS =================== */
+:root { --MT-gap: 10px; }
+
+#MT-juego{
+  --W: min(680px, 94vw);
+  --gap: var(--MT-gap);
+  color:#e7ecf3;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+  min-height:100vh; margin:0 auto; text-align:center; padding:10px 0 22px;
+}
+
+/* ---------- Header / Canvas ---------- */
+#MT-head{ position:relative; width:var(--W); margin:0 auto 10px; line-height:0; isolation:isolate; overflow:hidden; }
+#MT-title{ display:block; width:100%; height:auto; border-radius:14px; box-shadow:0 12px 44px rgba(0,0,0,.35); }
+#MT-canvas{ position:absolute; inset:0; width:100%; height:22%; pointer-events:none; display:block; }
+
+/* ---------- Shell general y caja tablero ---------- */
+#MT-shell{
+  width: 90%;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: clamp(12px, 2vw, 18px);
+  border-radius: 18px;
+  background: rgba(10, 14, 24, .55);
+  border: 1px solid rgba(35, 48, 70, .9);
+  box-shadow: 0 18px 48px rgba(0,0,0,.35);
+}
+
+#MT-board-box{
+  width: 80%;
+  margin: 0 auto clamp(12px, 2vw, 18px);
+}
+
+/* ---------- Tablero ---------- */
+#MT-board{
+  width:100% !important;
+  display:grid;
+  grid-template-columns:repeat(5, minmax(0, 1fr));
+  gap:var(--MT-gap);
+  align-items:stretch; justify-items:stretch;
+  user-select:none;
+
+  padding: clamp(12px, 2vw, 18px);
+  border-radius: 24px;
+  position: relative;
+  background:
+    radial-gradient(800px 420px at -10% -20%, rgba(56,189,248,.06), transparent 60%),
+    radial-gradient(800px 420px at 110% 120%, rgba(217,70,239,.06), transparent 60%),
+    linear-gradient(160deg,#0f172a 0%, #0b1220 40%, #111827 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.14),
+    inset 0 -10px 30px rgba(0,0,0,.35),
+    0 18px 36px rgba(0,0,0,.38);
+  border: 1px solid rgba(0,0,0,.38);
+  isolation:isolate;
+}
+#MT-board::before{
+  content:""; position:absolute; inset:6px; border-radius:20px;
+  box-shadow:
+    inset 0 0 0 1px rgba(0,0,0,.45),
+    inset 0 12px 24px rgba(0,0,0,.35),
+    inset 0 -8px 14px rgba(255,255,255,.06);
+  pointer-events:none;
+}
+#MT-board::after{
+  content:""; position:absolute; inset:-2px; border-radius:26px;
+  box-shadow: 0 0 0 2px rgba(255,255,255,.05), 0 8px 24px rgba(0,0,0,.45);
+  pointer-events:none;
+}
+#MT-board .screw{
+  position:absolute; width:14px; height:14px; border-radius:50%;
+  background: radial-gradient(circle at 30% 30%, #fff 0 15%, #9aa3ad 40%, #4b525a 70%, #14171a 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.28), inset 0 -1px 0 rgba(0,0,0,.4);
+  z-index: 3;
+}
+#MT-board .screw.tl{ left:10px; top:10px }
+#MT-board .screw.tr{ right:10px; top:10px }
+#MT-board .screw.bl{ left:10px; bottom:10px }
+#MT-board .screw.br{ right:10px; bottom:10px }
+
+#MT-board button{
+  width:100%; aspect-ratio:1/1; display:grid; place-items:center;
+  border-radius:18px; border:1px solid rgba(0,0,0,.35) !important;
+  background:
+    radial-gradient(120% 140% at 50% 35%, rgba(255,255,255,.10) 0%, rgba(255,255,255,0) 55%),
+    linear-gradient(160deg, #2b313a 0%, #404957 44%, #616a77 100%) !important;
+  color:#e7ecf3; font-weight:900; letter-spacing:.2px;
+  font-size:clamp(12px, 2.2vw, 16px);
+  cursor:pointer; transition:transform .18s ease, filter .12s ease, box-shadow .12s ease;
+  transform-style:preserve-3d; padding:6px;
+  box-shadow:0 1px 0 rgba(255,255,255,.05) inset, 0 -2px 6px rgba(0,0,0,.45) inset, 0 10px 18px rgba(0,0,0,.35), 0 1px 0 rgba(255,255,255,.06) !important;
+  overflow:hidden;
+}
+#MT-board button:hover{
+  filter:brightness(1.04);
+  box-shadow:0 1px 0 rgba(255,255,255,.05) inset, 0 -2px 6px rgba(0,0,0,.5) inset,
+             0 0 14px rgba(56,189,248,.10), 0 0 18px rgba(168,85,247,.10), 0 12px 22px rgba(0,0,0,.34) !important;
+}
+#MT-board button:disabled{ opacity:.80; cursor:not-allowed; transform:none; box-shadow:none; }
+
+.metal-btn .grain{
+  position:absolute; inset:0; border-radius:18px; z-index:0; opacity:.12;
+  background-image:url("data:image/svg+xml;utf8, <svg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/><feComponentTransfer><feFuncA type='table' tableValues='0 0 .7 0'/></feComponentTransfer></filter><rect width='100%' height='100%' filter='url(%23n)' /></svg>");
+  background-size:110px 110px; mix-blend-mode:overlay;
+}
+.metal-btn .content{
+  position:relative; z-index:2; width:100%; height:100%;
+  display:flex; align-items:center; justify-content:center; text-align:center;
+  padding: 9% !important; border-radius:12px; background:transparent; line-height:1; font-weight:800;
+}
+.metal-btn .content img{ display:block; width:100%; height:100%; object-fit: cover; border-radius:12px; }
+.metal-btn .content img.gomy{ width:66%; height:auto; object-fit:contain; }
+
+/* Chips y montos */
+.chip{
+  --chip-h: clamp(22px, 6.2vw, 34px);
+  --chip-fz: clamp(10px, 3.0vw, 14px);
+  display:flex; align-items:center; justify-content:center;
+  box-sizing:border-box;
+  height:var(--chip-h); padding:0 clamp(6px, 2vw, 10px);
+  max-width:68%; overflow:visible; white-space:nowrap;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.26);
+  color:#0b1220; font-weight:900; letter-spacing:.2px; font-size:var(--chip-fz);
+  background: linear-gradient(180deg, #ffffff, #e9eef7 78%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.20), inset 0 -1px 6px rgba(0,0,0,.28), 0 2px 10px rgba(0,0,0,.18);
+  text-shadow: 0 1px 0 rgba(255,255,255,.6);
+}
+
+/* Animaciones */
+@keyframes MT-flip{0%{transform:rotateY(0)}50%{transform:rotateY(90deg)}100%{transform:rotateY(0)}}
+@keyframes MT-shuffle{0%{transform:translate(0,0) rotate(0)}25%{transform:translate(1px,-1px) rotate(-1deg)}50%{transform:translate(-1px,1px) rotate(1deg)}75%{transform:translate(1px,1px) rotate(0)}100%{transform:translate(0,0) rotate(0)}}
+.MT-is-flipping{ animation:MT-flip .5s both; }
+.MT-is-shuffling{ animation:MT-shuffle .6s ease-in-out; }
+@keyframes MT-pop{0%{transform:scale(.92)}100%{transform:scale(1)}}
+.MT-pop{ animation:MT-pop .25s ease; }
+
+/* Looks premios */
+.MT-looks-1500{ background:linear-gradient(145deg,#064e3b,#0b6b52)!important; border-color:#18c38a!important; box-shadow:0 10px 36px rgba(14,159,110,.28); }
+.MT-looks-500 { background:linear-gradient(145deg,#14532d,#1b7a3e)!important; border-color:#34d399!important; box-shadow:0 10px 34px rgba(16,185,129,.25); }
+.MT-looks-200 { background:linear-gradient(145deg,#0b3a54,#0f5d8c)!important; border-color:#38bdf8!important; box-shadow:0 10px 34px rgba(56,189,248,.24); }
+.MT-looks-50  { background:linear-gradient(145deg,#334155,#1f2937)!important; border:2px solid #cbd5e1!important; box-shadow:0 0 0 1px rgba(203,213,225,.35),0 10px 26px rgba(148,163,184,.28),inset 0 0 28px rgba(226,232,240,.10); }
+.MT-looks-gomita{ background:linear-gradient(145deg,#3b0764,#5b0aa0)!important; border-color:#9b5cf7!important; box-shadow:0 10px 34px rgba(124,58,237,.25); }
+.MT-looks-nada{ background:linear-gradient(145deg,#191c24,#1b1f2a)!important; border-color:#2d3547!important; }
+
+/* ---------- Tarjeta códigos ---------- */
+#MT-card{ width:min(680px,96%); max-width:420px; margin:8px auto 0; padding:10px 12px;
+  border-radius:12px; background:rgba(12,18,34,.70); border:1px solid #233046; box-shadow:0 6px 18px rgba(0,0,0,.18); overflow:hidden; }
+#MT-card .MT-row{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:center; }
+#MT-card .MT-inputs{ width:100%; display:flex; flex-direction:column; gap:8px; align-items:center; }
+.MT-input-wrap{ position:relative; width:100%; max-width:360px; margin:0 auto; }
+.MT-input{ width:100%; height:38px; padding:6px 36px; border-radius:10px; border:1px solid #2f3c55; background:#0f172a; color:#e7ecf3; outline:none; font-weight:800; letter-spacing:.8px; text-align:center; font-size:13px; box-sizing:border-box; }
+.MT-label{ position:absolute; left:10px; top:50%; transform:translateY(-50%); font-size:11px; color:#8aa0c0; pointer-events:none; }
+.MT-icon{ position:absolute; right:10px; top:50%; transform:translateY(-50%); width:16px; height:16px; opacity:.7; pointer-events:none; }
+#MT-validar{ width:100%; height:38px; margin:6px 0 0; border-radius:10px; border:1px solid #2b3750; background:linear-gradient(135deg,#6d28d9,#2563eb); color:#fff; font-weight:900; cursor:pointer; }
+#MT-status{ font-size:12px; opacity:.92; margin-top:6px; text-align:center; }
+
+/* ---------- Modal principal ---------- */
+#MT-modal{
+  position: fixed; inset: 0; z-index: 9999;
+  display: none; align-items: center; justify-content: center;
+  background:
+    radial-gradient(1200px 800px at 50% -10%, rgba(0,191,255,.10), transparent 60%),
+    radial-gradient(900px 600px at 50% 110%, rgba(255,91,247,.08), transparent 60%),
+    linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.7));
+  backdrop-filter: blur(7px) saturate(110%);
+}
+#MT-card-modal{
+  position: relative;
+  width: min(92vw, 460px);
+  max-height: 90vh;
+  border-radius: 24px;
+  padding: 18px 16px 16px;
+  background:
+    radial-gradient(140% 120% at 50% 0%, rgba(255,255,255,.06), transparent 60%),
+    linear-gradient(180deg, rgba(16,20,29,.96), rgba(12,16,24,.95));
+  border: 1px solid rgba(60,90,120,.5);
+  box-shadow:
+    0 22px 60px rgba(0,0,0,.55),
+    inset 0 1px 0 rgba(255,255,255,.05);
+  color: #e7ecf3;
+  display: grid; gap: 14px;
+  overflow: hidden;
+}
+#MT-card-modal.success{ box-shadow: 0 22px 60px rgba(0,0,0,.55), 0 0 46px rgba(34,197,94,.22) inset, inset 0 1px 0 rgba(255,255,255,.05); }
+#MT-card-modal.warn   { box-shadow: 0 22px 60px rgba(0,0,0,.55), 0 0 46px rgba(168,85,247,.24) inset, inset 0 1px 0 rgba(255,255,255,.05); }
+#MT-card-modal.neutral{ box-shadow: 0 22px 60px rgba(0,0,0,.55), 0 0 40px rgba(148,163,184,.20) inset, inset 0 1px 0 rgba(255,255,255,.05); }
+
+#MT-figure{ display:grid; place-items:center; height:160px; border-radius:16px; background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.08)); box-shadow: inset 0 1px 0 rgba(255,255,255,.04); }
+#MT-figure img{ max-width: 128px; width: 60%; height:auto; display:block; }
+
+#MT-title-modal{ text-align:center; font-weight:800; line-height:1.2; text-shadow: 0 0 22px rgba(0,191,255,.30); }
+#MT-title-modal .xl{ font-size: clamp(24px, 6.5vw, 36px); }
+#MT-title-modal .md{ font-size: clamp(16px, 4.6vw, 20px); }
+.MT-accent{ color:#9ef7ff; }
+.MT-accent-purple{ color:#d7b6ff; }
+
+#MT-msg{ text-align:center; color:#c9d8ea; font-size: 14px; }
+#MT-cta, #MT-ok{
+  appearance:none; border:0; border-radius:14px;
+  padding:12px 14px; font-size:15px; font-weight:700; width:100%;
+  cursor:pointer; transition: transform .05s ease, filter .2s ease, box-shadow .2s ease;
+}
+#MT-cta{
+  display:none;
+  background: linear-gradient(180deg, #00bfff, #1f6feb);
+  color:#061018;
+  box-shadow: 0 12px 30px rgba(0,191,255,.35), 0 0 26px rgba(0,191,255,.30);
+}
+#MT-cta:hover{ filter:brightness(1.07) }
+#MT-cta:active{ transform: translateY(1px) }
+
+#MT-ok{
+  background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(0,0,0,.06));
+  color:#e7ecf3; border:1px solid rgba(60,90,120,.55);
+  box-shadow: 0 10px 24px rgba(0,0,0,.35), 0 0 18px rgba(168,85,247,.20);
+}
+#MT-ok:hover{ filter:brightness(1.05) }
+#MT-ok:active{ transform: translateY(1px) }
+
+@media (max-width: 420px){
+  #MT-card-modal{ width: min(94vw, 480px); padding: 16px 14px 14px; border-radius: 22px; }
+  #MT-figure{ height: 140px; }
+}
+
+/* ---------- Modal Teléfono ---------- */
+#MT-phone{
+  position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+  background: rgba(0,0,0,.60); backdrop-filter: blur(2px); z-index:10000;
+}
+#MT-phone .box{
+  width:min(92vw,420px); background:#0b1220; border:1px solid #2b3750;
+  border-radius:16px; padding:16px; color:#e7ecf3; box-shadow:0 18px 60px rgba(0,0,0,.45);
+}
+#MT-phone .row{ display:flex; gap:8px; margin-top:10px; }
+#MT-phone input{ flex:1; height:38px; border-radius:10px; background:#0f172a; color:#e7ecf3; border:1px solid #2f3c55; padding:6px 10px; }
+#MT-phone button{ height:38px; border-radius:10px; border:1px solid #2b3750; background:linear-gradient(135deg,#6d28d9,#2563eb); color:#fff; font-weight:800; cursor:pointer; }
+#MT-phone .muted{ color:#9fb0c9; font-size:12px; }
+#MT-phone .err{ color:#fca5a5; font-size:12px; min-height:16px; }
+
+/* ---------- Ajustes chips y X ---------- */
+.chip.money{
+  margin: 0 auto;
+  height: clamp(20px, 16%, 26px) !important;
+  padding: 0 clamp(6px, 2.8vw, 10px) !important;
+  font-size: clamp(10px, 3vw, 13px) !important;
+  font-weight: 900;
+  line-height: 1;
+  border-radius: 999px;
+  white-space: nowrap;
+  max-width: 80% !important;
+}
+.x{
+  font-size: clamp(16px, 5vw, 22px) !important;
+  display:flex; align-items:center; justify-content:center; height:100%;
+}
+
+/* ===== Botón arriba de los códigos ===== */
+#MT-card .MT-actions { width:100%; margin-bottom:8px; }
+#MT-card .MT-actions #MT-validar{
+  width:100%;
+  height:40px;
+  border-radius:10px;
+  border:1px solid #2b3750;
+  background:linear-gradient(135deg,#6d28d9,#2563eb);
+  color:#fff; font-weight:900; cursor:pointer;
+}
+
+/* Ajustes espaciales */
+#MT-card .MT-inputs{ margin-top:4px; }
+#MT-status{ margin-top:8px; }
+
+/* ===== Board estilo Mega5x5 original aplicado a Mitico ===== */
+#MT-board{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap: clamp(6px, 1.8vw, 14px);
+  width: min(92vw, 620px);
+  max-width: 100%;
+  margin: 0 auto;
+  padding: clamp(8px, 2.2vw, 16px);
+  border-radius: 24px;
+  position: relative;
+  background:
+    radial-gradient(800px 420px at -10% -20%, rgba(56,189,248,.06), transparent 60%),
+    radial-gradient(800px 420px at 110% 120%, rgba(217,70,239,.06), transparent 60%),
+    linear-gradient(160deg,#0f172a 0%, #0b1220 40%, #111827 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.14),
+    inset 0 -10px 30px rgba(0,0,0,.35),
+    0 18px 36px rgba(0,0,0,.38);
+  border: 1px solid rgba(0,0,0,.38);
+  isolation:isolate;
+}
+#MT-board::before{
+  content:""; position:absolute; inset:6px; border-radius:20px;
+  box-shadow:
+    inset 0 0 0 1px rgba(0,0,0,.45),
+    inset 0 12px 24px rgba(0,0,0,.35),
+    inset 0 -8px 14px rgba(255,255,255,.06);
+  pointer-events:none;
+}
+#MT-board::after{
+  content:""; position:absolute; inset:-2px; border-radius:26px;
+  box-shadow: 0 0 0 2px rgba(255,255,255,.05), 0 8px 24px rgba(0,0,0,.45);
+  pointer-events:none;
+}
+
+#MT-board .screw{
+  position:absolute; width:14px; height:14px; border-radius:50%;
+  background: radial-gradient(circle at 30% 30%, #fff 0 15%, #9aa3ad 40%, #4b525a 70%, #14171a 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.28), inset 0 -1px 0 rgba(0,0,0,.4);
+  z-index: 3;
+}
+#MT-board .screw.tl{ left:10px; top:10px }
+#MT-board .screw.tr{ right:10px; top:10px }
+#MT-board .screw.bl{ left:10px; bottom:10px }
+#MT-board .screw.br{ right:10px; bottom:10px }
+
+/* ===== Botón metálico Mega ===== */
+#MT-board .metal-btn{
+  position:relative; width:100%; aspect-ratio:1/1;
+  border-radius:18px; cursor:pointer; overflow:hidden; user-select:none; isolation:isolate;
+  border:1px solid rgba(0,0,0,.35) !important;
+  background:
+    radial-gradient(120% 140% at 50% 35%, rgba(255,255,255,.10) 0%, rgba(255,255,255,0) 55%),
+    linear-gradient(160deg, #2b313a 0%, #404957 44%, #616a77 100%) !important;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.05) inset,
+    0 -2px 6px rgba(0,0,0,.45) inset,
+    0 10px 18px rgba(0,0,0,.35),
+    0 1px 0 rgba(255,255,255,.06) !important;
+  transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+  display:grid; place-items:center;
+}
+#MT-board .metal-btn:hover{
+  filter:brightness(1.04);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.05) inset,
+    0 -2px 6px rgba(0,0,0,.5) inset,
+    0 0 14px rgba(56,189,248,.10),
+    0 0 18px rgba(168,85,247,.10),
+    0 12px 22px rgba(0,0,0,.34) !important;
+}
+#MT-board .metal-btn:active{ transform:translateY(2px); }
+
+#MT-board .metal-btn .grain{
+  position:absolute; inset:0; border-radius:18px; z-index:0; opacity:.12;
+  background-image:url("data:image/svg+xml;utf8, <svg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/><feComponentTransfer><feFuncA type='table' tableValues='0 0 .7 0'/></feComponentTransfer></filter><rect width='100%' height='100%' filter='url(%23n)' /></svg>");
+  background-size:110px 110px; mix-blend-mode:overlay;
+}
+#MT-board .metal-btn .content{
+  position:relative; z-index:2; width:100%; height:100%;
+  display:flex; align-items:center; justify-content:center; text-align:center;
+  padding: 9% !important; border-radius:12px; background:transparent; line-height:1; font-weight:800;
+}
+#MT-board .metal-btn .content img{ display:block; width:100%; height:100%; object-fit: cover; border-radius:12px; }
+#MT-board .metal-btn .content img.gomy{ width:66%; height:auto; object-fit:contain; }
+
+/* ===== Animaciones iguales al mega ===== */
+@keyframes MT-flip{0%{transform:rotateY(0)}50%{transform:rotateY(90deg)}100%{transform:rotateY(0)}}
+@keyframes MT-shuffle{0%{transform:translate(0,0) rotate(0)}25%{transform:translate(1px,-1px) rotate(-1deg)}50%{transform:translate(-1px,1px) rotate(1deg)}75%{transform:translate(1px,1px) rotate(0)}100%{transform:translate(0,0) rotate(0)}}
+.MT-is-flipping{ animation:MT-flip .5s both; }
+.MT-is-shuffling{ animation:MT-shuffle .6s ease-in-out; }
+@keyframes MT-pop{0%{transform:scale(.92)}100%{transform:scale(1)}}
+.MT-pop{ animation:MT-pop .25s ease; }
+
+/* ===== Colores por premio (mismas familias) ===== */
+.MT-looks-1500{ background: linear-gradient(160deg,#1a2520 0%, #243a2f 50%, #2f6a54 100%) !important; border-color:#2f6a54 !important; box-shadow: 0 1px 0 rgba(255,255,255,.06) inset, 0 -2px 6px rgba(0,0,0,.45) inset, 0 12px 22px rgba(0,0,0,.28), 0 0 14px rgba(234,179,8,.12) !important; }
+.MT-looks-500{  background: linear-gradient(160deg,#17251f 0%, #1f352a 50%, #2b5c46 100%) !important; border-color:#2b5c46 !important; box-shadow: 0 1px 0 rgba(255,255,255,.06) inset, 0 -2px 6px rgba(0,0,0,.45) inset, 0 12px 22px rgba(0,0,0,.28), 0 0 12px rgba(16,185,129,.10) !important; }
+.MT-looks-200{  background: linear-gradient(160deg,#172033 0%, #1a2b45 50%, #274b72 100%) !important; border-color:#274b72 !important; box-shadow: 0 1px 0 rgba(255,255,255,.06) inset, 0 -2px 6px rgba(0,0,0,.45) inset, 0 12px 22px rgba(0,0,0,.28), 0 0 12px rgba(56,189,248,.12) !important; }
+.MT-looks-50{   background: linear-gradient(160deg,#2b2f37 0%, #353b44 50%, #4c5561 100%) !important; border-color:#4c5561 !important; box-shadow: 0 1px 0 rgba(255,255,255,.06) inset, 0 -2px 6px rgba(0,0,0,.45) inset, 0 12px 20px rgba(0,0,0,.26) !important; }
+.MT-looks-gomita{background: linear-gradient(160deg,#281b3b 0%, #35265a 50%, #5a3fa1 100%) !important; border-color:#6b4bc5 !important; box-shadow: 0 1px 0 rgba(255,255,255,.06) inset, 0 -2px 6px rgba(0,0,0,.45) inset, 0 12px 22px rgba(0,0,0,.28), 0 0 14px rgba(168,85,247,.14) !important; }
+.MT-looks-nada{  background: linear-gradient(160deg,#2f343a 0%, #3c434c 50%, #59616b 100%) !important; border-color:#3a414a !important; }
+
+/* ================== MITICO · OVERRIDES GORDITOS Y VIVOS ================== */
+
+/* 1) El tablero ocupa ~90% del ancho visible del shell */
+#MT-board-box{
+  width: 90% !important;           /* antes 80% */
+  max-width: 980px;
+  margin: 0 auto clamp(12px, 2vw, 18px);
+}
+#MT-board{
+  width: 100% !important;           /* que estire dentro del box */
+  gap: clamp(10px, 2.4vw, 18px);    /* un poco más de aire */
+  padding: clamp(12px, 2.6vw, 22px);
+}
+
+/* 2) Botones/celdas más grandes visualmente */
+#MT-board .metal-btn{
+  border-radius: 20px;
+}
+#MT-board .metal-btn .content{
+  padding: 5% !important;           /* menos padding = contenido más grande */
+}
+#MT-board .metal-btn .content img.gomy{
+  width: 78%;                       /* gomita más grande */
+}
+
+/* Monto: más alto, más grande, centrado y con buena legibilidad */
+.chip.money{
+  height: clamp(30px, 8vw, 46px) !important;
+  padding: 0 clamp(14px, 4.8vw, 22px) !important;
+  font-size: clamp(16px, 4.8vw, 28px) !important;
+  font-weight: 900;
+  letter-spacing: .3px;
+  text-shadow: 0 1px 0 rgba(255,255,255,.65), 0 0 10px rgba(255,255,255,.2);
+  box-shadow:
+    0 2px 12px rgba(0,0,0,.28),
+    inset 0 1px 0 rgba(255,255,255,.9),
+    inset 0 -3px 10px rgba(0,0,0,.2);
+}
+
+/* X de sin premio: que se vea desde la Luna */
+.x{
+  font-size: clamp(28px, 7vw, 50px) !important;
+  opacity: .96;
+  text-shadow: 0 1px 0 rgba(0,0,0,.35);
+}
+
+/* 3) Colores VIVOS por premio + glow (píntame bonito) */
+
+/* $1000 dorado potente */
+.MT-looks-1500{
+  background: linear-gradient(160deg,#4b3200 0%, #a66b00 45%, #ffd95a 100%) !important;
+  border-color: #ffde7a !important;
+  box-shadow:
+    0 0 22px rgba(255,215,0,.35),
+    inset 0 1px 0 rgba(255,255,255,.25),
+    inset 0 -8px 16px rgba(0,0,0,.35) !important;
+}
+.MT-1500 .chip.money{
+  background: linear-gradient(180deg,#fff2a8,#ffd34d) !important;
+  color:#241800 !important;
+  border:1px solid rgba(255,219,88,.9) !important;
+}
+
+/* $500 verde neón */
+.MT-looks-500{
+  background: linear-gradient(160deg,#064e3b 0%, #13b981 50%, #34f5b5 100%) !important;
+  border-color:#34f5b5 !important;
+  box-shadow:
+    0 0 20px rgba(16,185,129,.35),
+    inset 0 1px 0 rgba(255,255,255,.20),
+    inset 0 -8px 16px rgba(0,0,0,.35) !important;
+}
+.MT-500 .chip.money{
+  background: linear-gradient(180deg,#a7f3d0,#34d399) !important;
+  color:#062b1e !important;
+  border:1px solid rgba(52,211,153,.9) !important;
+}
+
+/* $200 azul eléctrico */
+.MT-looks-200{
+  background: linear-gradient(160deg,#0b3a54 0%, #0ea5e9 50%, #67e8f9 100%) !important;
+  border-color:#67e8f9 !important;
+  box-shadow:
+    0 0 20px rgba(14,165,233,.35),
+    inset 0 1px 0 rgba(255,255,255,.20),
+    inset 0 -8px 16px rgba(0,0,0,.35) !important;
+}
+.MT-200 .chip.money{
+  background: linear-gradient(180deg,#bae6fd,#38bdf8) !important;
+  color:#052a3a !important;
+  border:1px solid rgba(56,189,248,.9) !important;
+}
+
+/* $50 plata brillante */
+.MT-looks-50{
+  background: linear-gradient(160deg,#2b2f37 0%, #7c8594 45%, #dbe1ea 100%) !important;
+  border-color:#dbe1ea !important;
+  box-shadow:
+    0 0 18px rgba(203,213,225,.45),
+    inset 0 1px 0 rgba(255,255,255,.25),
+    inset 0 -8px 16px rgba(0,0,0,.35) !important;
+}
+.MT-50 .chip.money{
+  background: linear-gradient(180deg,#ffffff,#e5e7eb) !important;
+  color:#0b1220 !important;
+  border:1px solid rgba(229,231,235,.9) !important;
+}
+
+/* Gomita violeta neón */
+.MT-looks-gomita{
+  background: linear-gradient(160deg,#3b0764 0%, #7c3aed 50%, #d946ef 100%) !important;
+  border-color:#c084fc !important;
+  box-shadow:
+    0 0 20px rgba(192,132,252,.35),
+    inset 0 1px 0 rgba(255,255,255,.20),
+    inset 0 -8px 16px rgba(0,0,0,.35) !important;
+}
+
+/* Nada: gris oscuro pero no triste */
+.MT-looks-nada{
+  background: linear-gradient(160deg,#1f2430 0%, #2b313c 60%, #3b4350 100%) !important;
+  border-color:#3a414a !important;
+}
+
+/* Hover extra para todos, porque drama */
+#MT-board .metal-btn:hover{
+  filter: brightness(1.06) saturate(1.05);
+}
+
+/* En móviles chicos sigue ocupando el 90% y sube tamaños sin romper */
+@media (max-width: 420px){
+  #MT-board-box{ width: 92% !important; }
+  #MT-board{ gap: clamp(8px, 2.8vw, 16px); padding: clamp(10px, 3vw, 18px); }
+  .chip.money{
+    height: clamp(28px, 10vw, 42px) !important;
+    font-size: clamp(15px, 5.2vw, 26px) !important;
+  }
+  .x{ font-size: clamp(26px, 8vw, 44px) !important; }
+}
+/* ================== ALIGN + 90% + CELDAS CUADRADAS ================== */
+
+/* 1) Alinea header y shell al mismo ancho y centrados */
+#MT-head,
+#MT-shell{
+  width: min(980px, 90vw) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* 2) El contenedor externo del tablero (la “caja de fuera”) también alineado */
+#MT-board-box{
+  width: 100% !important;            /* hereda del shell (90vw máx 980px) */
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* 3) El tablero ocupa el 100% del box (que ya está al 90% del viewport) */
+#MT-board{
+  width: 100% !important;
+  grid-template-columns: repeat(5, 1fr) !important;
+  gap: clamp(10px, 2.6vw, 20px) !important;
+  padding: clamp(10px, 2.4vw, 20px) !important;
+  border-radius: 18px !important;
+}
+
+/* 4) CUADRADAS: quita redondeos fuertes en botones y contenido */
+#MT-board .metal-btn{
+  border-radius: 8px !important;     /* de 18px a 8px */
+}
+#MT-board .metal-btn .content{
+  border-radius: 6px !important;
+  padding: 6% !important;            /* menos padding = premio más grande */
+}
+#MT-board .metal-btn .content img,
+#MT-board .metal-btn .content .hidden-cover{
+  border-radius: 6px !important;     /* no círculos */
+}
+
+/* Aumenta presencia de premio (por si los ves tímidos) */
+.chip.money{
+  height: clamp(28px, 7.5vw, 44px) !important;
+  padding: 0 clamp(12px, 4.4vw, 22px) !important;
+  font-size: clamp(16px, 4.6vw, 26px) !important;
+}
+
+/* X bien visible */
+.x{
+  font-size: clamp(28px, 7vw, 46px) !important;
+}
+
+/* 5) El modal de resultado centrado y con ancho coherente (alineado con todo) */
+#MT-modal{ padding: 18px; }
+#MT-card-modal{
+  width: min(90vw, 980px) !important;   /* igual que shell/head */
+  margin: 0 auto !important;
+}
+
+/* 6) Por si algún estilo viejo forcejea con el ancho del tablero */
+#MT-board{ max-width: none !important; }
+
+/* ================== MITICO · FONDOS POR PREMIO + CENTRADO REAL ================== */
+
+/* 1) Centrado total de contenido dentro de cada casilla */
+#MT-board .metal-btn{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+#MT-board .metal-btn .content{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:100% !important;
+  height:100% !important;
+  padding: 6% !important;
+}
+
+/* El chip SIEMPRE centrado y grande */
+#MT-board .chip.money{
+  margin: 0 auto !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  height: clamp(28px, 7vw, 44px) !important;
+  padding: 0 clamp(12px, 4.4vw, 22px) !important;
+  font-size: clamp(10px, 4vw, 20px) !important;
+  max-width: 88% !important;
+  white-space: nowrap;
+}
+
+/* La X también centrada y visible */
+#MT-board .x{
+  margin: 0 auto !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  font-size: clamp(20px, 4vw, 25px) !important;
+}
+
+/* 2) Color de FONDO por tipo de premio (la casilla cambia de color al revelarse) */
+/*    Usa las clases que ya pones: MT-looks-* y refuerza con MT-* por si el JS añade ambas */
+
+.MT-looks-1500, .MT-1500{
+  background: linear-gradient(160deg, #3a2500, #a66b00 55%, #ffd66b 100%) !important;
+  border-color: #ffdd87 !important;
+  box-shadow: 0 0 22px rgba(255,208,0,.35), inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+
+.MT-looks-500, .MT-500{
+  background: linear-gradient(160deg, #0b3b2e, #16a34a 55%, #34f5b5 100%) !important;
+  border-color: #4ade80 !important;
+  box-shadow: 0 0 20px rgba(34,197,94,.35), inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+
+.MT-looks-200, .MT-200{
+  background: linear-gradient(160deg, #0b3a54, #0ea5e9 55%, #67e8f9 100%) !important;
+  border-color: #38bdf8 !important;
+  box-shadow: 0 0 20px rgba(14,165,233,.35), inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+
+.MT-looks-50, .MT-50{
+  background: linear-gradient(160deg, #2e3340, #8b94a3 55%, #e6ebf5 100%) !important;
+  border-color: #e6ebf5 !important;
+  box-shadow: 0 0 18px rgba(203,213,225,.45), inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+
+.MT-looks-gomita{
+  background: linear-gradient(160deg, #3b0764, #7c3aed 55%, #d946ef 100%) !important;
+  border-color: #c084fc !important;
+  box-shadow: 0 0 20px rgba(192,132,252,.35), inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+
+.MT-looks-nada{
+  background: linear-gradient(160deg, #1f2430, #2b313c 60%, #3b4350 100%) !important;
+  border-color: #3a414a !important;
+}
+
+/* 3) Opcional: el estado OCULTO (antes de revelar) más neutro y oscuro */
+#MT-board .metal-btn .hidden-cover{
+  filter: saturate(.8) brightness(.9);
+  border-radius: 6px;
+}
+
+/* 4) Hover con un poco más de punch para todos */
+#MT-board .metal-btn:hover{
+  filter: brightness(1.06) saturate(1.06);
+}
+

@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <title>GummyBank</title>
+    <link href="css/styles.css" rel="stylesheet" />
+    <!-- Desaign RESEÑAS -->
+    <link rel="stylesheet" href="css/review.css?v=1">
+    <!-- Fuente -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Desaign MEGA 5X5-->
+    <link rel="stylesheet" href="css/mini6x6.css">
+    <!-- Desaign MEGA 5X5-->
+    <link rel="stylesheet" href="css/mega5x5.css?v=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+    <style>
+/* ====== Marca/Imágenes ====== */
+#logo-gummy-bank{width:90vw;max-width:1000px;height:auto;display:block;margin:20px auto}
+.imagen-recompensa{width:90vw;max-width:1000px;height:auto;display:block;margin:20px auto;margin-left:-5px}
+.imagen-madera-ajustada{transform:scale(1.04);margin-left:-15px}
+
+/* ====== Bóvedas ====== */
+.vault.cristal{box-shadow:0 0 20px rgba(0,255,255,.5);border:2px solid rgba(0,255,255,.4)}
+.vault.plateada{box-shadow:0 0 20px rgba(200,200,200,.5);border:2px solid rgba(180,180,180,.4)}
+.vault.dorada{box-shadow:0 0 20px rgba(255,215,0,.5);border:2px solid rgba(255,215,0,.4)}
+.vault.cristal button{background:linear-gradient(90deg,#00eaff,#00bfff)}
+.vault.plateada button{background:linear-gradient(90deg,#aaa,#ddd);color:#000}
+.vault.dorada button{background:linear-gradient(90deg,gold,#f90)}
+.vault.madera{box-shadow:0 0 20px rgba(139,69,19,.6);border:2px solid rgba(160,82,45,.5);background:linear-gradient(135deg,#8b5a2b,#deb887);color:#fff}
+.vault.madera button{background:linear-gradient(90deg,#8b4513,#d2b48c);color:#fff}
+
+/* ====== Lluvia: SIEMPRE al fondo ====== */
+#lluvia-container{position:fixed;inset:0;z-index:-1;pointer-events:none}
+main,header,section.rewards,#mini-juego,.vault{position:relative;z-index:1}
+
+/* ====== Modales ====== */
+.modal-overlay{position:fixed;inset:0;display:none;z-index:10040;background:rgba(0,0,0,.55);backdrop-filter:blur(2px)}
+.custom-modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:10050}
+
+/* ====== Modal de registro ====== */
+#modal-registro.custom-modal{width:min(420px,92vw);padding:18px 16px}
+#modal-registro{max-width:420px;width:92vw;box-sizing:border-box}
+#modal-registro h2{margin:0 0 12px;font-size:20px;color:#e7ecf3;text-align:center}
+#modal-registro form{margin:0;display:grid;gap:10px}
+#modal-registro input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid #2b3b55;background:#0f172a;color:#e7ecf3;outline:none;box-sizing:border-box}
+#modal-registro input::placeholder{color:#8aa0c2}
+#modal-registro input:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.25)}
+#modal-registro .acciones{display:grid;gap:8px;margin-top:4px}
+#modal-registro button{width:100%;padding:12px 14px;border-radius:12px;border:1px solid transparent;font-weight:600;cursor:pointer;transition:transform .12s ease,box-shadow .12s ease,filter .12s ease;box-sizing:border-box}
+#modal-registro button[type="submit"]{background:linear-gradient(90deg,#22c55e,#84cc16);color:#0b1220}
+#modal-registro button[type="button"]{background:#111827;color:#e5e7eb;border-color:#263042}
+#modal-registro button:active{transform:translateY(1px)}
+body.modal-open{overflow:hidden}
+#modal-registro input,#modal-registro button{pointer-events:auto}
+
+</style>
+
+<style>
+  html,body{
+    height:100%; margin:0;
+    background:#000; color:#fff; overflow:hidden;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Poppins, sans-serif;
+  }
+  /* El lienzo está detrás pero visible */
+  #fx{
+    position:fixed; inset:0; width:100vw; height:100vh; display:block; z-index:0;
+    background:#000;
+  }
+  /* Contenido encima */
+  main{
+    position:relative; z-index:1; height:100vh;
+    display:grid; place-items:center; text-align:center;
+  }
+  h1{
+    font-size:clamp(32px,7vw,84px); margin:0;
+    text-shadow: 0 0 24px #8ef, 0 0 48px #f0f, 0 0 72px #0ff;
+  }
+  p{ opacity:.9 }
+  .btn{
+    position:fixed; right:12px; bottom:12px; z-index:2;
+    background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.2);
+    color:#fff; padding:8px 12px; border-radius:10px; cursor:pointer; backdrop-filter: blur(6px);
+  }
+</style>
+</head>
+<body>
+<canvas id="fx"></canvas>
+<div id="lluvia-container" aria-hidden="true"></div>
+    <header>
+      <div class="top-bar">
+        <div class="left-group">
+          <a href="https://www.instagram.com/gummybank?igsh=MW82Z3hvN2VjbWYxZw%3D%3D&utm_source=qr" target="_blank" style="text-decoration:none">
+            <i class="bi bi-instagram"><span> gummybank</span></i>
+          </a>
+        </div>
+        <div class="icon-question" style="display:flex;align-items:center;gap:10px">
+          <i class="bi bi-info-circle" aria-label="Información"></i>
+          <span id="lock-icon" style="cursor:pointer;font-size:20px" aria-label="Administrador">🔒</span>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div id="lluvia-container"></div>
+
+      <div class="animated-bag">
+        <img alt="Gummy Bank" src="img/titulo.jpg" id="logo-gummy-bank" />
+      </div>
+
+
+
+
+<!-- ====== BARRA PROMO 40px CON COUNTDOWN A LAS 5:00 PM ====== -->
+
+<div id="MG-promo-bar" role="status" aria-live="polite">
+  <center>
+  <span class="MG-promo-blink">El nuevo evento termina en:</span>
+  <span class="MG-promo-timer" id="MG-countdown">00:00:00</span>
+</div>
+
+<style>
+  /* Barra 40px full width, sin espacios */
+  #MG-promo-bar{
+    width:99%;
+    height:40px; min-height:40px;
+    margin:0 !important; padding:0 12px;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    background:
+      linear-gradient(90deg,#e90e0e, #ff1500 45%, #360505 85%);
+    color:#ffffff;
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+    font-weight:900; text-transform:uppercase; letter-spacing:.6px;
+    box-shadow:0 6px 18px rgba(0,0,0,.22), inset 0 0 24px rgba(255,255,255,.06);
+    margin-top: 100px; /* se mueve 40px hacia abajo */
+  }
+  /* Texto que parpadea */
+  .MG-promo-blink{ animation:MGblink 1s steps(2,start) infinite; }
+  @keyframes MGblink{ 50%{ opacity:.35 } }
+
+  /* Puntero/bala entre texto y timer */
+  .MG-promo-sep{ opacity:.85; font-weight:900 }
+
+  /* Timer legible dentro de 40px */
+  .MG-promo-timer{
+    font-variant-numeric:tabular-nums;
+    padding:4px 10px; border-radius:999px;
+    background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.12);
+  }
+
+  /* Respeta usuarios con reduce-motion */
+  @media (prefers-reduced-motion: reduce){
+    .MG-promo-blink{ animation:none }
+  }
+</style>
+
+<script>
+  // Cuenta regresiva al próximo 5:00 PM (hora local)
+  (function(){
+    const el = document.getElementById('MG-countdown');
+    if(!el) return;
+
+    function two(n){ return n.toString().padStart(2,'0'); }
+
+    function nextFivePM(){
+      const now = new Date();
+      const t = new Date();
+      t.setHours(17,0,0,0);            // 17:00:00 local
+      if(now >= t) t.setDate(t.getDate()+1);
+      return t;
+    }
+
+    let target = nextFivePM();
+
+    function tick(){
+      const now = new Date();
+      let diff = target - now;
+
+      // Si llegó a cero, reinicia para el siguiente día 17:00
+      if (diff <= 0){
+        target = nextFivePM();
+        diff = target - now;
+      }
+
+      const s = Math.floor(diff/1000);
+      const hh = Math.floor(s/3600);
+      const mm = Math.floor((s%3600)/60);
+      const ss = s%60;
+
+      el.textContent = `${two(hh)}:${two(mm)}:${two(ss)}`;
+    }
+
+    tick();
+    setInterval(tick, 1000);
+  })();
+</script>
+
+
+
+<!-- RESEÑAS  -->
+<section class="gb-review-card" aria-labelledby="grc-title">
+  <center>
+    <h3 id="grc-title">Tu opinión cuenta</h3>
+    <p class="grc-sub">
+      <center>
+        Déjanos tu reseña y participa por
+        <strong class="grc-badge">5 paquetes de gomitas y $100 pesos</strong>
+        <span class="grc-meta">Entrega: <strong>Lunes</strong></span>
+      </center>
+    </p>
+  </center>
+
+  <form id="grc-form" novalidate>
+    <label class="grc-lab" for="grc-tel">Número de teléfono (Tu boleto)</label>
+    <input id="grc-tel" name="telefono" inputmode="numeric" autocomplete="tel"
+    placeholder="10 dígitos" class="grc-inp" required minlength="8" maxlength="15" />
+
+    <label class="grc-lab" for="grc-txt">Tu reseña (Confirmación de participación)</label>
+    <textarea id="grc-txt" name="resena" class="grc-ta" rows="4"
+              placeholder="¿Qué te parece GummyBank?" required minlength="5" maxlength="600"></textarea>
+
+    <div class="grc-row">
+      <small id="grc-count" class="grc-muted">0/600</small>
+      <div class="grc-spacer"></div>
+      <button id="grc-send" class="gb-cta" type="submit" disabled>Enviar reseña</button>
+    </div>
+
+    <p id="grc-msg" class="grc-msg" aria-live="polite"></p>
+  </form>
+</section>
+<!-- END RESEÑAS  -->
+
+<!-- ================== MEGA JUEGO ================== -->
+<section id="MG-juego">
+  <div id="MG-head">
+    <img id="MG-title" src="img/gan201.png" alt="">
+    <canvas id="MG-canvas"></canvas>
+  </div>
+
+  <p class="MG-kicker">Te GARANTIZAMOS un premio con 5 tiros</p>
+
+  <div id="MG-board"></div>
+
+  <div class="MG-row MG-inputs">
+    <div class="MG-input-wrap">
+      <span class="MG-label">Código #1</span>
+      <input id="MG-code1" class="MG-input" type="text" placeholder="SUERTE!! :)">
+    </div>
+    <div class="MG-input-wrap">
+      <span class="MG-label">Código #2</span>
+      <input id="MG-code2" class="MG-input" type="text" placeholder="LO DE ARRIBA X2">
+    </div>
+  </div>
+  <div class="MG-row MG-actions">
+    <button id="MG-validar">Validar y jugar</button>
+  </div>
+  <div id="MG-status"></div>
+</section>
+
+<!-- Modal resultado -->
+<div id="MG-modal" style="display:none">
+  <div id="MG-card-modal">
+    <div id="MG-figure"></div>
+    <h3 id="MG-title-modal"></h3>
+    <p id="MG-msg"></p>
+    <a id="MG-cta" href="#" style="display:none">Abrir Instagram</a>
+    <button id="MG-ok">Cerrar</button>
+  </div>
+</div>
+
+<!-- Modal teléfono -->
+<div id="MG-phone" style="display:none">
+  <input id="MG-phone-input" />
+  <button id="MG-phone-ok">Continuar</button>
+  <button id="MG-phone-cancel">Cancelar</button>
+  <div id="MG-phone-error"></div>
+</div>
+<!-- END CODE MEGA 5X5 -->
+
+<!-- ================== MINI JUEGO 36 CASILLAS (6x6) ================== -->
+  <section id="mini-juego" class="mini-section">
+    <!-- Header con overlay de canvas para confeti -->
+    <div class="header-canvas">
+      <img src="img/gan200.png" alt="Título" class="header-img">
+      <canvas id="miniCanvas" class="header-canvas-overlay"></canvas>
+    </div>
+
+    <p class="kicker">Tienes 1 oportunidad por código</p>
+    <div id="board"></div>
+
+    <center>
+      <div class="controls">
+        <input id="codigo-input" type="text" placeholder="Ingresa tu código" class="codigo-input">
+        <button id="validar-btn" class="validar-btn">Validar y jugar</button>
+      </div>
+      <div id="codigo-status" class="subtitle status"></div>
+    </center>
+
+    <!-- Modal de resultado -->
+    <div id="mini-modal" class="mini-modal">
+      <div id="mini-modal-card" class="mini-modal-card neutral">
+        <div id="mini-modal-figure" aria-hidden="true"></div>
+        <h3 id="mini-modal-title" class="mini-modal-title"></h3>
+        <p id="mini-modal-msg" class="mini-modal-msg"></p>
+        <div id="mini-modal-actions" class="mini-modal-actions">
+          <a id="modal-cta" class="cta" href="#" target="_blank" rel="noopener noreferrer" style="display:none">Abrir Instagram</a>
+          <button id="mini-modal-ok" class="mini-modal-ok">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal teléfono -->
+    <div id="phone-modal" class="phone-modal">
+      <div class="phone-card">
+        <h3 class="phone-title">Confirma tu teléfono</h3>
+        <p class="phone-sub">Para registrar tu participación, ingresa tu número.</p>
+        <div class="phone-row">
+          <input id="phone-input" class="phone-input" inputmode="tel" autocomplete="tel" maxlength="15" placeholder="8 a 15 dígitos">
+          <button id="phone-ok" class="phone-btn">Continuar</button>
+          <button id="phone-cancel" class="phone-btn secondary">Cancelar</button>
+        </div>
+        <div id="phone-error" class="phone-err"></div>
+      </div>
+    </div>
+  </section>
+  <!-- ================== FIN MINI JUEGO ================== -->
+
+<!-- Contenedor de la lluvia (si ya lo tienes, omite esta línea) -->
+<div id="lluvia-container" aria-hidden="true"></div>
+<!-- Acceso por candado -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const lock = document.getElementById('lock-icon');
+  if (!lock) {
+    console.warn('No se encontró #lock-icon en el DOM.');
+    return;
+  }
+
+  // Mapa de roles -> pass, token de sesión y página de destino
+  const routes = {
+    admin:   { pass: '1234',     token: 'auth',           page: 'admin.html' },
+    panel:   { pass: '12345',     token: 'ventas_auth',    page: 'ventas.html' },
+    vendedor:   { pass: '123456', token: 'vendedor_auth',  page: 'premios.html' },
+    registroven:{ pass: '12345678',     token: 'registro_auth',  page: 'registro-premios.html' },
+    resena:  { pass: '1',       token: 'resena_auth',    page: 'resenas.html' },
+    r:       { pass: '1',       token: 'resena_auth',    page: 'resenas.html' } // alias
+  };
+
+  lock.addEventListener('click', () => {
+    const u = prompt('Usuario:');      if (u == null) return;
+    const p = prompt('Contraseña:');   if (p == null) return;
+
+    const user = String(u).trim().toLowerCase();
+    const pass = String(p).trim();
+    const cfg  = routes[user];
+
+    if (cfg && pass === cfg.pass) {
+      sessionStorage.setItem(cfg.token, 'true');
+      window.location.href = cfg.page;
+    } else {
+      alert('Acceso denegado. Usuario o contraseña incorrectos.');
+    }
+  });
+});
+</script>
+
+<!-- Lluvia de gomitas: script independiente, SIN type="module" -->
+<script>
+(() => {
+  // Usa el contenedor existente o crea uno silenciosamente
+  const cont = document.getElementById('lluvia-container') || (() => {
+    const d = document.createElement('div');
+    d.id = 'lluvia-container';
+    d.setAttribute('aria-hidden','true');
+    document.body.appendChild(d);
+    return d;
+  })();
+
+  function crearLluviaImagen() {
+    const img = new Image();
+    img.src = './img/gomita.png';   // cambia la ruta si la imagen vive en otro lado
+    img.alt = '';
+    img.className = 'gomita';
+
+    // Posición y duración aleatorias
+    img.style.left = (Math.random() * window.innerWidth) + 'px';
+    img.style.animationDuration = (2 + Math.random() * 3) + 's';
+
+    cont.appendChild(img);
+
+    // Limpieza al terminar la animación o por seguridad a los 7s
+    const kill = () => img.remove();
+    img.addEventListener('animationend', kill, { once: true });
+    setTimeout(kill, 7000);
+  }
+
+  // Lluvia continua
+  let timer = setInterval(crearLluviaImagen, 250);
+
+  // Pausa cuando la pestaña no está visible (ahorra CPU)
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      clearInterval(timer);
+      timer = null;
+    } else if (!timer) {
+      timer = setInterval(crearLluviaImagen, 250);
+    }
+  });
+})();
+</script>
+<style>
+ /* Lluvia visible pero detrás del contenido */
+#lluvia-container{
+  position: fixed;
+  inset: 0;
+  z-index: 0;           /* detrás del contenido */
+  pointer-events: none; /* no bloquea clics */
+  overflow: hidden;
+}
+
+/* Todo tu contenido normal por encima */
+header, main, section, footer, .vault, .gb-review-card{
+  position: relative;
+  z-index: 1;
+}
+
+/* Modales siguen dominando */
+.modal-overlay{ position:fixed; inset:0; z-index:10040; }
+.custom-modal{ position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); z-index:10050; }
+
+</style>
+
+
+<!-- Modal de información -->
+<div class="modal-info" id="infoModal" style="display:none">
+  <div class="modal-content-info">
+    <center><h3>Instrucciones y Condiciones</h3></center>
+    <p><strong>¿Cómo participar?</strong>
+    <ul>
+      <li>Compra tu bolsita de gomitas con código único.
+      <li>Da clic en <strong>Registrar Código</strong> en la bóveda que desees participar.
+      <li>Ingresa el código y tu número de teléfono.
+      <li>Espera a que se llene la bóveda para el sorteo.
+    </ul>
+
+    <p><strong>Tipos de bóvedas</strong>
+    <ul>
+      <li>🪵 <strong>Madera</strong>: 25 códigos
+      <li>🔹 <strong>Cristal</strong>: 100 códigos
+      <li>⚪ <strong>Plateada</strong>: 250 códigos
+      <li>🟡 <strong>Dorada</strong>: 500 códigos
+    </ul>
+
+    <p><strong>Reglas importantes</strong>
+    <ul>
+      <li>Cada código es único y solo se usa una vez.
+      <li>Cada código se puede registrar en una sola bóveda.
+      <li>Si ganas y no respondes en 24 horas, tu premio será sorteado nuevamente.
+      <li>Para reclamar tu premio debes seguir la página de Instagram gummybank_.
+    </ul>
+
+    <p><strong>Privacidad</strong>
+    <ul><li>Tu número solo se usa para contactarte si eres ganador.</ul>
+
+    <center><h2>¡Suerte!</h2></center>
+    <button onclick="cerrarInfoModal()">Cerrar</button>
+  </div>
+</div>
+<div class="modal-overlay" id="overlay-info" style="display:none"></div>
+
+<footer style="text-align:center;margin-top:40px;padding:20px;color:#aaa;font-size:.9rem">
+  © 2025 Gummy Bank. All rights reserved<br/>Moy and Juan
+</footer>
+
+    </main>
+
+    <!-- JS RESEÑAS -->
+    <script type="module" src="js/review.js"></script>
+    <!-- JS MEGA 5X5 -->
+    <script type="module" src="js/mega5x5.js?v=3"></script>
+    <!-- JS MEGA 5X5 -->
+    <script type="module" src="js/mini6x6.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+(() => {
+  // ======= CONFIG =======
+  const CONFIG = {
+    bpm: 128,
+    fogColors: ['black','black','black'], // si quieres glow, usa colores neón aquí
+    laserColors: ['#00f7ff','#ff5bf7','#9dfcfe','#5bffb0'],
+    lasers: 10,
+    strobeIntensity: 0.65,
+    fogSpeed: 0.09,
+    laserSweepSpeed: 1.1,
+    noise: 1.0
+  };
+
+  // ======= Canvas =======
+  const canvas = document.getElementById('fx');
+  const ctx = canvas.getContext('2d');
+  let W, H, DPR;
+  function resize() {
+    DPR = Math.min(2, window.devicePixelRatio || 1);
+    W = canvas.width  = Math.floor(innerWidth  * DPR);
+    H = canvas.height = Math.floor(innerHeight * DPR);
+    canvas.style.width  = innerWidth  + 'px';
+    canvas.style.height = innerHeight + 'px';
+  }
+  addEventListener('resize', resize);
+  resize();
+
+  // ======= Utils =======
+  const R = (a,b)=> Math.random()*(b-a)+a;
+  const TAU = Math.PI*2;
+
+  // Noise 1D simple
+  const nsize = 512, p = new Array(nsize).fill(0).map(()=>Math.random());
+  const n1 = x => {
+    const i = Math.floor(x)%nsize, f = x - Math.floor(x);
+    const a = p[(i+nsize)%nsize], b = p[(i+1+nsize)%nsize];
+    const t = f*f*(3-2*f); return a*(1-t)+b*t;
+  };
+
+  // ======= Entidades =======
+  const blobs = CONFIG.fogColors.map((c,i)=>({
+    x:R(0.2,0.8), y:R(0.25,0.75), r:R(0.28,0.45), col:c, ph:R(0,1000)+i*33
+  }));
+
+  const lasers = Array.from({length:CONFIG.lasers}, (_,i)=>({
+    base:i/CONFIG.lasers, amp:R(0.18,0.5), sp:R(0.8,1.4)*CONFIG.laserSweepSpeed,
+    w:R(2.5,5)*DPR, col:CONFIG.laserColors[i%CONFIG.laserColors.length],
+    tilt:R(-0.4,0.4)
+  }));
+
+  // ======= Beat =======
+  let last = performance.now(), acc = 0;
+  const beatDur = 60000/CONFIG.bpm; // ms por beat
+  let beat = 0, running = true;
+
+  // ======= Helpers =======
+  function rgba(hex,a=1){
+    const c=hex.replace('#',''); const n=parseInt(c,16);
+    const r=(c.length===3?((n>>8)&0xF)*17:(n>>16)&255);
+    const g=(c.length===3?((n>>4)&0xF)*17:(n>>8)&255);
+    const b=(c.length===3? (n&0xF)*17: (n)&255);
+    return `rgba(${r},${g},${b},${a})`;
+  }
+
+  function fog(now){
+    // si fogColors son negros, esto prácticamente no se ve; déjalo por si luego cambias colores
+    ctx.globalCompositeOperation = 'screen';
+    for(const b of blobs){
+      const nx = n1(b.ph*0.003 + now*CONFIG.fogSpeed*0.0008) - 0.5;
+      const ny = n1(b.ph*0.004 + now*CONFIG.fogSpeed*0.0007) - 0.5;
+      const pul = 1 + 0.06*Math.sin(now*0.001 + b.ph);
+      const x=(b.x+nx*0.18)*W, y=(b.y+ny*0.18)*H, r=b.r*Math.max(W,H)*pul;
+
+      const g = ctx.createRadialGradient(x,y,r*0.08, x,y,r);
+      g.addColorStop(0, rgba(b.col, 0.95));
+      g.addColorStop(1, rgba(b.col, 0));
+      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,r,0,TAU); ctx.fill();
+    }
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  function beams(now){
+    lasers.forEach((L,i)=>{
+      const ph = Math.sin(now*0.001*L.sp + i)*0.5+0.5;
+      const cx = (L.base + L.amp*(ph-0.5))*W;
+      const angle = L.tilt + (ph-0.5)*0.5;
+      const w = L.w*(0.7 + 0.6*beat);
+      const wob = (n1(i*9.1 + now*0.002)-0.5) * CONFIG.noise * 80 * DPR;
+
+      ctx.save(); ctx.translate(cx, H*0.5); ctx.rotate(angle);
+
+      const grad = ctx.createLinearGradient(0,-H,0,H);
+      grad.addColorStop(0, rgba(L.col,0));
+      grad.addColorStop(0.5, rgba(L.col,0.98));
+      grad.addColorStop(1, rgba(L.col,0));
+      ctx.fillStyle = grad; ctx.globalCompositeOperation='screen';
+
+      ctx.beginPath();
+      ctx.moveTo(-w, -H + wob);
+      ctx.lineTo( w, -H - wob);
+      ctx.lineTo( w,  H + wob);
+      ctx.lineTo(-w,  H - wob);
+      ctx.closePath(); ctx.fill();
+
+      ctx.shadowBlur = 26*DPR; ctx.shadowColor = rgba(L.col,.9);
+      ctx.strokeStyle = rgba(L.col,.35); ctx.lineWidth = 1*DPR; ctx.stroke();
+
+      ctx.restore(); ctx.globalCompositeOperation='source-over';
+    });
+  }
+
+  function strobe(){
+    if(beat > 0.96){
+      ctx.fillStyle = `rgba(255,255,255,${CONFIG.strobeIntensity})`;
+      ctx.fillRect(0,0,W,H);
+    }
+  }
+
+  // ======= Loop =======
+  function tick(now){
+    if(!running) { requestAnimationFrame(tick); return; }
+    const dt = now - last; last = now;
+    acc += dt; beat = (acc % beatDur) / beatDur;
+
+    // limpiar con desvanecido para conservar estelas
+    ctx.fillStyle = 'rgba(0,0,0,0.25)';
+    ctx.fillRect(0,0,W,H);
+
+    fog(now);     // casi invisible con negro, pero listo por si cambias
+    beams(now);
+    strobe();
+
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+
+  // Botón pausar/seguir
+  document.getElementById('toggle').addEventListener('click', ()=>{
+    running = !running;
+    if(running) last = performance.now();
+  });
+})();
+</script>
+</body>
+</html>
