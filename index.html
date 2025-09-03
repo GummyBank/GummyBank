@@ -661,15 +661,20 @@ header .gb-actions .bi:hover{ transform:translateY(-1px); text-shadow:0 0 14px r
 
 <!-- END CODE MEGA 5X5 -->
 <!-- ================= JUEGO 3x1 · TRIPLE 3 ================= -->
+ <div id="MG-head">
+    <img id="MG-title" src="img/gan209.png" alt="" height="70px">
+    <canvas id="MG-canvas"></canvas>
+  </div>
 <section id="TRI-wrap">
   <header class="tri-head">
-    <h2 class="tri-title">TRIPLE 3 · Evento relámpago</h2>
+    
   </header>
 
   <!-- Tablero 3x1 -->
   <div id="TRI-board" class="tri-board" aria-label="Tablero 3x1">
     <!-- El JS inyecta 3 celdas .tri-cell -->
   </div>
+
 
   <!-- Tarjeta de códigos -->
   <!-- ====== FORM TRIPLE3 (listo) ====== -->
@@ -791,6 +796,7 @@ header .gb-actions .bi:hover{ transform:translateY(-1px); text-shadow:0 0 14px r
   <!-- ================== FIN MINI JUEGO ================== -->
 
   <!-- ================== Ranking  ================== -->
+   <br> <br> <br> <br>
 <header>
   <div class="wrap rk-hero">
     <center>
@@ -1191,41 +1197,185 @@ header, main, section, footer, .vault, .gb-review-card{
 </style>
 <!-- END LLUVIA DE BILLETES  -->
 
-<!-- Modal de información -->
-<div class="modal-info" id="infoModal" style="display:none">
-  <div class="modal-content-info">
-    <center><h3>Instrucciones y Condiciones</h3></center>
-    <p><strong>¿Cómo participar?</strong>
-    <ul>
-      <li>Compra tu bolsita de gomitas con código único.
-      <li>Da clic en <strong>Registrar Código</strong> en la bóveda que desees participar.
-      <li>Ingresa el código y tu número de teléfono.
-      <li>Espera a que se llene la bóveda para el sorteo.
-    </ul>
+<!-- ===== PRIVACY MODAL (TRANSPARENTE) + AUDIO ===== -->
+<dialog id="privacy-modal" class="tri-modal" aria-labelledby="pp-title" aria-modal="true">
+  <div class="pp-card">
+    <div class="pp-head">
+      <h2 id="pp-title">Política de Privacidad</h2>
+    </div>
 
-    <p><strong>Tipos de bóvedas</strong>
-    <ul>
-      <li>🪵 <strong>Madera</strong>: 25 códigos
-      <li>🔹 <strong>Cristal</strong>: 100 códigos
-      <li>⚪ <strong>Plateada</strong>: 250 códigos
-      <li>🟡 <strong>Dorada</strong>: 500 códigos
-    </ul>
+    <div class="pp-body">
+      <p><strong>1. Recopilación de datos</strong><br>
+      Gummy Bank solicita números de teléfono únicamente para validar participación en dinámicas promocionales, asignar códigos y comunicar premios.</p>
 
-    <p><strong>Reglas importantes</strong>
-    <ul>
-      <li>Cada código es único y solo se usa una vez.
-      <li>Cada código se puede registrar en una sola bóveda.
-      <li>Si ganas y no respondes en 24 horas, tu premio será sorteado nuevamente.
-      <li>Para reclamar tu premio debes seguir la página de Instagram gummybank_.
-    </ul>
+      <p><strong>2. Uso de los datos</strong><br>
+      Tu número se emplea para identificar jugadas y, en su caso, notificar premios. No se vende, transfiere ni comparte con terceros ajenos a la promoción.</p>
 
-    <p><strong>Privacidad</strong>
-    <ul><li>Tu número solo se usa para contactarte si eres ganador.</ul>
+      <p><strong>3. Conservación</strong><br>
+      Los datos se almacenan de forma temporal y se eliminan al finalizar la promoción o cuando dejen de ser necesarios para los fines descritos.</p>
 
-    <center><h2>¡Suerte!</h2></center>
-    <button onclick="cerrarInfoModal()">Cerrar</button>
+      <p><strong>4. Seguridad</strong><br>
+      Aplicamos medidas técnicas y administrativas razonables para proteger la información contra accesos no autorizados, pérdida o alteración.</p>
+
+      <p><strong>5. Limitación de responsabilidad</strong><br>
+      Gummy Bank se deslinda de cualquier uso indebido de la información por parte de usuarios o terceros que accedan de forma fraudulenta. No nos hacemos responsables por errores en la captura del número ni por consecuencias derivadas de un mal uso por parte del participante.</p>
+
+      <p><strong>6. Consentimiento</strong><br>
+      Al presionar “Aceptar”, confirmas que leíste y comprendes esta Política, y autorizas el tratamiento de tus datos según lo descrito.</p>
+    </div>
+
+    <div class="pp-actions">
+      <button id="privacy-ok" class="pp-btn primary" type="button">Aceptar</button>
+    </div>
   </div>
-</div>
+</dialog>
+
+<audio id="bg-music" src="musica.mp3" preload="auto" loop></audio>
+
+<script>
+  (function(){
+    const modal = document.getElementById("privacy-modal");
+    const okBtn = document.getElementById("privacy-ok");
+    const music = document.getElementById("bg-music");
+
+    // Mostrar SIEMPRE al cargar (sin localStorage, así te garantizas el click)
+    window.addEventListener("DOMContentLoaded", () => {
+      modal.showModal();
+    });
+
+    // Bloquear cerrar con ESC o click fuera sin aceptar
+    modal.addEventListener("cancel", (e) => e.preventDefault());
+
+    // Aceptar: cerrar y reproducir música
+    okBtn.addEventListener("click", () => {
+      modal.close();
+      music.play().catch(() => {/* algunos navegadores aún piden otra interacción */});
+    });
+  })();
+</script>
+
+<style>
+  :root{
+    /* Usa tus vars si existen; si no, defaults decentes */
+    --tri-ink: #e7ecf3;
+    --tri-muted: #9fb0c9;
+    --tri-cyan: #00e0ff;
+    --tri-accent: #1f6feb;
+    --panel-1: #151b25;
+    --panel-2: #0f1520;
+  }
+
+  /* Backdrop oscuro con blur, nada de placas blancas */
+  #privacy-modal{
+    border: none;
+    padding: 0;
+    background: transparent;             /* sin fondo del dialog */
+  }
+  #privacy-modal::backdrop{
+    background: rgba(0,0,0,.65);
+    backdrop-filter: blur(3px);
+  }
+
+  /* Card “glass” 100% TRANSPARENTE, sin fondos blancos */
+  .pp-card{
+    width: min(92vw, 520px);
+    margin: 8vh auto 0;
+    border-radius: 18px;
+    position: relative;
+    color: var(--tri-ink);
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,.18)); /* vidrio oscuro */
+    border: 1px solid rgba(255,255,255,.14);
+    box-shadow: 0 22px 52px rgba(0,0,0,.55), 0 0 24px rgba(0,191,255,.12);
+    overflow: hidden;
+  }
+  /* aro de luz animado */
+  .pp-card::after{
+    content:"";
+    position:absolute; inset:-2px; border-radius:inherit; padding:1px;
+    background: conic-gradient(from 0deg,
+      rgba(255,255,255,0) 0deg,
+      rgba(255,255,255,.55) 60deg,
+      rgba(255,255,255,0) 120deg 360deg);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    animation: pp-scan 3s linear infinite;
+    pointer-events: none;
+  }
+  @keyframes pp-scan{ to{ transform: rotate(360deg) } }
+
+  /* Header degradado neón (sin blancos) */
+  .pp-head{
+    padding: 12px 16px;
+    text-align: center;
+    background: linear-gradient(90deg, var(--tri-cyan), #6b5bff 60%, #a855f7);
+    color: #eaf6ff;
+    letter-spacing: .14em;
+    font-weight: 800;
+    font-size: 13px;
+    text-transform: uppercase;
+    box-shadow: inset 0 -1px 0 rgba(255,255,255,.08);
+  }
+  .pp-head h2{ margin:0; font: inherit; }
+
+  /* Cuerpo scrollable, texto tenue, nada de láminas claras */
+  .pp-body{
+    padding: 14px 16px 8px;
+    max-height: 52vh;
+    overflow: auto;
+    font-size: 14px;
+    color: var(--tri-muted);
+  }
+  .pp-body p{ margin: 0 0 10px 0; }
+  .pp-body strong{ color: var(--tri-ink); }
+
+  /* Botón gordito con brillo */
+  .pp-actions{
+    display: flex; gap: 12px;
+    padding: 12px 16px 16px;
+  }
+  .pp-btn{
+    flex: 1;
+    height: 48px;
+    border-radius: 14px;
+    border: 1px solid transparent;
+    font-weight: 800;
+    letter-spacing: .2px;
+    cursor: pointer;
+    transition: transform .08s ease, filter .2s ease, box-shadow .2s ease;
+  }
+  .pp-btn:active{ transform: translateY(1px); }
+  .pp-btn.primary{
+    color: #061219;
+    background: linear-gradient(180deg, var(--tri-cyan), var(--tri-accent));
+    box-shadow: 0 14px 28px rgba(0,117,255,.35), 0 0 20px rgba(0,153,255,.22);
+  }
+  .pp-btn.primary:hover{ filter: brightness(1.06); }
+
+  /* RESPONSIVE móvil: más compacto, dedo feliz */
+  @media (max-width: 480px){
+    .pp-card{
+      width: 92vw;
+      margin: 10vh auto 0;
+      border-radius: 16px;
+    }
+    .pp-head{
+      font-size: 12px;
+      letter-spacing: .12em;
+      padding: 10px 12px;
+    }
+    .pp-body{
+      font-size: 13px;
+      max-height: 58vh;
+      padding: 12px;
+    }
+    .pp-btn{
+      height: 46px;
+      font-size: 14px;
+    }
+  }
+</style>
+
 
 <div class="modal-overlay" id="overlay-info" style="display:none"></div>
 
