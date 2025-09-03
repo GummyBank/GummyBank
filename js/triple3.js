@@ -426,10 +426,10 @@ async function onPick(cell){
   const msg = key==="P300" ? "¡Felicidades, te llevas $300!"
             : key==="GOMI" ? "¡Ganaste una bolsa de gomitas!"
             : "Obtuviste 10 pts.";
-  if(modalTitle) modalTitle.innerHTML = key==="P300" ? "🎉 Premio mayor" : key==="GOMI" ? "🍬 Dulce victoria" : "✨ Suma puntos";
+  if(modalTitle) modalTitle.innerHTML = key==="P300" ? "🎉 Premio mayor" : key==="GOMI" ? "🍬 Dulce victoria" : "Felicidades, Suma puntos en el Ranking";
   if(modalResult) modalResult.innerHTML =
     `${msg}<br><br><strong>TOMA CAPTURA DE PANTALLA</strong><br>` +
-    `Envíala por DM en Instagram para reclamar: <a href="${CFG.igUrl}" target="_blank" rel="noopener">${CFG.igUrl}</a>`;
+    `Envíala por DM en Instagram para reclamar tu premio`;
   if(btnAgain) btnAgain.style.display="none";
   if(btnOk) btnOk.textContent="OK";
   if(modal && !modal.open) modal.showModal();
