@@ -12,7 +12,7 @@ const MG_IG_URL = IG_URL;
 
 const MG_TOTAL  = 25; // 5x5
 const MG_COUNTS = { p1000: 1, p500: 1, p200: 2, p50: 4, gomita: 9 };
-const MG_THRESH = { p1000: 100000, p500: 100000, p200: 10000, p50: 9, gomita: 4 };
+const MG_THRESH = { p1000: 100000, p500: 100000, p200: 10000, p50: 6, gomita: 3};
 
 // Imagen para el estado "oculto" (puedes sobreescribir con window.MG_HIDDEN_IMG antes del script)
 const MG_HIDDEN_IMG = window.MG_HIDDEN_IMG || "img/casilla-oculta.png";

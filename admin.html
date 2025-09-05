@@ -2,10 +2,9 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Panel Admin · Bóvedas + Súper juego</title>
+  <title>Panel Admin · Jugadas (Mini · Triple3 · Mítico · Súper)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Paleta consistente con el sitio -->
   <style>
     :root{
       --bg:#0f1115;
@@ -16,19 +15,14 @@
       --muted:#9fb0c9;
       --accent:#1f6feb;
       --accent-2:#00bfff;
-      --danger:#ef4444;
-      --danger-2:#b91c1c;
+      --danger:#ef4444; --danger-2:#b91c1c;
       --ok:#22c55e;
 
-      /* acentos por bóveda */
-      --madera-1:#8b5a2b;  --madera-2:#d2b48c;
-      --cristal-1:#00eaff; --cristal-2:#00bfff;
-      --plateada-1:#bbb;   --plateada-2:#ddd;
-      --dorada-1:#ffd700;  --dorada-2:#ff9900;
-
-      /* acentos mini / súper / triple3 */
-      --mini-1:#7c3aed; --mini-2:#22c55e;
-      --super-1:#22c55e; --super-2:#0ea5e9;
+      /* acentos mini / súper / triple3 / mítico */
+      --mini-1:#7c3aed;   --mini-2:#22c55e;
+      --super-1:#22c55e;  --super-2:#0ea5e9;
+      --tri-1:#60a5fa;    --tri-2:#f59e0b;
+      --mitico-1:#e879f9; --mitico-2:#38bdf8;
     }
 
     *{box-sizing:border-box}
@@ -65,12 +59,10 @@
     .btn:active{transform:translateY(1px)}
     .btn-danger{background:linear-gradient(180deg, rgba(239,68,68,.18), rgba(239,68,68,.12)); border-color:#3a1e23; color:#ffb4b4}
     .btn-danger:hover{background:linear-gradient(180deg, rgba(239,68,68,.24), rgba(239,68,68,.18))}
-    .btn-ghost{background:transparent}
     .btn-outline{background:transparent; border:1px dashed #2a3548; color:#cfe0ff}
     .btn-outline:hover{background:#0f141e}
     .btn-neutral{background:#1b2330}
     .btn-green{background:linear-gradient(180deg, rgba(34,197,94,.25), rgba(34,197,94,.18)); border-color:#244b35; color:#b6ffce}
-    .btn-green:hover{filter:brightness(1.08)}
 
     .hint{color:var(--muted); font-size:13px}
 
@@ -99,12 +91,10 @@
 
     /* Chips por tipo */
     .chip{padding:4px 10px; border-radius:999px; font-weight:700; font-size:12px;}
-    .madera .chip{background:linear-gradient(90deg, var(--madera-1), var(--madera-2)); color:#1c130b}
-    .cristal .chip{background:linear-gradient(90deg, var(--cristal-1), var(--cristal-2)); color:#042a30}
-    .plateada .chip{background:linear-gradient(90deg, var(--plateada-1), var(--plateada-2)); color:#202020}
-    .dorada .chip{background:linear-gradient(90deg, var(--dorada-1), var(--dorada-2)); color:#2a1f00}
     .mini .chip{background:linear-gradient(90deg, var(--mini-1), var(--mini-2)); color:#0a0a0a}
     .super .chip{background:linear-gradient(90deg, var(--super-1), var(--super-2)); color:#041a12}
+    .triple .chip{background:linear-gradient(90deg, var(--tri-1), var(--tri-2)); color:#1a1204}
+    .mitico .chip{background:linear-gradient(90deg, var(--mitico-1), var(--mitico-2)); color:#0b1220}
 
     .list{
       padding:10px 12px 12px; flex:1 1 auto; min-height:140px;
@@ -128,8 +118,9 @@
     .badge.p200{background:rgba(14,159,110,.18); border-color:#199b72}
     .badge.p500{background:rgba(16,185,129,.18); border-color:#15803d}
     .badge.p1500{background:rgba(245,158,11,.18); border-color:#b45309}
-    .badge.p300{background:rgba(245,158,11,.18); border-color:#b45309}   /* $300 para Triple3 */
-    .badge.pts{background:rgba(59,130,246,.18); border-color:#2563eb}     /* 10 pts para Triple3 */
+    .badge.p1000{background:rgba(245,158,11,.18); border-color:#b45309} /* para Mítico $1000 */
+    .badge.p300{background:rgba(245,158,11,.18); border-color:#b45309}  /* $300 para Triple3 */
+    .badge.pts{background:rgba(59,130,246,.18); border-color:#2563eb}    /* 10 pts para Triple3 */
     .badge.nada{background:rgba(148,163,184,.15); border-color:#334155}
     .ts{font-size:12px; color:var(--muted)}
 
@@ -164,7 +155,6 @@
       color:var(--muted); font-size:12px; text-align:center;
     }
 
-    /* Mobile niceties */
     @media (max-width:520px){
       .title{font-size:16px}
       .actions{width:100%; justify-content:space-between}
@@ -194,89 +184,9 @@
   </div>
 
   <div class="wrap">
-    <p class="hint" style="margin:8px 0 14px">Administra registros por bóveda y jugadas.</p>
+    <p class="hint" style="margin:8px 0 14px">Administra jugadas: Mini, Triple 3, Mítico y Súper juego.</p>
 
     <section class="grid">
-      <!-- MADERA -->
-      <article class="card madera" id="madera-card">
-        <div class="card-head">
-          <div class="vh">
-            <span class="chip">🪵 Madera</span>
-            <h2>Madera</h2>
-            <span class="vap">Límite: 25</span>
-          </div>
-        </div>
-        <div class="list">
-          <ul id="lista-madera"><li class="empty">Sin registros aún</li></ul>
-        </div>
-        <div class="card-foot">
-          <button class="btn btn-outline" onclick="confirmarEliminacion('madera','ultimos')">Eliminar últimos 25</button>
-          <div class="foot-right">
-            <button class="btn btn-danger" onclick="confirmarEliminacion('madera','todos')">Eliminar todos</button>
-          </div>
-        </div>
-      </article>
-
-      <!-- CRISTAL -->
-      <article class="card cristal" id="cristal-card">
-        <div class="card-head">
-          <div class="vh">
-            <span class="chip">🔹 Cristal</span>
-            <h2>Cristal</h2>
-            <span class="vap">Límite: 100</span>
-          </div>
-        </div>
-        <div class="list">
-          <ul id="lista-cristal"><li class="empty">Sin registros aún</li></ul>
-        </div>
-        <div class="card-foot">
-          <button class="btn btn-outline" onclick="confirmarEliminacion('cristal','ultimos')">Eliminar últimos 100</button>
-          <div class="foot-right">
-            <button class="btn btn-danger" onclick="confirmarEliminacion('cristal','todos')">Eliminar todos</button>
-          </div>
-        </div>
-      </article>
-
-      <!-- PLATEADA -->
-      <article class="card plateada" id="plateada-card">
-        <div class="card-head">
-          <div class="vh">
-            <span class="chip">⚪ Plateada</span>
-            <h2>Plateada</h2>
-            <span class="vap">Límite: 250</span>
-          </div>
-        </div>
-        <div class="list">
-          <ul id="lista-plateada"><li class="empty">Sin registros aún</li></ul>
-        </div>
-        <div class="card-foot">
-          <button class="btn btn-outline" onclick="confirmarEliminacion('plateada','ultimos')">Eliminar últimos 250</button>
-          <div class="foot-right">
-            <button class="btn btn-danger" onclick="confirmarEliminacion('plateada','todos')">Eliminar todos</button>
-          </div>
-        </div>
-      </article>
-
-      <!-- DORADA -->
-      <article class="card dorada" id="dorada-card">
-        <div class="card-head">
-          <div class="vh">
-            <span class="chip">🟡 Dorada</span>
-            <h2>Dorada</h2>
-            <span class="vap">Límite: 500</span>
-          </div>
-        </div>
-        <div class="list">
-          <ul id="lista-dorada"><li class="empty">Sin registros aún</li></ul>
-        </div>
-        <div class="card-foot">
-          <button class="btn btn-outline" onclick="confirmarEliminacion('dorada','ultimos')">Eliminar últimos 500</button>
-          <div class="foot-right">
-            <button class="btn btn-danger" onclick="confirmarEliminacion('dorada','todos')">Eliminar todos</button>
-          </div>
-        </div>
-      </article>
-
       <!-- MINI JUEGO -->
       <article class="card mini" id="mini-card">
         <div class="card-head">
@@ -298,7 +208,7 @@
       </article>
 
       <!-- TRIPLE 3 (3x1) -->
-      <article class="card mini" id="triple3-card">
+      <article class="card triple" id="triple3-card">
         <div class="card-head">
           <div class="vh">
             <span class="chip">🔷 Triple 3</span>
@@ -313,6 +223,26 @@
           <button class="btn btn-outline" onclick="confirmarEliminacion('triple3','ultimos')">Eliminar últimas 200</button>
           <div class="foot-right">
             <button class="btn btn-danger" onclick="confirmarEliminacion('triple3','todos')">Eliminar todas</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- MÍTICO 5x5 -->
+      <article class="card mitico" id="mitico-card">
+        <div class="card-head">
+          <div class="vh">
+            <span class="chip">🌀 Mítico</span>
+            <h2>Jugadas Mítico 5x5</h2>
+            <span class="vap">Teléfono y premio final</span>
+          </div>
+        </div>
+        <div class="list">
+          <ul id="lista-mitico"><li class="empty">Sin jugadas aún</li></ul>
+        </div>
+        <div class="card-foot">
+          <button class="btn btn-outline" onclick="confirmarEliminacion('mitico','ultimos')">Eliminar últimas 200</button>
+          <div class="foot-right">
+            <button class="btn btn-danger" onclick="confirmarEliminacion('mitico','todos')">Eliminar todas</button>
           </div>
         </div>
       </article>
@@ -354,100 +284,129 @@
   </div>
 
   <!-- Lógica -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import {
-      getFirestore, collection, query, where, orderBy, limit,
-      getDocs, getCountFromServer, deleteDoc, doc
-    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+ <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+  import {
+    getFirestore, collection, query, where, orderBy, limit,
+    getDocs, getCountFromServer, deleteDoc, doc
+  } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAJJgDg5SUPvvHgPtDNhIy1f1fiGpBHBw",
-      authDomain: "registro-gomitas.firebaseapp.com",
-      projectId: "registro-gomitas",
-      storageBucket: "registro-gomitas.appspot.com",
-      messagingSenderId: "435485731864",
-      appId: "1:435485731864:web:43dff09753a4c9d507e76d"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyAJJgDg5SUPvvHgPtDNhIy1f1fiGpBHBw",
+    authDomain: "registro-gomitas.firebaseapp.com",
+    projectId: "registro-gomitas",
+    storageBucket: "registro-gomitas.appspot.com",
+    messagingSenderId: "435485731864",
+    appId: "1:435485731864:web:43dff09753a4c9d507e76d"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const db  = getFirestore(app);
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
 
-    const LIMITE_POR_BOVEDA = {
-      madera:25, cristal:100, plateada:250, dorada:500,
-      minijuego:200, triple3:200, super:200
-    };
+  const LIMITE_POR_BOVEDA = { minijuego:200, triple3:200, mitico:200, super:200 };
 
-    const UL = {
-      madera:      document.getElementById("lista-madera"),
-      cristal:     document.getElementById("lista-cristal"),
-      plateada:    document.getElementById("lista-plateada"),
-      dorada:      document.getElementById("lista-dorada"),
-      minijuego:   document.getElementById("lista-minijuego"),
-      triple3:     document.getElementById("lista-triple3"),
-      super:       document.getElementById("lista-super"),
-    };
+  const UL = {
+    minijuego: document.getElementById("lista-minijuego"),
+    triple3:   document.getElementById("lista-triple3"),
+    mitico:    document.getElementById("lista-mitico"),
+    super:     document.getElementById("lista-super"),
+  };
 
-    function fmtFecha(ts){
+  const CARD = {
+    minijuego: document.getElementById("mini-card"),
+    triple3:   document.getElementById("triple3-card"),
+    mitico:    document.getElementById("mitico-card"),
+    super:     document.getElementById("super-card"),
+  };
+
+  function fmtFecha(ts){
+    try{
+      const d = ts?.toDate ? ts.toDate() : (ts instanceof Date ? ts : null);
+      if(!d) return "—";
+      return d.toLocaleString(undefined, {year:'2-digit',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+    }catch{ return "—"; }
+  }
+
+  function putEmpty(ul, msg="Sin jugadas aún"){ ul.innerHTML = `<li class="empty">${msg}</li>`; }
+
+  function showError(ul, err){
+    console.error(err);
+    const msg = err?.message || String(err) || "Error desconocido.";
+    ul.innerHTML = `<li class="empty">⚠️ ${msg.replace(/</g,"&lt;")}</li>`;
+  }
+
+  // Intenta con orderBy(createdAt). Si falla o no hay createdAt, hace fallback simple.
+  async function safeGetDocsByDate(colName){
+    const ref = collection(db, colName);
+    try{
+      const q1 = query(ref, orderBy("createdAt","desc"), limit(400));
+      const snap = await getDocs(q1);
+      if (!snap.empty) return snap;
+      // Sin docs, intenta sin orderBy (por si no hay createdAt)
+      const q2 = query(ref, limit(400));
+      return await getDocs(q2);
+    }catch(e){
+      // Fallback por si no existe el campo/índice/reglas… lo mostramos y también probamos sin orderBy
       try{
-        const d = ts?.toDate ? ts.toDate() : (ts instanceof Date ? ts : null);
-        if(!d) return "—";
-        return d.toLocaleString(undefined, {year:'2-digit',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
-      }catch{ return "—"; }
-    }
-
-    async function cargarRegistros(boveda) {
-      const ul = UL[boveda];
-      ul.innerHTML = `<li class="empty">Cargando...</li>`;
-
-      let ref, q;
-      if (boveda === "minijuego") {
-        ref = collection(db, "minijuego_plays");
-        q   = query(ref, orderBy("createdAt", "desc"));
-      } else if (boveda === "triple3") {
-        ref = collection(db, "triple3_plays");
-        q   = query(ref, orderBy("createdAt", "desc"));
-      } else if (boveda === "super") {
-        ref = collection(db, "mega7x7_plays");
-        q   = query(ref, orderBy("createdAt", "desc"));
-      } else {
-        ref = collection(db, boveda);
-        q   = query(ref, orderBy("registrado", "desc"));
+        const q2 = query(ref, limit(400));
+        return await getDocs(q2);
+      }catch(e2){
+        // Ya ni modo, devolvemos el error real
+        throw e2 || e;
       }
+    }
+  }
 
-      const snap= await getDocs(q);
+  async function cargarRegistros(boveda) {
+    const ul = UL[boveda];
+    putEmpty(ul, "Cargando…");
+
+    const col = boveda === "minijuego" ? "minijuego_plays"
+             : boveda === "triple3"   ? "triple3_plays"
+             : boveda === "mitico"    ? "mitico_plays"
+             : boveda === "super"     ? "mega7x7_plays"
+             : null;
+
+    if (!col) { putEmpty(ul); return; }
+
+    try{
+      const snap = await safeGetDocsByDate(col);
+
+      // Diagnóstico en la cabecera de la card
+      const headHint = CARD[boveda]?.querySelector(".vap");
+      if (headHint) headHint.textContent = `Encontradas: ${snap.size}`;
 
       if (snap.empty) {
-        ul.innerHTML = `<li class="empty">${
-          (boveda==='minijuego'||boveda==='super'||boveda==='triple3')
-          ? 'Sin jugadas aún' : 'Sin registros aún'
-        }</li>`;
+        putEmpty(ul);
         if (boveda === "super") await cargarStatsSuper();
         return;
       }
 
       const frag = document.createDocumentFragment();
       snap.forEach(d => {
-        const x = d.data();
+        const x = d.data(); // tolerancia de campos
         const li = document.createElement("li");
         li.className = "item";
 
         if (boveda === "minijuego") {
-          const premio = (x.resultado || "").toString().toLowerCase();
+          const premio = (x.resultado ?? x.finalPrize ?? x.rawPrize ?? "nada").toString().toLowerCase();
           let badgeClass = "badge ";
-          if (premio === "200") badgeClass += "p200";
+          if (premio === "200" || premio === "p200") badgeClass += "p200";
           else if (premio === "gomita" || premio === "gomitas") badgeClass += "gomita";
+          else if (premio === "p50" || premio === "50") badgeClass += "p50";
           else badgeClass += "nada";
 
           li.innerHTML = `
-            <span class="code">${x.codigo || "—"}</span>
-            <span class="phone">${x.telefono || "—"}</span>
-            <span class="${badgeClass}">${premio==='200'?'$200':(premio||'sin premio')}</span>
+            <span class="code">${x.codigo ?? x.code ?? "—"}</span>
+            <span class="phone">${x.telefono ?? x.phone ?? "—"}</span>
+            <span class="${badgeClass}">${premio==='200'||premio==='p200'?'$200':(premio||'sin premio')}</span>
             <span class="ts">${fmtFecha(x.createdAt)}</span>
           `;
-        } else if (boveda === "triple3") {
-          const codes = Array.isArray(x.codes) ? x.codes : [];
-          const prizeKey = (x.result || "").toString().toUpperCase();
+        }
+
+        if (boveda === "triple3") {
+          const codes = Array.isArray(x.codes) ? x.codes : [x.codigo1, x.codigo2, x.codigo3].filter(Boolean);
+          const prizeKey = (x.result || x.resultado || "").toString().toUpperCase();
           let badgeClass = "badge ", label = "pendiente";
           if (prizeKey === "P300"){ badgeClass += "p300"; label = "$300"; }
           else if (prizeKey === "GOMI"){ badgeClass += "gomita"; label = "gomitas"; }
@@ -461,176 +420,170 @@
             <span class="code">${codes[1] || "—"}</span>
             <span style="opacity:.6">+</span>
             <span class="code">${codes[2] || "—"}</span>
-            <span class="phone">${x.phone || x.telefono || "—"}</span>
+            <span class="phone">${x.phone ?? x.telefono ?? "—"}</span>
             <span class="${badgeClass}">${label}</span>
             <span class="ts">${fmtFecha(x.createdAt)}</span>
           `;
-        } else if (boveda === "super") {
-          const premio = (x.finalPrize || x.rawPrize || "nada").toString().toLowerCase();
-          let badgeClass = "badge ";
-          let label = "sin premio";
+        }
+
+        if (boveda === "mitico") {
+          const premioRaw = (x.finalPrize ?? x.rawPrize ?? "nada").toString().toLowerCase();
+          let badgeClass = "badge ", label = "sin premio";
+          if (premioRaw === "p1000"){ badgeClass += "p1000"; label = "$1000"; }
+          else if (premioRaw === "p500"){ badgeClass += "p500"; label = "$500"; }
+          else if (premioRaw === "p200"){ badgeClass += "p200"; label = "$200"; }
+          else if (premioRaw === "p50"){  badgeClass += "p50";  label = "$50"; } 
+          else if (premioRaw === "gomita" || premioRaw === "gomitas"){ badgeClass += "gomita"; label = "gomitas"; }
+          else { badgeClass += "nada"; }
+
+          li.innerHTML = `
+            <span class="phone">${x.telefono ?? x.phone ?? "—"}</span>
+            <span class="${badgeClass}">${label}</span>
+            <span class="ts">${fmtFecha(x.createdAt)}</span>
+          `;
+        }
+
+        if (boveda === "super") {
+          const premio = (x.finalPrize ?? x.rawPrize ?? "nada").toString().toLowerCase();
+          let badgeClass = "badge ", label = "sin premio";
           if (premio === "p1500"){ badgeClass += "p1500"; label = "$1500"; }
           else if (premio === "p500"){ badgeClass += "p500"; label = "$500"; }
           else if (premio === "p200"){ badgeClass += "p200"; label = "$200"; }
           else if (premio === "p50"){  badgeClass += "p50";  label = "$50"; } 
-          else if (premio === "gomita"){ badgeClass += "gomita"; label = "gomitas"; }
+          else if (premio === "gomita" || premio === "gomitas"){ badgeClass += "gomita"; label = "gomitas"; }
           else { badgeClass += "nada"; }
 
           li.innerHTML = `
             <span class="code">${x.codigo1 || "—"}</span>
             <span style="opacity:.6">+</span>
             <span class="code">${x.codigo2 || "—"}</span>
-            <span class="phone">${x.telefono || "—"}</span>
+            <span class="phone">${x.telefono ?? x.phone ?? "—"}</span>
             <span class="${badgeClass}">${label}</span>
             <span class="ts">${fmtFecha(x.createdAt)}</span>
           `;
-        } else {
-          if (!x.telefono) return;
-          li.innerHTML = `
-            <span class="code">${x.codigo || "—"}</span>
-            <span class="phone">${x.telefono}</span>
-            <span class="ts">${fmtFecha(x.registrado)}</span>
-          `;
         }
+
         frag.appendChild(li);
       });
+
       ul.innerHTML = "";
       ul.appendChild(frag);
 
       if (boveda === "super") await cargarStatsSuper();
-    }
-
-    // Conteo para el Súper juego: códigos usados y jugadas
-    async function cargarStatsSuper(){
-      const stats = document.getElementById("super-stats");
-      try{
-        const qCodes = query(
-          collection(db,"codigos"),
-          where("usadoEn","==","MegaJuego7x7")
-        );
-        const codesCountSnap = await getCountFromServer(qCodes);
-        const codigosUsados = Number(codesCountSnap.data().count || 0);
-
-        const playsCountSnap = await getCountFromServer(query(collection(db,"mega7x7_plays")));
-        const jugadasRegistradas = Number(playsCountSnap.data().count || 0);
-
-        const jugadasCalculadas = Math.floor(codigosUsados / 2);
-
-        stats.textContent = `Códigos usados: ${codigosUsados} · Jugadas (códigos/2): ${jugadasCalculadas} · Registradas: ${jugadasRegistradas}`;
-      }catch(e){
-        console.error(e);
-        stats.textContent = "No se pudieron cargar los conteos";
+    }catch(err){
+      showError(ul, err);
+      if (/Missing or insufficient permissions/i.test(err?.message || "")) {
+        // El clásico: reglas de Firestore no dejan leer
+        const hint = CARD[boveda]?.querySelector(".vap");
+        if (hint) hint.textContent = "Sin permisos de lectura (revisa reglas de Firestore).";
       }
     }
+  }
 
-    async function eliminarDocumentos(boveda, tipo) {
-      let ref, q;
-      if (boveda === "minijuego") {
-        ref = collection(db, "minijuego_plays");
-        if (tipo === "ultimos") {
-          const cantidad = LIMITE_POR_BOVEDA[boveda] || 200;
-          q = query(ref, orderBy("createdAt","desc"), limit(cantidad));
-        } else {
-          q = query(ref);
-        }
-      } else if (boveda === "triple3") {
-        ref = collection(db, "triple3_plays");
-        if (tipo === "ultimos") {
-          const cantidad = LIMITE_POR_BOVEDA[boveda] || 200;
-          q = query(ref, orderBy("createdAt","desc"), limit(cantidad));
-        } else {
-          q = query(ref);
-        }
-      } else if (boveda === "super") {
-        ref = collection(db, "mega7x7_plays");
-        if (tipo === "ultimos") {
-          const cantidad = LIMITE_POR_BOVEDA[boveda] || 200;
-          q = query(ref, orderBy("createdAt","desc"), limit(cantidad));
-        } else {
-          q = query(ref);
-        }
-      } else {
-        ref = collection(db, boveda);
-        if (tipo === "ultimos") {
-          const cantidad = LIMITE_POR_BOVEDA[boveda] || 100;
-          q = query(ref, orderBy("registrado","desc"), limit(cantidad));
-        } else {
-          q = query(ref);
-        }
-      }
+  // Conteo para el Súper juego: códigos usados y jugadas
+  async function cargarStatsSuper(){
+    const stats = document.getElementById("super-stats");
+    try{
+      const qCodes = query(collection(db,"codigos"), where("usadoEn","==","MegaJuego7x7"));
+      const codesCountSnap = await getCountFromServer(qCodes);
+      const codigosUsados = Number(codesCountSnap.data().count || 0);
 
-      const snap = await getDocs(q);
-      if (snap.empty) return 0;
+      const playsCountSnap = await getCountFromServer(query(collection(db,"mega7x7_plays")));
+      const jugadasRegistradas = Number(playsCountSnap.data().count || 0);
 
-      let count = 0;
-      for (const d of snap.docs) {
-        const col = (boveda === "minijuego") ? "minijuego_plays" :
-                    (boveda === "triple3")   ? "triple3_plays"   :
-                    (boveda === "super")     ? "mega7x7_plays"   : boveda;
-        await deleteDoc(doc(db, col, d.id));
-        count++;
-      }
-      return count;
+      const jugadasCalculadas = Math.floor(codigosUsados / 2);
+      stats.textContent = `Códigos usados: ${codigosUsados} · Jugadas (códigos/2): ${jugadasCalculadas} · Registradas: ${jugadasRegistradas}`;
+    }catch(e){
+      console.error(e);
+      stats.textContent = "No se pudieron cargar los conteos";
     }
+  }
 
-    // Modal control
-    let bovedaSeleccionada = "";
-    let tipoEliminacion = "";
+  async function eliminarDocumentos(boveda, tipo) {
+    const col = boveda === "minijuego" ? "minijuego_plays"
+             : boveda === "triple3"   ? "triple3_plays"
+             : boveda === "mitico"    ? "mitico_plays"
+             : boveda === "super"     ? "mega7x7_plays"
+             : null;
+    if (!col) return 0;
 
-    window.confirmarEliminacion = function(boveda, tipo){
-      bovedaSeleccionada = boveda;
-      tipoEliminacion = tipo;
+    const ref = collection(db, col);
+    const cantidad = LIMITE_POR_BOVEDA[boveda] || 200;
+    const q = (tipo === "ultimos")
+      ? query(ref, orderBy("createdAt","desc"), limit(cantidad))
+      : query(ref);
 
-      const limite = LIMITE_POR_BOVEDA[boveda] || 100;
-      const texto = (()=>{
-        const scope = boveda === 'minijuego' ? 'jugadas del Mini juego' :
-                      boveda === 'triple3'   ? 'jugadas de Triple 3' :
-                      boveda === 'super'     ? 'jugadas del Súper juego' :
-                      'la bóveda ' + boveda.toUpperCase();
-        return tipo === "ultimos"
-          ? `Vas a eliminar los últimos ${limite} registros de ${scope}.`
-          : `Vas a eliminar TODOS los registros actuales de ${scope}.`;
-      })();
+    const snap = await getDocs(q);
+    if (snap.empty) return 0;
 
-      document.getElementById("confirmTitle").textContent = "Confirmar eliminación";
-      document.getElementById("confirmText").textContent  = texto + " Esta acción no se puede deshacer.";
-      document.getElementById("overlay").style.display = "grid";
-    };
+    let count = 0;
+    for (const d of snap.docs) {
+      await deleteDoc(doc(db, col, d.id));
+      count++;
+    }
+    return count;
+  }
 
-    window.cerrarModal = function(){
-      document.getElementById("overlay").style.display = "none";
-    };
+  // Modal control
+  let bovedaSeleccionada = "";
+  let tipoEliminacion = "";
 
-    document.getElementById("confirmBtn").addEventListener("click", async ()=>{
-      const eliminados = await eliminarDocumentos(bovedaSeleccionada, tipoEliminacion).catch(err=>{
-        alert("No se pudo eliminar: " + (err?.message || "Error desconocido"));
-        return 0;
-      });
-      cerrarModal();
-      if (eliminados > 0) {
-        await cargarRegistros(bovedaSeleccionada);
-        if (bovedaSeleccionada === "super") await cargarStatsSuper();
-        // Feedback visual
-        const cardId = bovedaSeleccionada === 'minijuego' ? 'mini-card'
-                       : bovedaSeleccionada === 'triple3'  ? 'triple3-card'
-                       : bovedaSeleccionada === 'super'    ? 'super-card'
-                       : `${bovedaSeleccionada}-card`;
-        const card = document.getElementById(cardId);
-        card.style.boxShadow = "0 0 0 2px rgba(34,197,94,.35), 0 12px 40px rgba(0,0,0,.28)";
-        setTimeout(()=>{ card.style.boxShadow = "0 12px 40px rgba(0,0,0,.28)"; }, 800);
-      }
+  window.confirmarEliminacion = function(boveda, tipo){
+    bovedaSeleccionada = boveda;
+    tipoEliminacion = tipo;
+
+    const limite = LIMITE_POR_BOVEDA[boveda] || 200;
+    const scope = boveda === 'minijuego' ? 'jugadas del Mini juego'
+                  : boveda === 'triple3' ? 'jugadas de Triple 3'
+                  : boveda === 'mitico'  ? 'jugadas de Mítico'
+                  : 'jugadas del Súper juego';
+    const texto = tipo === "ultimos"
+      ? `Vas a eliminar los últimos ${limite} registros de ${scope}.`
+      : `Vas a eliminar TODOS los registros actuales de ${scope}.`;
+
+    document.getElementById("confirmTitle").textContent = "Confirmar eliminación";
+    document.getElementById("confirmText").textContent  = texto + " Esta acción no se puede deshacer.";
+    document.getElementById("overlay").style.display = "grid";
+  };
+
+  window.cerrarModal = function(){
+    document.getElementById("overlay").style.display = "none";
+  };
+
+  document.getElementById("confirmBtn").addEventListener("click", async ()=>{
+    const eliminados = await eliminarDocumentos(bovedaSeleccionada, tipoEliminacion).catch(err=>{
+      alert("No se pudo eliminar: " + (err?.message || "Error desconocido"));
+      return 0;
     });
+    cerrarModal();
+    if (eliminados > 0) {
+      await cargarRegistros(bovedaSeleccionada);
+      if (bovedaSeleccionada === "super") await cargarStatsSuper();
 
-    // Inicial
-    ["madera","cristal","plateada","dorada","minijuego","triple3","super"].forEach(cargarRegistros);
-    cargarStatsSuper();
-  </script>
-
-  <script>
-    function cerrarSesion(){
-      sessionStorage.removeItem("auth");
-      window.location.replace("index.html");
+      const cardId = bovedaSeleccionada === 'minijuego' ? 'mini-card'
+                   : bovedaSeleccionada === 'triple3'  ? 'triple3-card'
+                   : bovedaSeleccionada === 'mitico'   ? 'mitico-card'
+                   : 'super-card';
+      const card = document.getElementById(cardId);
+      card.style.boxShadow = "0 0 0 2px rgba(34,197,94,.35), 0 12px 40px rgba(0,0,0,.28)";
+      setTimeout(()=>{ card.style.boxShadow = "0 12px 40px rgba(0,0,0,.28)"; }, 800);
     }
-  </script>
+  });
+
+  // Inicial
+  ["minijuego","triple3","mitico","super"].forEach(cargarRegistros);
+  cargarStatsSuper();
+</script>
+<script>
+  // Hacerla global para que onclick la encuentre
+  window.cerrarSesion = function () {
+    try {
+      sessionStorage.removeItem("auth");
+      sessionStorage.clear(); // por si acaso
+    } catch (_) {}
+    window.location.replace("index.html");
+  };
+</script>
+
 </body>
 </html>

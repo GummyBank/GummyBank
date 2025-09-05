@@ -28,6 +28,9 @@ const CFG = {
   modalAfterMs: 420    // espera final antes de abrir el modal
 };
 
+// Umbrales por premio (cada N jugadas desde la última vez que salieron)
+const THRESH = { P300: 1000, GOMI: 3 };
+
 /* ======================= Helpers ======================= */
 const $ = id => document.getElementById(id);
 const keyToLabel = k => (k==="P300"?"$300":k==="GOMI"?"Gomitas":"10pts");
@@ -213,11 +216,11 @@ const phoneClose = $("tri-phone-close");
 /* ======================= Estado ======================= */
 let activeCells = [];      // botones en orden DOM
 let currentMapping = null; // ["P300","P10","GOMI"] respecto a activeCells
-let unlocked = false;
 let roundReady = false;
 let validatedCodes = null;
 let phoneNumber = null;
 let justPlayedId = null;
+let roundElig = { P300: false, GOMI: false }; // elegibilidad snapshot para la ronda
 
 /* ======================= Construcción de casillas ======================= */
 function setHidden(contentEl){
@@ -325,53 +328,90 @@ async function validateCodesOnly(c1,c2,c3){
   }
   return codes;
 }
+
 async function lockAndLogCodes(codes, phone){
   const metaRef = doc(db, CFG.metaDocPath);
-  const refs = codes.map(c=>doc(db, CFG.codesCol, c));
-  const { isUnlocked, playId, nextCount } = await runTransaction(db, async tx=>{
-    // LECTURAS
+  const refs = codes.map(c => doc(db, CFG.codesCol, c));
+
+  const { playId, nextTotalPlays, elig } = await runTransaction(db, async tx => {
+    // Leer meta y códigos
     const metaSnap = await tx.get(metaRef);
-    const meta = metaSnap.exists()? metaSnap.data():{ totalPlays:0 };
+    const meta = metaSnap.exists() ? metaSnap.data() : {
+      totalPlays: 0,
+      since300: 0, sinceGomi: 0,
+      wins300: 0,  winsGomi: 0
+    };
+
     const codeSnaps = [];
-    for(const r of refs){ codeSnaps.push({ref:r, snap:await tx.get(r)}); }
-    for(const {ref,snap} of codeSnaps){
-      if(!snap.exists()) throw new Error("Código no válido: " + ref.id);
-      const d=snap.data()||{};
-      if((d.estado||"").toLowerCase()==="usado") throw new Error("Código ya usado: " + ref.id);
+    for (const r of refs) codeSnaps.push({ ref: r, snap: await tx.get(r) });
+    for (const { ref, snap } of codeSnaps) {
+      if (!snap.exists()) throw new Error("Código no válido: " + ref.id);
+      const d = snap.data() || {};
+      if ((d.estado || "").toLowerCase() === "usado") throw new Error("Código ya usado: " + ref.id);
     }
-    // ESCRITURAS
-    const nextCount = (meta.totalPlays||0)+1;
-    const isUnlocked = (nextCount % 100 === 0);
-    tx.set(metaRef,{ totalPlays: nextCount, updatedAt: serverTimestamp() },{ merge:true });
-    for(const {ref} of codeSnaps){
-      tx.set(ref,{ estado:"usado", usadoEn: CFG.gameTag, telefono: phone, usadoAt: serverTimestamp() },{ merge:true });
+
+    // Marcar códigos como usados
+    for (const { ref } of codeSnaps) {
+      tx.set(ref, { estado: "usado", usadoEn: CFG.gameTag, telefono: phone, usadoAt: serverTimestamp() }, { merge: true });
     }
-    const preId = (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now())+Math.random().toString(16).slice(2);
+
+    // Elegibilidad según contadores actuales (antes de esta jugada)
+    const elig = {
+      P300: +(meta.since300 || 0) >= THRESH.P300,
+      GOMI: +(meta.sinceGomi || 0) >= THRESH.GOMI
+    };
+
+    // Registrar jugada "abierta" (sin resultado aún)
+    const preId = (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2);
     const playRef = doc(collection(db, CFG.playsCol), preId);
-    tx.set(playRef,{ createdAt: serverTimestamp(), codes, unlocked: isUnlocked, phone, result:null, pickIndex:null });
-    return { isUnlocked, playId: preId, nextCount };
+    tx.set(playRef, {
+      createdAt: serverTimestamp(),
+      codes, phone,
+      eligSnapshot: elig,
+      result: null,
+      pickIndex: null,
+      revealed: null
+    });
+
+    // Nota: totalPlays se incrementa al FINALIZAR la jugada, no aquí
+    return { playId: preId, nextTotalPlays: +(meta.totalPlays || 0), elig };
   });
-  return { isUnlocked, playId, nextCount };
+
+  return { playId, nextTotalPlays, elig };
 }
 
 /* ======================= Preparar ronda ======================= */
-async function setupRound(unlockedFlag){
-  unlocked = unlockedFlag;
+async function setupRound(elig){
+  roundElig = { ...elig };
 
-  // Mapping real (para logging)
-  currentMapping = unlocked ? (()=>{ const k=["P300","P10","GOMI"]; shuffleInPlace(k); return k; })()
-                            : ["P10","P10","P10"];
+  // Base: todo P10
+  const m = ["P10","P10","P10"];
+
+  // Si hay GOMI habilitado, asigna 1 casilla a GOMI
+  if (elig.GOMI) {
+    const i = (Math.random() * m.length) | 0;
+    m[i] = "GOMI";
+  }
+  // Si hay P300 habilitado, asigna 1 casilla a P300 (otra casilla distinta)
+  if (elig.P300) {
+    let idxs = [0,1,2].filter(i => m[i] === "P10");
+    const i = idxs[(Math.random() * idxs.length) | 0] ?? 0;
+    m[i] = "P300";
+  }
+
+  currentMapping = m.slice();
+  shuffleInPlace(currentMapping);
 
   // 1) Voltear a dorso oculto
   coverAllBacks();
   flipAllToBack();
 
-  // 2) Micro pausa + mezcla visible >= 2s
+  // 2) Mezcla visible
   await sleep(520);
   await mixFor(CFG.mixMs);
 
-  // 3) Listas para elegir
-  activeCells.forEach(c=>c.disabled=false);
+  // 3) Habilitar picks
+  activeCells.forEach(c => c.disabled = false);
   roundReady = true;
 }
 
@@ -395,16 +435,67 @@ async function revealOthersSequential(idx){
   const order = [0,1,2].filter(n=>n!==idx);
   for(const i of order){
     await sleep(CFG.revealGapMs);
-    // Si la ronda estaba bloqueada, “simulamos” mayores
-    if(!unlocked){
+    if (roundElig.P300 || roundElig.GOMI) {
+      // hay algo habilitado: revela mapping real
+      revealOne(i);
+    } else {
+      // sin nada habilitado: teatro visual
       const fake = (i===order[0]) ? "$300" : "Gomitas";
       const el = activeCells[i].querySelector(".back .content");
       setPrize(el, fake);
       themeCell(activeCells[i], fake);
-    }else{
-      revealOne(i);
     }
   }
+}
+
+/* ======================= Cierre de jugada (transacción) ======================= */
+async function finalizePlay(playId, rawKey, pickIndex, revealedArr){
+  const metaRef = doc(db, CFG.metaDocPath);
+  const playRef = doc(db, CFG.playsCol, playId);
+
+  const toLabel = k => k==="P300" ? "P300" : k==="GOMI" ? "GOMI" : "P10";
+
+  await runTransaction(db, async tx => {
+    const metaSnap = await tx.get(metaRef);
+    const meta = metaSnap.exists() ? metaSnap.data() : {
+      totalPlays: 0,
+      since300: 0, sinceGomi: 0,
+      wins300: 0,  winsGomi: 0
+    };
+
+    // Elegibilidad ACTUAL al cerrar
+    const eligNow = {
+      P300: +(meta.since300 || 0) >= THRESH.P300,
+      GOMI: +(meta.sinceGomi || 0) >= THRESH.GOMI
+    };
+
+    // Cascada: si eligió algo no habilitado, baja a lo permitido
+    function cascade(k, elig){
+      if (k === "P300") return elig.P300 ? "P300" : (elig.GOMI ? "GOMI" : "P10");
+      if (k === "GOMI") return elig.GOMI ? "GOMI" : "P10";
+      return "P10";
+    }
+    const finalKey = cascade(toLabel(rawKey), eligNow);
+
+    // Actualizar contadores: el que salió se resetea, los demás incrementan
+    const next = {
+      since300 : finalKey === "P300" ? 0 : +(meta.since300 || 0) + 1,
+      sinceGomi: finalKey === "GOMI" ? 0 : +(meta.sinceGomi || 0) + 1,
+      wins300  : +(meta.wins300 || 0) + (finalKey === "P300" ? 1 : 0),
+      winsGomi : +(meta.winsGomi || 0) + (finalKey === "GOMI" ? 1 : 0),
+      totalPlays: +(meta.totalPlays || 0) + 1,
+      updatedAt: serverTimestamp()
+    };
+
+    tx.set(metaRef, next, { merge: true });
+    tx.set(playRef, {
+      result: finalKey,                   // "P300" | "GOMI" | "P10"
+      pickIndex,
+      revealed: revealedArr,
+      eligAtClose: eligNow,
+      finishedAt: serverTimestamp()
+    }, { merge: true });
+  });
 }
 
 /* ======================= Click en una casilla ======================= */
@@ -435,13 +526,8 @@ async function onPick(cell){
   if(modal && !modal.open) modal.showModal();
 
   try{
-    if(justPlayedId){
-      await setDoc(doc(db, CFG.playsCol, justPlayedId), {
-        result: key,
-        pickIndex: idx,
-        revealed: currentMapping,
-        finishedAt: serverTimestamp()
-      }, { merge:true });
+    if (justPlayedId) {
+      await finalizePlay(justPlayedId, key, idx, currentMapping);
     }
   }catch(e){ console.warn("No se pudo cerrar la jugada:", e); }
 }
@@ -475,15 +561,17 @@ if(phoneOk){
 
     btnPlay && (btnPlay.disabled=true);
     try{
-      const { isUnlocked, playId, nextCount } = await lockAndLogCodes(validatedCodes, phoneNumber);
+      const { playId, nextTotalPlays, elig } = await lockAndLogCodes(validatedCodes, phoneNumber);
       justPlayedId = playId;
-      await setupRound(isUnlocked);
+      await setupRound(elig);
 
       const hint = $("tri-hint");
-      if(hint){
-        hint.textContent = isUnlocked
-          ? `Ronda desbloqueada (#${nextCount}): premios activos.`
-          : `Tirada #${nextCount}. Los premios mayores se activan cada 100.`;
+      if (hint) {
+        const parts = [];
+        parts.push(`Tirada #${nextTotalPlays + 1}`);
+        parts.push(elig.P300 ? "P300 activo" : "P300 en cola");
+        parts.push(elig.GOMI ? "Gomitas activo" : "Gomitas en cola");
+        hint.textContent = parts.join(" · ");
       }
     }catch(err){
       if(modalTitle) modalTitle.textContent = "⚠️ No se pudo jugar";
