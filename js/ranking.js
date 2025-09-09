@@ -14,7 +14,7 @@ const listado  = document.getElementById("listado");
 function renderTop(top3){
   topPodio.innerHTML = "";
   const medals = [
-    {cls:"m1", place:1, prize:"$500"},
+    {cls:"m1", place:1, prize:"$1000"},
     {cls:"m2", place:2, prize:"$200"},
     {cls:"m3", place:3, prize:"$100"},
   ];

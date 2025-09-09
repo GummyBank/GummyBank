@@ -438,6 +438,54 @@ header .gb-actions .bi:hover{ transform:translateY(-1px); text-shadow:0 0 14px r
   </form>
 </section>
 <!-- END RESEÑAS  -->
+<!-- ===== PROMO BAR · GANA $1000 ===== -->
+<div id="gb-promo" role="region" aria-label="Promoción">
+  <div class="gbp-inner">
+    <div class="gbp-left">
+      <span class="gbp-badge" aria-hidden="true">🔥</span>
+      <span class="gbp-text"><strong>Gana $1000</strong> solo por comprar</span>
+    </div>
+    <button id="gbp-cta" class="gbp-btn" type="button" aria-label="Ver ranking">Ver</button>
+  </div>
+</div>
+
+
+
+<!-- ================== MEMO ================== -->
+<div class="wrap">
+      <div class="hero">
+        <div class="neon-wrap">
+          <h1 class="neon">MEMORAMA</h1>
+        </div>
+        <div class="sub">1 oportunidad por código</div>
+      </div>
+
+      <div class="group">
+        <div class="group-inner">
+
+          <!-- TABLERO -->
+          <div class="panel-board">
+            <div id="MEM-board"></div>
+          </div>
+
+          <!-- CONTROLES: 2 códigos + botón -->
+          <!-- CONTROLES: 1 código + botón -->
+          <div class="panel-ctrl">
+            <div class="codebox">
+              <div class="input-wrap">
+                <div class="hint">Código</div>
+                <input id="mem-code" class="code-input" placeholder="XXXXXXXXXX">
+              </div>
+            </div>
+            <button id="mem-play" class="btn">Validar y jugar</button>
+            <div id="mem-msg" class="status">Ingresa tu código para jugar.</div>
+          </div>
+
+
+        </div>
+      </div>
+    </div>
+<!-- ================== END MEMO ================== -->
 <!-- ================== MEGA JUEGO ================== -->
 <section id="MG-juego">
   <style>
@@ -482,10 +530,12 @@ header .gb-actions .bi:hover{ transform:translateY(-1px); text-shadow:0 0 14px r
 }
 
   </style>
-  <div id="MG-head">
-    <img id="MG-title" src="img/gan201.png" alt="" height="70px">
-    <canvas id="MG-canvas"></canvas>
-  </div>
+ <div class="hero">
+        <div class="neon-wrap">
+          <h1 class="neon">PRIZE BOX</h1>
+        </div>
+        <div class="sub">1 oportunidad por 2 código</div>
+      </div>
 
   <!-- Shell 90% -->
   <section id="MG-shell">
@@ -663,10 +713,12 @@ header .gb-actions .bi:hover{ transform:translateY(-1px); text-shadow:0 0 14px r
 
 <!-- END CODE MEGA 5X5 -->
 <!-- ================= JUEGO 3x1 · TRIPLE 3 ================= -->
- <div id="MG-head">
-    <img id="MG-title" src="img/gan209.png" alt="" height="70px">
-    <canvas id="MG-canvas"></canvas>
-  </div>
+<div class="hero">
+        <div class="neon-wrap">
+          <h1 class="neon">3 X 3</h1>
+        </div>
+        <div class="sub">oportunidad por código</div>
+      </div>
 <section id="TRI-wrap">
   <header class="tri-head">
     
@@ -894,6 +946,9 @@ header .gb-actions .bi:hover{ transform:translateY(-1px); text-shadow:0 0 14px r
     </div>
   </div>
 
+
+  <!-- Ancla para scroll del anuncio -->
+<div id="ranking"></div>
 
   <!-- ================== Ranking  ================== -->
 <header>
@@ -1167,16 +1222,18 @@ header .gb-actions .bi:hover{ transform:translateY(-1px); text-shadow:0 0 14px r
 </style>
 
 <script>
-  // ====== RUTAS (ajusta tus contraseñas y destinos) ======
-  const GB_ROUTES = {
-    admin:       { pass: '1234',     token: 'auth',           page: 'admin.html' },
-    panel:       { pass: '12345',    token: 'ventas_auth',    page: 'ventas.html' },
-    vendedor:    { pass: '123456',   token: 'vendedor_auth',  page: 'premios.html' },
-    registroven: { pass: '12345678', token: 'registro_auth',  page: 'registro-premios.html' },
-    resena:      { pass: '1',        token: 'resena_auth',    page: 'resenas.html' },
-    r:           { pass: '1',        token: 'resena_auth',    page: 'resenas.html' },
-    ranking:     { pass: '9999',     token: 'ranking_auth',   page: 'ranking-admin.html' }
-  };
+  /// ====== RUTAS (ajusta tus contraseñas y destinos) ======
+const GB_ROUTES = {
+  admin:       { pass: '1234',     token: 'auth',           page: 'admin.html' },
+  panel:       { pass: '12345',    token: 'ventas_auth',    page: 'ventas.html' },
+  vendedor:    { pass: '123456',   token: 'vendedor_auth',  page: 'premios.html' },
+  registroven: { pass: '12345678', token: 'registro_auth',  page: 'registro-premios.html' },
+  r:           { pass: '1',        token: 'resena_auth',    page: 'resenas.html' },
+  resena:      { pass: '1',        token: 'resena_auth',    page: 'resenas.html' },
+  ranking:     { pass: '9999',     token: 'ranking_auth',   page: 'ranking-admin.html' },
+  ven:         { pass: '22',       token: 'regventas_auth', page: 'vendedor1.html' }
+};
+
 
   (function(){
     const overlay = document.getElementById('gb-login-overlay');
@@ -1539,6 +1596,42 @@ header, main, section, footer, .vault, .gb-review-card{
 <!-- END FUTTER Y SPOTIFY -->
     </main>
 
+<!-- JS DE ANUNCIO-->
+    <script>
+  (function(){
+    const btn = document.getElementById('gbp-cta');
+    if(!btn) return;
+
+    function findRankingTarget(){
+      // 1) Ancla explícita si la pusiste
+      const a = document.getElementById('ranking');
+      if(a) return a;
+      // 2) Título/hero del ranking
+      const hero = document.querySelector('.rk-hero');
+      if(hero) return hero;
+      // 3) Donde se monta el top
+      const podio = document.getElementById('topPodio');
+      if(podio) return podio;
+      // 4) Último recurso: el primero <h1> que diga “Mejor Cliente”
+      const h1s = Array.from(document.querySelectorAll('h1'));
+      return h1s.find(h => /mejor\s+cliente/i.test(h.textContent || '')) || document.body;
+    }
+
+    btn.addEventListener('click', () => {
+      const target = findRankingTarget();
+      try{
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }catch(_){
+        // por si el navegador es dramático
+        window.location.hash = '#ranking';
+      }
+    }, { passive: true });
+  })();
+</script>
+
+
+    <!-- JS MEMO -->
+    <script type="module" src="js/memorama.game.js?v=1"></script>
     <!-- JS RESEÑAS -->
     <script type="module" src="js/review.js"></script>
     <!-- JS MEGA 5X5 -->
@@ -1566,6 +1659,11 @@ header, main, section, footer, .vault, .gb-review-card{
     }
   }, { once: true }); // solo la primera vez
 </script>
+
+<!-- RESET CODES --
+<button onclick="resetCodigos()">Resetear códigos</button>
+<script type="module" src="js/resetcodigos.js"></script>
+
 <!-- End Audio-->
   </body>
 </html>

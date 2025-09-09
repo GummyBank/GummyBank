@@ -13,7 +13,7 @@ const MT_IG_URL = IG_URL;
 
 const MT_TOTAL  = 25; // 5x5
 const MT_COUNTS = { p1000: 1, p500: 1, p200: 3, p50: 3, gomita: 8 };
-const MT_THRESH = { p1000: 100000, p500: 100000, p200: 10000, p50: 6, gomita: 4 };
+const MT_THRESH = { p1000: 100000, p500: 100000, p200: 10000, p50: 8, gomita: 5 };
 
 // Imagen de “oculto”
 const MT_HIDDEN_IMG = window.MT_HIDDEN_IMG || "img/casilla-oculta.png";

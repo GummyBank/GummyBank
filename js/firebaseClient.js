@@ -1,8 +1,8 @@
 // /js/firebaseClient.js
 import { initializeApp, getApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
-// Si quieres sobreescribir desde tu HTML, define window.firebaseConfig antes de cargar módulos
 const firebaseConfig = window.firebaseConfig || {
   apiKey: "AIzaSyAJJgDg5SUPvvHgPtDNhIy1f1fiGpBHBw",
   authDomain: "registro-gomitas.firebaseapp.com",
@@ -13,11 +13,8 @@ const firebaseConfig = window.firebaseConfig || {
   measurementId: "G-20KEW71X9G"
 };
 
-// Robusto contra “app/no-app” y contra doble init
-const app = (() => {
-  try { return getApp(); }              // si ya existe, úsalo
-  catch { return initializeApp(firebaseConfig); } // si no, créalo
-})();
+const app = (() => { try { return getApp(); } catch { return initializeApp(firebaseConfig); } })();
 
 export const db = getFirestore(app);
+export const auth = getAuth(app);   // ← ESTA LÍNEA ES LA QUE TE FALTA
 export default app;

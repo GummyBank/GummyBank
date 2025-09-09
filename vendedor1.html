@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Registro semanal · Ventas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      --bg:#0f1115; --panel:#11151d; --card:#151a23; --line:#243041;
+      --ink:#e7ecf3; --muted:#9fb0c9; --accent:#00bfff;
+      --ring: 0 0 22px rgba(0,191,255,.22), 0 0 56px rgba(0,191,255,.12);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,Segoe UI,Roboto,Arial}
+    .wrap{max-width:980px;margin:14px auto;padding:0 10px}
+    .title{display:flex;align-items:center;gap:8px;margin:0 0 10px}
+    .title h1{font-size:18px;margin:0}
+    .badge{font-size:11px;padding:4px 8px;border:1px solid var(--line);border-radius:999px;background:rgba(0,191,255,.08)}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.02), transparent), var(--card);
+      border:1px solid var(--line); border-radius:16px; box-shadow:var(--ring); overflow:hidden}
+    .card h2{margin:0;padding:12px 14px;font-size:15px;border-bottom:1px solid var(--line)}
+    .content{padding:12px}
+
+    /* Layout: mobile-first */
+    .grid{display:grid;grid-template-columns:1fr;gap:12px}
+    @media (min-width:760px){ .grid{grid-template-columns:1fr 1fr} }
+
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media (max-width:480px){ .row{grid-template-columns:1fr} }
+
+    .field{display:flex;flex-direction:column;gap:6px}
+    .field label{font-size:12px;color:var(--muted)}
+    input{background:#0f141e;border:1px solid #202a3b;color:var(--ink);
+      padding:12px;border-radius:12px;outline:none;font:inherit}
+    input[type="number"]{appearance:textfield}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .btn{border:1px solid var(--accent);background:linear-gradient(180deg, rgba(0,191,255,.12), rgba(0,191,255,.06));color:var(--ink);padding:12px 14px;border-radius:12px;cursor:pointer}
+    @media (max-width:480px){ .btn{width:100%} }
+
+    /* Tabla normal (≥720px) */
+    .table-wrap{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+    table{width:100%;border-collapse:collapse}
+    thead th{font-size:12px;color:var(--muted);text-align:left;background:#0f141e;padding:10px;border-bottom:1px solid var(--line)}
+    tbody td{padding:10px;border-bottom:1px dashed rgba(159,176,201,.2)}
+    tbody tr:last-child td{border-bottom:none}
+    tfoot td{padding:10px;background:#0f141e;border-top:1px solid var(--line);font-weight:700}
+    .num{text-align:right}
+
+    /* Modo tarjetas (≤720px): sin scroll lateral, 100% legible en 320px */
+    @media (max-width:720px){
+      .table-wrap{border:none}
+      table, thead, tfoot{display:none}
+      #cards{display:grid;gap:10px}
+      .card-row{
+        background:var(--card); border:1px solid var(--line); border-radius:12px; padding:10px;
+      }
+      .card-row .rday{font-weight:700;margin-bottom:6px}
+      .kv{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px dashed rgba(159,176,201,.2)}
+      .kv:first-of-type{border-top:none}
+      .kv .k{color:var(--muted);font-size:12px}
+    }
+
+    /* Totales compactos para móvil */
+    .totals{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+    .tot{background:#0f141e;border:1px solid var(--line);border-radius:12px;padding:10px}
+    .tot .k{color:var(--muted);font-size:12px}
+    .tot .v{font-weight:700;text-align:right}
+    @media (min-width:721px){ .totals{display:none} }
+
+    /* Toast simple */
+    .toast{
+      position:fixed;right:12px;bottom:12px;display:flex;gap:10px;align-items:center;
+      background:#0b1320;border:1px solid #22314a;color:var(--ink);
+      padding:10px 14px;border-radius:12px;box-shadow:var(--ring);opacity:0;transform:translateY(10px);
+      transition:.25s;z-index:9999
+    }
+    .toast.show{opacity:1;transform:translateY(0)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="title">
+      <h1>Registro semanal de ventas</h1>
+      <span id="weekBadge" class="badge">Semana actual</span>
+    </div>
+
+    <div class="grid">
+      <!-- FORM -->
+      <section class="card">
+        <h2>Captura del día</h2>
+        <div class="content">
+          <div class="row">
+            <div class="field">
+              <label for="vendidas">Bolsas vendidas</label>
+              <input id="vendidas" type="number" min="0" step="1" value="0" />
+            </div>
+            <div class="field">
+              <label for="regaladas">Bolsas regaladas</label>
+              <input id="regaladas" type="number" min="0" step="1" value="0" />
+            </div>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <div class="field">
+              <label for="efectivo">Dinero regalado (premios en efectivo)</label>
+              <input id="efectivo" type="number" min="0" step="1" value="0" />
+            </div>
+            <div class="field">
+              <label for="quedan">Bolsas que les quedan</label>
+              <input id="quedan" type="number" min="0" step="1" value="0" />
+            </div>
+          </div>
+          <div class="actions">
+            <button id="btnGuardar" class="btn">Registrar</button>
+            <button id="btnSemanaActual" class="btn">Semana actual</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- TABLA / TARJETAS -->
+      <section class="card">
+        <h2>Resumen Lunes a Viernes</h2>
+        <div class="content">
+          <div class="badge" id="weekLabel" style="display:inline-block;margin-bottom:8px">—</div>
+
+          <!-- modo tarjetas (móvil) -->
+          <div id="cards" style="display:none"></div>
+
+          <!-- modo tabla (desktop) -->
+          <div class="table-wrap">
+            <table id="table">
+              <thead>
+                <tr>
+                  <th>Día</th>
+                  <th class="num">Vendidas</th>
+                  <th class="num">Regaladas</th>
+                  <th class="num">Efectivo regalado</th>
+                  <th class="num">Quedan</th>
+                  <th class="num">Ganancia</th>
+                  <th class="num">A entregar</th>
+                </tr>
+              </thead>
+              <tbody id="tbody"></tbody>
+              <tfoot>
+                <tr>
+                  <td>Total</td>
+                  <td id="tVendidas" class="num">0</td>
+                  <td id="tRegaladas" class="num">0</td>
+                  <td id="tEfectivo" class="num">$0</td>
+                  <td id="tQuedan" class="num">0</td>
+                  <td id="tGanancia" class="num">$0</td>
+                  <td id="tEntregar" class="num">$0</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <!-- totales móviles -->
+          <div class="totals" id="totalsMobile" style="margin-top:10px">
+            <div class="tot"><div class="k">Vendidas</div><div id="mVendidas" class="v">0</div></div>
+            <div class="tot"><div class="k">Regaladas</div><div id="mRegaladas" class="v">0</div></div>
+            <div class="tot"><div class="k">Efectivo</div><div id="mEfectivo" class="v">$0</div></div>
+            <div class="tot"><div class="k">Quedan</div><div id="mQuedan" class="v">0</div></div>
+            <div class="tot"><div class="k">Ganancia</div><div id="mGanancia" class="v">$0</div></div>
+            <div class="tot"><div class="k">A entregar</div><div id="mEntregar" class="v">$0</div></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"><span id="toastMsg">Listo</span></div>
+
+  <script type="module">
+    // Firestore (solo db). Nada de auth.
+    import { db } from "./js/firebaseClient.js";
+    import { collection, addDoc, serverTimestamp, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    const COL = "registroSemanalVendedores";
+    const dayNames = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
+    const diasSemana = ["Lunes","Martes","Miércoles","Jueves","Viernes"];
+    const $ = s=>document.querySelector(s);
+
+    // Fechas util
+    function atMidnight(d){ const x = new Date(d); x.setHours(0,0,0,0); return x }
+    function getMonday(d){ const x=atMidnight(d); const g=x.getDay(); const diff=(g===0?-6:1-g); x.setDate(x.getDate()+diff); return x }
+    function isoDate(d){ return atMidnight(d).toISOString().slice(0,10) }
+    function weekLabel(mon){ const fri=new Date(mon); fri.setDate(fri.getDate()+4); return isoDate(mon)+" a "+isoDate(fri) }
+
+    // DOM
+    const vendidas = $("#vendidas");
+    const regaladas = $("#regaladas");
+    const efectivo  = $("#efectivo");
+    const quedan    = $("#quedan");
+    const btnGuardar = $("#btnGuardar");
+    const btnSemanaActual = $("#btnSemanaActual");
+    const weekLabelEl = $("#weekLabel");
+    const weekBadge = $("#weekBadge");
+
+    const tbody = $("#tbody");
+    const cards = $("#cards");
+    const table = $("#table");
+
+    const tVendidas = $("#tVendidas"), tRegaladas=$("#tRegaladas"), tEfectivo=$("#tEfectivo"),
+          tQuedan=$("#tQuedan"), tGanancia=$("#tGanancia"), tEntregar=$("#tEntregar");
+
+    // Totales móvil
+    const mVendidas=$("#mVendidas"), mRegaladas=$("#mRegaladas"), mEfectivo=$("#mEfectivo"),
+          mQuedan=$("#mQuedan"), mGanancia=$("#mGanancia"), mEntregar=$("#mEntregar");
+
+    const toast = $("#toast"), toastMsg=$("#toastMsg");
+
+    let currentMonday = getMonday(new Date());
+    let unsub = null;
+
+    function showToast(msg, ok=true){
+      toastMsg.textContent = msg;
+      toast.style.borderColor = ok ? "#224a33" : "#5a2a2a";
+      toast.classList.add("show");
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(()=>toast.classList.remove("show"), 2200);
+    }
+
+    // Guardar
+    btnGuardar.addEventListener("click", async ()=>{
+      try{
+        const today = new Date(), monday=getMonday(today);
+        const v = +vendidas.value||0, r=+regaladas.value||0, ef=+efectivo.value||0, q=+quedan.value||0;
+        const docData = {
+          date: isoDate(today),
+          dayName: dayNames[today.getDay()],
+          weekStart: isoDate(monday),
+          vendidas: v, regaladas: r, efectivoRegalado: ef, quedan: q,
+          ganancia: v*5, entregar: v*20 - ef,
+          createdAt: serverTimestamp()
+        };
+        await addDoc(collection(db, COL), docData);
+        vendidas.value=0; regaladas.value=0; efectivo.value=0; quedan.value=0;
+        showToast("Registro guardado.");
+      }catch(e){ console.error(e); showToast("Error al guardar. Reglas/credenciales.", false); }
+    });
+
+    // Render combinado (tabla desktop + tarjetas móvil)
+    function renderSemana(rows){
+      const byDay = {};
+      diasSemana.forEach(d=>byDay[d]={vendidas:0,regaladas:0,efectivo:0,quedan:0,ganancia:0,entregar:0});
+      rows.forEach(d=>{
+        if(diasSemana.includes(d.dayName)){
+          const x = byDay[d.dayName];
+          x.vendidas += d.vendidas||0;
+          x.regaladas += d.regaladas||0;
+          x.efectivo += d.efectivoRegalado||0;
+          x.quedan   += d.quedan||0;
+          x.ganancia += d.ganancia||0;
+          x.entregar += d.entregar||0;
+        }
+      });
+
+      // Tabla
+      tbody.innerHTML="";
+      const totals={vendidas:0,regaladas:0,efectivo:0,quedan:0,ganancia:0,entregar:0};
+      diasSemana.forEach(d=>{
+        const x = byDay[d];
+        totals.vendidas+=x.vendidas; totals.regaladas+=x.regaladas; totals.efectivo+=x.efectivo;
+        totals.quedan+=x.quedan; totals.ganancia+=x.ganancia; totals.entregar+=x.entregar;
+
+        const tr=document.createElement("tr");
+        tr.innerHTML = `
+          <td>${d}</td>
+          <td class="num">${x.vendidas}</td>
+          <td class="num">${x.regaladas}</td>
+          <td class="num">$${x.efectivo}</td>
+          <td class="num">${x.quedan}</td>
+          <td class="num">$${x.ganancia}</td>
+          <td class="num">$${x.entregar}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      tVendidas.textContent = totals.vendidas;
+      tRegaladas.textContent = totals.regaladas;
+      tEfectivo.textContent = "$"+totals.efectivo;
+      tQuedan.textContent = totals.quedan;
+      tGanancia.textContent = "$"+totals.ganancia;
+      tEntregar.textContent = "$"+totals.entregar;
+
+      // Tarjetas móvil
+      cards.innerHTML = "";
+      diasSemana.forEach(d=>{
+        const x = byDay[d];
+        const div = document.createElement("div");
+        div.className = "card-row";
+        div.innerHTML = `
+          <div class="rday">${d}</div>
+          <div class="kv"><span class="k">Vendidas</span><span>${x.vendidas}</span></div>
+          <div class="kv"><span class="k">Regaladas</span><span>${x.regaladas}</span></div>
+          <div class="kv"><span class="k">Efectivo</span><span>$${x.efectivo}</span></div>
+          <div class="kv"><span class="k">Quedan</span><span>${x.quedan}</span></div>
+          <div class="kv"><span class="k">Ganancia</span><span>$${x.ganancia}</span></div>
+          <div class="kv"><span class="k">A entregar</span><span>$${x.entregar}</span></div>
+        `;
+        cards.appendChild(div);
+      });
+
+      // Totales móvil
+      mVendidas.textContent = totals.vendidas;
+      mRegaladas.textContent = totals.regaladas;
+      mEfectivo.textContent  = "$"+totals.efectivo;
+      mQuedan.textContent    = totals.quedan;
+      mGanancia.textContent  = "$"+totals.ganancia;
+      mEntregar.textContent  = "$"+totals.entregar;
+
+      weekLabelEl.textContent = "Semana: " + weekLabel(currentMonday);
+      weekBadge.textContent   = "Semana: " + weekLabel(currentMonday);
+
+      // Mostrar/ocultar modos según ancho
+      const isMobile = window.matchMedia("(max-width: 720px)").matches;
+      cards.style.display = isMobile ? "grid" : "none";
+      table.style.display = isMobile ? "none" : "table";
+    }
+
+    function attachSnapshot(){
+      if(unsub) unsub();
+      const qy = query(collection(db, COL), where("weekStart","==", isoDate(currentMonday)));
+      unsub = onSnapshot(qy, snap=>{
+        const rows = snap.docs.map(d=>({id:d.id, ...d.data()}));
+        renderSemana(rows);
+      }, _=> showToast("No se pudo leer la semana.", false));
+    }
+
+    $("#btnSemanaActual").addEventListener("click", ()=>{
+      currentMonday = getMonday(new Date());
+      attachSnapshot();
+    });
+
+    // Redibujar al cambiar de tamaño (por si rota el teléfono)
+    window.addEventListener("resize", ()=>attachSnapshot());
+
+    attachSnapshot();
+  </script>
+</body>
+</html>
