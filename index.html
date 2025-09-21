@@ -7,6 +7,8 @@
     <link href="css/styles.css" rel="stylesheet" />
     <!-- Desaign Ranking-->
     <link href="css/ranking.css" rel="stylesheet" />
+    <!-- Desaign Mines-->
+    <link href="css/mines.css" rel="stylesheet" />
     <!-- Desaign Fondo-->
     <link rel="stylesheet" href="css/Fx.css">
     <!-- Desaign RESEÑAS -->
@@ -315,10 +317,42 @@ header .gb-actions .bi:hover{ transform:translateY(-1px); text-shadow:0 0 14px r
 }
       </style>
       <div class="animated-bag">
-        <img alt="Gummy Bank" src="img/titulo.jpg" id="logo-gummy-bank" />
+        <img alt="Gummy Bank" src="img/titull.jpg" id="logo-gummy-bank" />
       </div>
 
+      <!-- ===== PROMO BAR · GANA $1000 ===== -->
+<div id="gb-promo" role="region" aria-label="Promoción">
+  <div class="gbp-inner">
+    <div class="gbp-left">
+      <span class="gbp-badge" aria-hidden="true">🔥</span>
+      <span class="gbp-text"><strong>Gana $1000</strong> solo por comprar</span>
+    </div>
+    <button id="gbp-cta" class="gbp-btn" type="button" aria-label="Ver ranking">Ver</button>
+  </div>
+</div>
 
+ <main class="wrap">
+    <section class="mx-mines">
+      <header class="mx-head">
+        <div class="hero">
+        <div class="neon-wrap">
+          <h1 class="neon">GummyBOOM!!</h1>
+        </div>
+      </header>
+
+      <!-- Controles -->
+      <div class="mx-ctrl">
+        <input id="mx-code" maxlength="8" placeholder="Valida tu código" />
+        <button id="mx-play">Validar y jugar</button>
+      </div>
+
+      <!-- Layout: leyenda a la izquierda, tablero a la derecha -->
+      <div class="mx-wrap mx-fixed">
+        <aside id="mx-legend" class="mx-legend" aria-hidden="true"></aside>
+        <div id="MX-board" class="mx-board" aria-label="Tablero de minas"></div>
+      </div>
+    </section>
+  </main>
 
 
 <!-- ====== BARRA PROMO 40px CON COUNTDOWN A LAS 5:00 PM ====== 
@@ -438,18 +472,6 @@ header .gb-actions .bi:hover{ transform:translateY(-1px); text-shadow:0 0 14px r
   </form>
 </section>
 <!-- END RESEÑAS  -->
-<!-- ===== PROMO BAR · GANA $1000 ===== -->
-<div id="gb-promo" role="region" aria-label="Promoción">
-  <div class="gbp-inner">
-    <div class="gbp-left">
-      <span class="gbp-badge" aria-hidden="true">🔥</span>
-      <span class="gbp-text"><strong>Gana $1000</strong> solo por comprar</span>
-    </div>
-    <button id="gbp-cta" class="gbp-btn" type="button" aria-label="Ver ranking">Ver</button>
-  </div>
-</div>
-
-
 
 <!-- ================== MEMO ================== -->
 <div class="wrap">
@@ -712,7 +734,7 @@ header .gb-actions .bi:hover{ transform:translateY(-1px); text-shadow:0 0 14px r
 </div>
 
 <!-- END CODE MEGA 5X5 -->
-<!-- ================= JUEGO 3x1 · TRIPLE 3 ================= -->
+<!-- ================= JUEGO 3x1 · TRIPLE 3 ================= --
 <div class="hero">
         <div class="neon-wrap">
           <h1 class="neon">3 X 3</h1>
@@ -724,14 +746,14 @@ header .gb-actions .bi:hover{ transform:translateY(-1px); text-shadow:0 0 14px r
     
   </header>
 
-  <!-- Tablero 3x1 -->
+  <!-- Tablero 3x1 --
   <div id="TRI-board" class="tri-board" aria-label="Tablero 3x1">
     <!-- El JS inyecta 3 celdas .tri-cell -->
   </div>
 
 
   <!-- Tarjeta de códigos -->
-  <!-- ====== FORM TRIPLE3 (listo) ====== -->
+  <!-- ====== FORM TRIPLE3 (listo) ====== --
 <div class="tri-card">
   <p class="tri-sub" style="text-align:center">Usa 3 códigos para jugar. 1 premio por tirada.</p>
 
@@ -1633,7 +1655,8 @@ header, main, section, footer, .vault, .gb-review-card{
   })();
 </script>
 
-
+    <!-- JS MINES -->
+    <script type="module" src="js/mines.js"></script>
     <!-- JS MEMO -->
     <script type="module" src="js/memorama.game.js?v=1"></script>
     <!-- JS RESEÑAS -->
@@ -1664,7 +1687,7 @@ header, main, section, footer, .vault, .gb-review-card{
   }, { once: true }); // solo la primera vez
 </script>
 
-<!-- RESET CODES --
+<!-- RESET CODES -->
 <button onclick="resetCodigos()">Resetear códigos</button>
 <script type="module" src="js/resetcodigos.js"></script>
 

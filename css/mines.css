@@ -1,0 +1,330 @@
+/* ====== MINES (Gummy) ====== */
+.mx-mines{--ink:#e7ecf3;--muted:#9fb0c9;--gold:#f3c95a;--line:#243041;--ok:#22c55e;--warn:#f59e0b;--danger:#ef4444;
+  color:var(--ink);max-width:960px;margin:auto;padding:10px}
+.mx-head h2{margin:6px 0 2px;font-weight:1000;letter-spacing:.05em}
+#mx-status{margin:0;color:var(--muted)}
+.mx-ctrl{display:grid;grid-template-columns:1fr auto;gap:10px;margin:14px 0}
+#mx-code{background:#0e141b;border:1px solid #2a3950;border-radius:10px;color:#e8f1ff;font-weight:800;padding:12px 14px;letter-spacing:.08em}
+#mx-play{border:0;border-radius:10px;padding:12px 14px;cursor:pointer;background:linear-gradient(180deg,var(--gold),#ffd972);color:#2b1e00;font-weight:900}
+
+/* Tablero visible SIEMPRE */
+.mx-board{--cols:5; --rows:6; display:grid; gap:10px;
+  grid-template-columns:repeat(var(--cols),minmax(0,1fr));}
+.mx-cell{
+  position:relative; aspect-ratio:1/1; border-radius:14px; cursor:pointer;
+  border:1px solid rgba(243,201,90,.35);
+  background:
+    radial-gradient(120% 140% at 50% 35%, rgba(255,255,255,.06) 0%, rgba(255,255,255,0) 55%),
+    linear-gradient(160deg,#121518 0%,#1b2128 44%,#2b313a 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), inset 0 -2px 8px rgba(0,0,0,.5),
+              0 0 0 1px rgba(243,201,90,.25), 0 8px 16px rgba(0,0,0,.35);
+  display:grid; place-items:center; font-weight:1000; color:#cfe4d6; overflow:hidden;
+  transition:transform .12s ease, filter .12s ease, box-shadow .12s ease;
+}
+.mx-cell[disabled]{pointer-events:none; filter:saturate(.7)}
+.mx-cell.active{outline:2px solid rgba(243, 202, 90, 0)}
+.mx-cell.good{box-shadow:inset 0 0 0 2px rgba(34, 197, 94, 0), 0 0 24px rgba(34, 197, 94, 0.023)}
+.mx-cell.boom{box-shadow:inset 0 0 0 2px rgba(239, 68, 68, 0.049), 0 0 24px rgba(239, 68, 68, 0)}
+
+/* Iconos al revelar */
+.mx-cell.mine::before,
+.mx-cell.gift::before,
+.mx-cell.boom::before{
+  position:absolute; content:""; inset:auto; 
+  font-size:clamp(22px,6vw,34px); line-height:1;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,.35));
+}
+
+/* Bomba en minas (incluida la que tocaste) */
+.mx-cell.mine::before{ content:"💣"; }
+
+/* Regalo en seguras cuando se revela todo tras perder */
+.mx-cell.gift::before{ content:"🎁"; }
+
+/* Click en mina: muestra bomba con halo rojo */
+.mx-cell.boom::before{ 
+  content:"💣"; 
+  font-size:clamp(26px,7vw,40px);
+}
+.mx-cell.boom{
+  box-shadow:inset 0 0 0 2px rgba(239,68,68,.8),
+             0 0 26px rgba(239,68,68,.45);
+}
+
+/* Flip/baraja al inicio */
+.mx-cell.shuffle{animation:minesFlip .45s ease}
+@keyframes minesFlip{
+  0%{transform:rotateY(0) scale(1)}
+  50%{transform:rotateY(90deg) scale(.96)}
+  100%{transform:rotateY(0) scale(1)}
+}
+
+/* Chip de premio EN la casilla (siempre contenido) */
+.mx-chip{
+  position:absolute; left:8px; top:8px; z-index:2; pointer-events:none;
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:.42em .9em; border-radius:999px;
+  border:1px solid rgba(255,255,255,.95);
+  background:linear-gradient(180deg,#fff,#e9eef7 78%); color:#0b1220;
+  font-weight:1000; letter-spacing:.02em;
+  font-size:clamp(11px,3.2vw,16px);
+  max-width:86%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.95), 0 6px 16px rgba(0,0,0,.28);
+}
+.mx-chip::after{
+  content:""; display:block; width:38px; height:4px; border-radius:999px;
+  background:linear-gradient(90deg,rgba(255,255,255,.0),rgba(255,255,255,.7),rgba(255,255,255,0));
+  position:absolute; inset:auto 8px -6px auto; filter:blur(1px);
+}
+
+/* Cashout */
+.mx-cash{margin-top:12px; border:0; padding:12px 14px; border-radius:10px;background:#1f2937; color:#e5eefb; cursor:pointer}
+.mx-cash:disabled{opacity:.5; cursor:not-allowed}
+
+/* Estado listo para jugar (solo activa puntero) */
+.mx-ready .mx-board{pointer-events:auto}
+
+/* Layout: leyenda a la izquierda, tablero a la derecha */
+.mx-wrap{display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:start}
+@media (max-width:560px){ .mx-wrap{grid-template-columns:1fr; } }
+
+/* Leyenda (no clickeable) */
+.mx-legend{display:flex; flex-direction:column; gap:10px; pointer-events:none}
+.mx-step{
+  background:linear-gradient(180deg,#ffffff,#e9eef7 78%);
+  color:#0b1220; border:1px solid rgba(255,255,255,.9);
+  border-radius:999px; font-weight:1000; font-size:14px;
+  padding:.42em .9em; white-space:nowrap; box-shadow:0 6px 16px rgba(0,0,0,.18);
+}
+
+/* Tablero (sin chips adentro) */
+.mx-board{--cols:5; --rows:6; display:grid; gap:10px;
+  grid-template-columns:repeat(var(--cols),minmax(0,1fr));}
+.mx-cell{
+  position:relative; aspect-ratio:1/1; border-radius:14px; cursor:pointer; overflow:hidden;
+  border:1px solid rgba(243,201,90,.35);
+  background:
+    radial-gradient(120% 140% at 50% 35%, rgba(255,255,255,.06) 0%, rgba(255,255,255,0) 55%),
+    linear-gradient(160deg,#121518 0%,#1b2128 44%,#2b313a 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), inset 0 -2px 8px rgba(0,0,0,.5),
+              0 0 0 1px rgba(243,201,90,.25), 0 8px 16px rgba(0,0,0,.35);
+  transition:filter .12s ease, box-shadow .12s ease;
+}
+.mx-cell[disabled]{pointer-events:none; filter:saturate(.75)}
+.mx-cell.active{outline:2px solid rgba(243,201,90,.55)}
+.mx-cell.good{box-shadow:inset 0 0 0 2px rgba(34,197,94,.7), 0 0 20px rgba(34,197,94,.32)}
+.mx-cell.boom{box-shadow:inset 0 0 0 2px rgba(239,68,68,.85), 0 0 24px rgba(239,68,68,.42)}
+.mx-cell.mine::before,.mx-cell.gift::before,.mx-cell.boom::before{
+  position:absolute; content:""; font-size:clamp(22px,6vw,34px); line-height:1;
+  filter:drop-shadow(0 4px 10px rgba(0,0,0,.35));
+}
+.mx-cell.mine::before{content:"💣";}
+.mx-cell.gift::before{content:"🎁";}
+.mx-cell.boom::before{content:"💣"; font-size:clamp(26px,7vw,40px)}
+
+/* Brillo multicolor en la casilla elegida */
+.mx-cell.chosen::after{
+  content:""; position:absolute; inset:-2px; border-radius:16px; padding:2px;
+  background: conic-gradient(#ef444400,#f59f0b00,#fbbe2400,#22c55e00,#06b5d400);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  animation:mxSpin 1.8s linear infinite;
+}
+@keyframes mxSpin{ to{ transform:rotate(1turn); } }
+
+/* Flip inicial */
+.mx-cell.shuffle{animation:minesFlip .45s ease}
+@keyframes minesFlip{0%{transform:rotateY(0) scale(1)}50%{transform:rotateY(90deg) scale(.96)}100%{transform:rotateY(0) scale(1)}}
+/* ===== Layout lateral fijo para la leyenda ===== */
+.mx-wrap.mx-fixed{
+  display:flex !important;
+  gap:12px !important;
+  align-items:stretch !important;
+  overflow-x:auto;            /* si no cabe, desliza lateralmente */
+  box-sizing:border-box;
+}
+
+/* Leyenda: columna fija a la izquierda, NO clickeable */
+.mx-legend{
+  flex:0 0 200px !important;  /* ancho fijo de la leyenda */
+  display:grid !important;
+  grid-template-rows: repeat(var(--rows, 4), 1fr) !important; /* 4 filas = 4 premios */
+  gap:12px !important;
+  pointer-events:none;
+}
+.mx-step{
+  display:flex; align-items:center; justify-content:flex-start;
+  padding:0 14px; height:100%;
+  border-radius:999px;
+  background:linear-gradient(180deg,#ffffff,#e9eef7 78%);
+  color:#0b1220; border:1px solid rgba(255,255,255,.9);
+  font-weight:1000; font-size:14px; white-space:nowrap;
+  box-shadow:0 6px 16px rgba(0,0,0,.18);
+}
+
+/* Tablero: ocupa el resto del espacio */
+.mx-board{
+  --cols:5; --rows:4;
+  flex:1 1 auto !important;
+  display:grid !important;
+  gap:12px !important;
+  grid-template-columns: repeat(var(--cols), minmax(0,1fr)) !important;
+  min-width:280px;   /* evita que colapse si el contenedor es angosto */
+}
+
+/* Celdas (sigue igual, incluyo lo esencial por si tu CSS viejo pisa) */
+.mx-cell{
+  aspect-ratio:1/1; border-radius:14px; cursor:pointer; overflow:hidden;
+  border:1px solid rgba(243,201,90,.35);
+  background:
+    radial-gradient(120% 140% at 50% 35%, rgba(255,255,255,.06) 0%, rgba(255,255,255,0) 55%),
+    linear-gradient(160deg,#121518 0%,#1b2128 44%,#2b313a 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), inset 0 -2px 8px rgba(0,0,0,.5),
+              0 0 0 1px rgba(243,201,90,.25), 0 8px 16px rgba(0,0,0,.35);
+}
+.mx-cell[disabled]{pointer-events:none; filter:saturate(.75)}
+.mx-cell.active{outline:2px solid rgba(243,201,90,.55)}
+.mx-cell.good{box-shadow:inset 0 0 0 2px rgba(34,197,94,.7), 0 0 20px rgba(34,197,94,.32)}
+.mx-cell.boom{box-shadow:inset 0 0 0 2px rgba(239,68,68,.85), 0 0 24px rgba(239,68,68,.42)}
+.mx-cell.mine::before,.mx-cell.gift::before,.mx-cell.boom::before{
+  position:absolute; content:""; font-size:clamp(22px,6vw,34px); line-height:1;
+  filter:drop-shadow(0 4px 10px rgba(0,0,0,.35));
+}
+.mx-cell.mine::before{content:"💣";}
+.mx-cell.gift::before{content:"🎁";}
+.mx-cell.boom::before{content:"💣"; font-size:clamp(26px,7vw,40px)}
+.mx-cell.chosen::after{
+  content:""; position:absolute; inset:-2px; border-radius:16px; padding:2px;
+  background: conic-gradient(#ef444400,#f59f0b00,#fbbe2400,#22c55e00,#06b5d400);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  animation:mxSpin 1.8s linear infinite;
+}
+@keyframes mxSpin{ to{ transform:rotate(1turn); } }
+
+/* ===== Compactar TODO (leyenda + tablero + controles) ===== */
+:root{
+  --mx-scale: 0.90;        /* escala global del bloque (0.90 = 90%) */
+  --mx-legend-w: 150px;    /* ancho de la columna de premios */
+  --mx-gap: 8px;           /* separación entre celdas y entre filas de la leyenda */
+  --mx-chip-fs: 12px;      /* tamaño texto de premios */
+  --mx-cell-radius: 10px;  /* radios más chicos para las celdas */
+}
+
+/* En móviles muy angostos, encoge más y afina la leyenda */
+@media (max-width: 420px){
+  :root{ --mx-scale: 0.86; --mx-legend-w: 140px; }
+}
+@media (max-width: 370px){
+  :root{ --mx-scale: 0.80; --mx-legend-w: 125px; }
+}
+@media (max-width: 330px){
+  :root{ --mx-scale: 0.74; --mx-legend-w: 115px; }
+}
+
+/* Aplica la escala sin romper el layout */
+.mx-wrap.mx-fixed{
+  transform: scale(var(--mx-scale)) !important;
+  transform-origin: top left !important;
+  width: calc(100% / var(--mx-scale)) !important;   /* contrarresta el scale */
+  display:flex !important; gap: var(--mx-gap) !important;
+  align-items: stretch !important; overflow-x:hidden;
+}
+
+/* Leyenda lateral más compacta */
+.mx-legend{
+  flex: 0 0 var(--mx-legend-w) !important;
+  display:grid !important;
+  grid-template-rows: repeat(var(--rows, 4), 1fr) !important;
+  gap: var(--mx-gap) !important;
+  pointer-events:none;
+}
+.mx-step{
+  height:100%; padding: 0 10px; border-radius: 999px;
+  font-size: var(--mx-chip-fs); font-weight: 900;
+  background: linear-gradient(180deg,#ffffff,#e9eef7 78%);
+  color:#0b1220; border:1px solid rgba(255,255,255,.9);
+  box-shadow: 0 4px 12px rgba(0,0,0,.14);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* Tablero y celdas más apretados */
+.mx-board{
+  --cols:5; --rows:4;
+  flex:1 1 auto !important;
+  display:grid !important;
+  gap: var(--mx-gap) !important;
+  grid-template-columns: repeat(var(--cols), minmax(0,1fr)) !important;
+  min-width: 240px;
+}
+.mx-cell{
+  border-radius: var(--mx-cell-radius);
+}
+
+/* Iconos más chicos (bomba, regalo) */
+.mx-cell.mine::before,
+.mx-cell.gift::before,
+.mx-cell.boom::before{
+  font-size: clamp(18px, 5vw, 28px) !important;
+}
+.mx-cell.boom::before{ font-size: clamp(20px, 6vw, 32px) !important; }
+
+/* Controles arriba, versión compacta */
+.mx-ctrl{
+  grid-template-columns: 1fr auto !important;
+  gap: 8px !important; margin: 10px 0 !important;
+}
+#mx-code{ padding:10px 12px !important; font-size:14px !important; }
+#mx-play{ padding:10px 12px !important; font-size:14px !important; border-radius:10px !important; }
+
+/* Botón cashout compacto */
+#mx-cashout.mx-cash{ padding:10px 12px !important; border-radius:10px !important; }
+@media (max-width: 400px){
+  :root{ --mx-legend-w: 110px; }
+}
+@media (max-width: 360px){
+  :root{ --mx-legend-w: 100px; }
+}
+/* Modo preview: se ven las 💣 y 🎁 con menos fuerza para que se note que aún no juega */
+.mx-mines.mx-preview .mx-cell{ filter:saturate(.85); }
+.mx-mines.mx-preview .mx-cell.mine::before,
+.mx-mines.mx-preview .mx-cell.gift::before{ opacity:.65; }
+
+/* ——— Tapa 100% el brillo del tablero debajo del modal ——— */
+.mx-pop::before{
+  background: rgba(10,14,20,.75) !important;   /* un poco más opaco para cortar halos del fondo */
+  backdrop-filter: blur(2px);
+}
+
+.mx-pop .mx-dialog{
+  position: relative;
+  overflow: hidden;                             /* corta sombras que se “asoman” */
+  box-shadow: none !important;                  /* cero glow del propio modal */
+}
+
+/* Capa opaca interna que vuelve SÓLIDO el modal */
+.mx-pop .mx-dialog::before{
+  content: "";
+  position: absolute; inset: 0;
+  background: #0e141b;                          /* mismo color de tu modal */
+  z-index: 0;                                   /* va detrás del contenido */
+}
+
+/* Asegura que el contenido quede por encima de la capa opaca */
+.mx-pop .mx-dialog > *{
+  position: relative;
+  z-index: 1;
+}
+
+/* Header plano, SIN pseudo-elementos ni sombras */
+.mx-pop .mx-title,
+.mx-pop .mx-title::before,
+.mx-pop .mx-title::after{
+  background: none !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  content: none !important;
+}
+
+/* Opcional: reduce el glow del “acierto” del tablero */
+.mx-cell.good{ box-shadow: inset 0 0 0 2px rgba(249, 249, 249, 0.504); }  /* sin el 0 0 24px verde */

@@ -1,143 +1,271 @@
-
+// js/Fx.js — Casino minimal: paño + bokeh + glitter + naipes grandes.
+// Responsivo, con “zonas seguras” para que el fondo no distraiga detrás de la UI.
 (() => {
-  // ======= CONFIG =======
-  const CONFIG = {
-    bpm: 128,
-    fogColors: ['black','black','black'], // si quieres glow, usa colores neón aquí
-    laserColors: ['#00f7ff','#ff5bf7','#9dfcfe','#5bffb0'],
-    lasers: 10,
-    strobeIntensity: 0.65,
-    fogSpeed: 0.09,
-    laserSweepSpeed: 1.1,
-    noise: 1.0
-  };
+  const cvs = document.getElementById('fx');
+  if (!cvs) return;
+  const ctx = cvs.getContext('2d', { alpha: true });
 
-  // ======= Canvas =======
-  const canvas = document.getElementById('fx');
-  const ctx = canvas.getContext('2d');
-  let W, H, DPR;
+  // Cap de DPI para móviles
+  const DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+
+  // ================== CONFIG DINÁMICA ==================
+  function cfg() {
+    const w = innerWidth;
+    const small = w <= 420;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    return {
+      reduce,
+      maxFps: small ? 45 : 60,
+      feltHue: 140,
+      // densidades
+      bokeh: small ? 16 : 24,
+      glitter: small ? 22 : 34,
+      suits: small ? 8 : 12,
+      suitAlpha: 0.14,          // opacidad de naipes
+      vignette: 0.35,
+      // zonas a proteger
+      safeSelectors: ['.hero', '#gb-promo', '#MG-board-box', '#MEM-board', '.tri-card'],
+      safePad: 18,
+      safeStrength: 0.55
+    };
+  }
+  let CFG = cfg();
+
+  // ================== ESTADO ==================
+  let W = 0, H = 0, last = 0, anim = 0;
+  let bokeh = [], glitz = [], suits = [];
+
+  // ================== UTIL ==================
   function resize() {
-    DPR = Math.min(2, window.devicePixelRatio || 1);
-    W = canvas.width  = Math.floor(innerWidth  * DPR);
-    H = canvas.height = Math.floor(innerHeight * DPR);
-    canvas.style.width  = innerWidth  + 'px';
-    canvas.style.height = innerHeight + 'px';
+    const w = innerWidth, h = innerHeight;
+    cvs.width = Math.floor(w * DPR);
+    cvs.height = Math.floor(h * DPR);
+    cvs.style.width = w + 'px';
+    cvs.style.height = h + 'px';
+    W = cvs.width; H = cvs.height;
   }
-  addEventListener('resize', resize);
-  resize();
+  const R = (a,b) => a + Math.random() * (b - a);
+  function circle(x,y,r){ ctx.moveTo(x+r,y); ctx.arc(x,y,r,0,Math.PI*2); }
 
-  // ======= Utils =======
-  const R = (a,b)=> Math.random()*(b-a)+a;
-  const TAU = Math.PI*2;
+  // ================== FONDO (PAÑO) ==================
+  function drawFelt(){
+    const g = ctx.createRadialGradient(W*0.5, H*0.6, 0, W*0.5, H*0.6, Math.max(W,H)*0.9);
+    g.addColorStop(0, `hsla(${CFG.feltHue} 35% 12% / 1)`);
+    g.addColorStop(1, `hsla(${CFG.feltHue} 45% 7% / 1)`);
+    ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
 
-  // Noise 1D simple
-  const nsize = 512, p = new Array(nsize).fill(0).map(()=>Math.random());
-  const n1 = x => {
-    const i = Math.floor(x)%nsize, f = x - Math.floor(x);
-    const a = p[(i+nsize)%nsize], b = p[(i+1+nsize)%nsize];
-    const t = f*f*(3-2*f); return a*(1-t)+b*t;
-  };
-
-  // ======= Entidades =======
-  const blobs = CONFIG.fogColors.map((c,i)=>({
-    x:R(0.2,0.8), y:R(0.25,0.75), r:R(0.28,0.45), col:c, ph:R(0,1000)+i*33
-  }));
-
-  const lasers = Array.from({length:CONFIG.lasers}, (_,i)=>({
-    base:i/CONFIG.lasers, amp:R(0.18,0.5), sp:R(0.8,1.4)*CONFIG.laserSweepSpeed,
-    w:R(2.5,5)*DPR, col:CONFIG.laserColors[i%CONFIG.laserColors.length],
-    tilt:R(-0.4,0.4)
-  }));
-
-  // ======= Beat =======
-  let last = performance.now(), acc = 0;
-  const beatDur = 60000/CONFIG.bpm; // ms por beat
-  let beat = 0, running = true;
-
-  // ======= Helpers =======
-  function rgba(hex,a=1){
-    const c=hex.replace('#',''); const n=parseInt(c,16);
-    const r=(c.length===3?((n>>8)&0xF)*17:(n>>16)&255);
-    const g=(c.length===3?((n>>4)&0xF)*17:(n>>8)&255);
-    const b=(c.length===3? (n&0xF)*17: (n)&255);
-    return `rgba(${r},${g},${b},${a})`;
-  }
-
-  function fog(now){
-    // si fogColors son negros, esto prácticamente no se ve; déjalo por si luego cambias colores
-    ctx.globalCompositeOperation = 'screen';
-    for(const b of blobs){
-      const nx = n1(b.ph*0.003 + now*CONFIG.fogSpeed*0.0008) - 0.5;
-      const ny = n1(b.ph*0.004 + now*CONFIG.fogSpeed*0.0007) - 0.5;
-      const pul = 1 + 0.06*Math.sin(now*0.001 + b.ph);
-      const x=(b.x+nx*0.18)*W, y=(b.y+ny*0.18)*H, r=b.r*Math.max(W,H)*pul;
-
-      const g = ctx.createRadialGradient(x,y,r*0.08, x,y,r);
-      g.addColorStop(0, rgba(b.col, 0.95));
-      g.addColorStop(1, rgba(b.col, 0));
-      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,r,0,TAU); ctx.fill();
+    // textura sutil
+    ctx.globalAlpha = 0.06;
+    for (let i=0;i<2;i++){
+      const g2 = ctx.createRadialGradient(R(0,W), R(0,H), 0, R(0,W), R(0,H), R(200,520)*DPR);
+      g2.addColorStop(0, `hsla(${CFG.feltHue} 30% 30% / 1)`);
+      g2.addColorStop(1, `hsla(${CFG.feltHue} 40% 10% / 0)`);
+      ctx.fillStyle = g2;
+      ctx.beginPath(); circle(R(0,W), R(0,H), R(200,520)*DPR); ctx.fill();
     }
+    ctx.globalAlpha = 1;
+
+    // viñeta
+    const v = ctx.createRadialGradient(W/2, H/2, Math.min(W,H)*0.5, W/2, H/2, Math.max(W,H)*0.85);
+    v.addColorStop(0, 'rgba(0,0,0,0)');
+    v.addColorStop(1, `rgba(0,0,0,${CFG.vignette})`);
+    ctx.fillStyle = v; ctx.fillRect(0,0,W,H);
+  }
+
+  // ================== BOKEH (DESTELLOS GRANDES) ==================
+  function makeBokeh(n){
+    const arr = [];
+    for (let i=0;i<n;i++){
+      arr.push({
+        x: R(0, W),
+        y: R(0, H*0.9),
+        r: R(40, 120) * DPR,              // radios grandes
+        a: R(0, Math.PI*2),
+        s: R(0.002, 0.005),               // velocidad de “pulso”
+        drift: R(0.04, 0.10) * DPR * (Math.random()<0.5 ? -1 : 1),
+        hue: R(35, 55),                   // cálidos
+        alpha: R(0.06, 0.15)
+      });
+    }
+    return arr;
+  }
+  function drawBokeh(o, t){
+    const tw = (Math.sin(o.a + t*o.s) + 1) / 2; // 0..1
+    const Rr = o.r * (0.8 + tw*0.25);
+    const g = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, Rr);
+    g.addColorStop(0, `hsla(${o.hue} 80% 65% / ${o.alpha})`);
+    g.addColorStop(1, `hsla(${o.hue} 80% 45% / 0)`);
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.fillStyle = g; ctx.beginPath(); circle(o.x, o.y, Rr); ctx.fill();
     ctx.globalCompositeOperation = 'source-over';
+    o.x += o.drift;
+    if (o.x < -Rr) o.x = W + Rr;
+    if (o.x > W + Rr) o.x = -Rr;
   }
 
-  function beams(now){
-    lasers.forEach((L,i)=>{
-      const ph = Math.sin(now*0.001*L.sp + i)*0.5+0.5;
-      const cx = (L.base + L.amp*(ph-0.5))*W;
-      const angle = L.tilt + (ph-0.5)*0.5;
-      const w = L.w*(0.7 + 0.6*beat);
-      const wob = (n1(i*9.1 + now*0.002)-0.5) * CONFIG.noise * 80 * DPR;
-
-      ctx.save(); ctx.translate(cx, H*0.5); ctx.rotate(angle);
-
-      const grad = ctx.createLinearGradient(0,-H,0,H);
-      grad.addColorStop(0, rgba(L.col,0));
-      grad.addColorStop(0.5, rgba(L.col,0.98));
-      grad.addColorStop(1, rgba(L.col,0));
-      ctx.fillStyle = grad; ctx.globalCompositeOperation='screen';
-
-      ctx.beginPath();
-      ctx.moveTo(-w, -H + wob);
-      ctx.lineTo( w, -H - wob);
-      ctx.lineTo( w,  H + wob);
-      ctx.lineTo(-w,  H - wob);
-      ctx.closePath(); ctx.fill();
-
-      ctx.shadowBlur = 26*DPR; ctx.shadowColor = rgba(L.col,.9);
-      ctx.strokeStyle = rgba(L.col,.35); ctx.lineWidth = 1*DPR; ctx.stroke();
-
-      ctx.restore(); ctx.globalCompositeOperation='source-over';
-    });
+  // ================== GLITTER (PUNTOS DORADOS + GRANDES) ==================
+  function makeGlitter(n){
+    const arr = [];
+    for (let i=0;i<n;i++){
+      arr.push({
+        x: R(0,W), y: R(0,H),
+        r: R(1.2, 2.5) * DPR,             // más visibles
+        a: R(0, Math.PI*2),
+        v: R(0.02, 0.06),
+        life: R(2,6), t: R(0,6)
+      });
+    }
+    return arr;
+  }
+  function drawGlitter(g, dt){
+    g.t += dt;
+    if (g.t > g.life) { g.x = R(0,W); g.y = R(0,H); g.t = 0; }
+    const tw = (Math.sin(g.a + performance.now()*0.006)+1)/2;
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.fillStyle = `hsla(48 90% 65% / ${0.2 + tw*0.6})`;
+    ctx.beginPath(); circle(g.x, g.y, g.r*(0.8 + tw*0.8)); ctx.fill();
+    ctx.globalCompositeOperation = 'source-over';
+    g.a += g.v;
   }
 
-  function strobe(){
-    if(beat > 0.96){
-      ctx.fillStyle = `rgba(255,255,255,${CONFIG.strobeIntensity})`;
-      ctx.fillRect(0,0,W,H);
+  // ================== NAIPES (GRANDES + HALO SUAVE) ==================
+  function makeSuits(n){
+    const arr = [], pool = ['spade','heart','club','diamond'];
+    for (let i=0;i<n;i++){
+      arr.push({
+        type: pool[i % pool.length],
+        x: R(0, W), y: R(0, H),
+        s: R(28, 50) * DPR,               // más grandes
+        rot: R(0, Math.PI*2), vr: R(-0.002, 0.002),
+        vx: R(-0.06, 0.06) * DPR, vy: R(0.03, 0.08) * DPR,
+        alpha: CFG.suitAlpha
+      });
+    }
+    return arr;
+  }
+  function drawSuit(su){
+    ctx.save();
+    ctx.translate(su.x, su.y);
+    ctx.rotate(su.rot);
+
+    const s = su.s;
+    // halo dorado muy sutil
+    ctx.globalAlpha = su.alpha * 0.45;
+    const halo = ctx.createRadialGradient(0, 0, s*0.6, 0, 0, s*1.4);
+    halo.addColorStop(0, 'hsla(48 90% 60% / 0.25)');
+    halo.addColorStop(1, 'hsla(48 90% 60% / 0)');
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.fillStyle = halo;
+    ctx.beginPath(); circle(0, 0, s*1.35); ctx.fill();
+
+    // figura
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = su.alpha;
+    ctx.fillStyle = (su.type==='heart'||su.type==='diamond') ? 'hsla(0 80% 55% / 1)' : 'hsla(48 90% 60% / 1)';
+    ctx.beginPath();
+    switch(su.type){
+      case 'heart':
+        ctx.moveTo(0, s*0.3);
+        ctx.bezierCurveTo(s*0.8, -s*0.5,  s*0.6, -s*1.2, 0, -s*0.5);
+        ctx.bezierCurveTo(-s*0.6, -s*1.2, -s*0.8, -s*0.5, 0, s*0.3);
+        break;
+      case 'diamond':
+        ctx.moveTo(0, -s);
+        ctx.lineTo(s*0.75, 0);
+        ctx.lineTo(0, s);
+        ctx.lineTo(-s*0.75, 0);
+        ctx.closePath();
+        break;
+      case 'spade':
+        ctx.moveTo(0, -s);
+        ctx.bezierCurveTo(s*0.9, -s*0.2, s*0.7, s*0.6, 0, s*0.2);
+        ctx.bezierCurveTo(-s*0.7, s*0.6, -s*0.9, -s*0.2, 0, -s);
+        break;
+      case 'club':
+        circle(0, -s*0.55, s*0.45);
+        circle(s*0.45, -s*0.05, s*0.45);
+        circle(-s*0.45, -s*0.05, s*0.45);
+        break;
+    }
+    ctx.fill();
+    ctx.restore();
+
+    // movimiento leve
+    su.rot += su.vr;
+    su.x += su.vx; su.y += su.vy;
+
+    // respawn al salir
+    if (su.x < -100 || su.x > W+100 || su.y > H+100) {
+      const rep = makeSuits(1)[0];
+      Object.assign(su, rep);
     }
   }
 
-  // ======= Loop =======
-  function tick(now){
-    if(!running) { requestAnimationFrame(tick); return; }
-    const dt = now - last; last = now;
-    acc += dt; beat = (acc % beatDur) / beatDur;
+  // ================== ZONAS SEGURAS ==================
+  function maskSafe(){
+    ctx.save();
+    ctx.globalCompositeOperation = 'multiply';
+    const pad = CFG.safePad * DPR;
+    for (const sel of CFG.safeSelectors){
+      const el = document.querySelector(sel); if (!el) continue;
+      const r = el.getBoundingClientRect(); if (!r.width || !r.height) continue;
+      const x = (r.left - pad) * DPR;
+      const y = (r.top  - pad) * DPR;
+      const w = (r.width  + 2*pad) * DPR;
+      const h = (r.height + 2*pad) * DPR;
+      const g = ctx.createRadialGradient(x+w/2, y+h/2, Math.min(w,h)*0.35, x+w/2, y+h/2, Math.max(w,h)*0.65);
+      g.addColorStop(0, `rgba(0,0,0,${CFG.safeStrength})`);
+      g.addColorStop(1, `rgba(0,0,0,0)`);
+      ctx.fillStyle = g; ctx.fillRect(x,y,w,h);
+    }
+    ctx.restore();
+  }
 
-    // limpiar con desvanecido para conservar estelas
-    ctx.fillStyle = 'rgba(0,0,0,0.25)';
+  // ================== LOOP ==================
+  function start(){
+    cancelAnimationFrame(anim);
+    CFG = cfg();
+    resize();
+    drawFelt();
+
+    if (CFG.reduce) return; // fondo estático
+
+    bokeh = makeBokeh(CFG.bokeh);
+    glitz = makeGlitter(CFG.glitter);
+    suits = makeSuits(CFG.suits);
+    last = 0;
+    anim = requestAnimationFrame(loop);
+  }
+
+  function loop(ts){
+    const minDelta = 1000 / CFG.maxFps;
+    if (!last) last = ts;
+    const d = ts - last;
+    if (d < minDelta) { anim = requestAnimationFrame(loop); return; }
+    last = ts;
+
+    // “trail” suave
+    ctx.fillStyle = 'rgba(0,0,0,0.12)';
     ctx.fillRect(0,0,W,H);
 
-    fog(now);     // casi invisible con negro, pero listo por si cambias
-    beams(now);
-    strobe();
+    const t = ts * 0.001;
+    for (const o of bokeh) drawBokeh(o, t);
+    for (const g of glitz) drawGlitter(g, d * 0.001);
+    for (const s of suits) drawSuit(s);
 
-    requestAnimationFrame(tick);
+    maskSafe();
+    anim = requestAnimationFrame(loop);
   }
-  requestAnimationFrame(tick);
 
-  // Botón pausar/seguir
-  document.getElementById('toggle').addEventListener('click', ()=>{
-    running = !running;
-    if(running) last = performance.now();
-  });
+  // Ahorro de batería y responsivo
+  addEventListener('resize', ()=>{ clearTimeout(start._t); start._t = setTimeout(start, 150); });
+  document.addEventListener('visibilitychange', ()=>{ if (document.hidden) cancelAnimationFrame(anim); else start(); });
+
+  start();
+
+  // API mínima para ajustar en vivo si quieres
+  window.GB_FX = {
+    setSuitAlpha(a){ for (const s of suits) s.alpha = a; },
+    setSafeStrength(v){ CFG.safeStrength = Math.max(0, Math.min(1, v)); }
+  };
 })();

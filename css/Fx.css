@@ -1,9 +1,64 @@
+#fx{ position:fixed; inset:0; width:100vw; height:100vh; z-index:-2; pointer-events:none; }
+#lluvia-container{ position:fixed; inset:0; z-index:-1; pointer-events:none; }
+#gb-promo{ position:relative; z-index:20; }
+header, main, section, footer{ position:relative; z-index:1; }
+html, body{ overflow-x:clip; }
 
-/* El canvas siempre detrás */
-#fx{
-  position: fixed;
-  top:0; left:0;
-  width:100vw; height:100vh;
-  z-index:-1;
+/* ====== PARCHE: NO TOCAR EL BOTÓN CENTRAL ======
+   Deja el interior tal cual estaba y solo agrega aro/brillo externo. */
+
+/* 1) Reset total del botón interno (nada de fondo, bordes ni sombras) */
+#MEM-board .mem-btn{
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+/* También quita overlays que metían fondo en la cara trasera */
+#MEM-board .face.back::before{ 
+  background: none !important; 
+  box-shadow: none !important; 
+  opacity: 0 !important;
+}
+
+/* 2) Marco casino por fuera del botón (no afecta el centro) */
+#MEM-board .mem-cell{
+  position: relative;
+  border-radius: 20px;
+  overflow: visible; /* para que el aro respire sin cortar el botón */
+}
+
+/* Aro de latón */
+#MEM-board .mem-cell::before{
+  content:"";
+  position:absolute; inset: -6px;
+  border-radius: 24px;
+  border: 1px solid rgba(243,201,90,.55);
+  box-shadow:
+    0 0 0 2px rgba(0,0,0,.8) inset,
+    0 0 18px rgba(243,201,90,.18),
+    0 8px 24px rgba(0,0,0,.35);
   pointer-events:none;
 }
+
+/* Halo suave dorado (muy sutil) */
+#MEM-board .mem-cell::after{
+  content:"";
+  position:absolute; inset:-10px;
+  border-radius: 28px;
+  background: radial-gradient(60% 60% at 50% 40%,
+               rgba(243,201,90,.16), rgba(243,201,90,0) 70%);
+  pointer-events:none;
+}
+
+/* 3) Hover solo al aro, el centro ni lo mira */
+#MEM-board .mem-cell:hover::before{
+  box-shadow:
+    0 0 0 2px rgba(0,0,0,.85) inset,
+    0 0 24px rgba(243,201,90,.28),
+    0 12px 30px rgba(0,0,0,.42);
+}
+
+/* 4) Mantén las fichas/chips tal cual (sin cambios) */
+#MEM-board .chip{ /* no tocar */ }
